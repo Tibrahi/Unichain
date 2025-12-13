@@ -13,6 +13,7 @@
   "dependencies": {
     "@lucid-evolution/lucid": "^0.4.29",
     "dotenv": "^17.2.3",
+    "express": "^5.2.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },

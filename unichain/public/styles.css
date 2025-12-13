@@ -1,0 +1,350 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: #0d0d0d;
+  color: #e0e0e0;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+nav {
+  background: #000;
+  padding: 1rem 0;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #fff;
+}
+
+.nav-button {
+  background: #fff;
+  color: #000;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  background: #ccc;
+  transform: translateY(-2px);
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #111, #000);
+  padding: 160px 0 100px;
+  text-align: center;
+}
+
+.hero-section h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  animation: fadeInUp 1s ease;
+}
+
+.hero-section p {
+  font-size: 1.3rem;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  color: #aaa;
+  animation: fadeInUp 1.2s ease;
+}
+
+.cta-button {
+  background: #fff;
+  color: #000;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  animation: fadeInUp 1.4s ease;
+}
+
+.cta-button:hover {
+  background: #ddd;
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+}
+
+.content-section {
+  padding: 100px 0;
+}
+
+.content-section h2 {
+  text-align: center;
+  font-size: 2.8rem;
+  margin-bottom: 3rem;
+  animation: fadeIn 1s ease;
+}
+
+.problem-grid, .features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.problem-item, .card {
+  background: #111;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #222;
+  transition: all 0.4s ease;
+}
+
+.problem-item:hover, .card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+  border-color: #444;
+}
+
+.card button {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.card button:hover {
+  background: #444;
+  transform: translateY(-3px);
+}
+
+.team-tabs {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.team-tabs input {
+  display: none;
+}
+
+.team-tabs label {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: #111;
+  margin-right: 0.5rem;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.team-tabs label:hover {
+  background: #222;
+}
+
+.team-tabs input:checked + label {
+  background: #222;
+  color: #fff;
+}
+
+.team-content {
+  display: none;
+  background: #111;
+  padding: 2rem;
+  border-radius: 0 8px 8px 8px;
+  border: 1px solid #222;
+  animation: fadeIn 0.6s ease;
+}
+
+#tab-1:checked ~ #content-1,
+#tab-2:checked ~ #content-2,
+#tab-3:checked ~ #content-3 {
+  display: block;
+}
+
+.faq-item {
+  background: #111;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #222;
+  overflow: hidden;
+}
+
+.faq-item summary {
+  padding: 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.faq-item summary:hover {
+  background: #1a1a1a;
+}
+
+.faq-item p {
+  padding: 0 1.5rem 1.5rem;
+  color: #bbb;
+}
+
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin: 4rem 0;
+  position: relative;
+}
+
+.roadmap-step {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 800px;
+  animation: fadeInUp 0.8s ease backwards;
+}
+
+.roadmap-step:nth-child(1) { animation-delay: 0.2s; }
+.roadmap-step:nth-child(3) { animation-delay: 0.4s; }
+.roadmap-step:nth-child(5) { animation-delay: 0.6s; }
+.roadmap-step:nth-child(7) { animation-delay: 0.8s; }
+.roadmap-step:nth-child(9) { animation-delay: 1s; }
+
+.step-number {
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+}
+
+.step-content {
+  background: #111;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #222;
+  flex: 1;
+}
+
+.step-content h3 {
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.roadmap-line {
+  width: 4px;
+  height: 80px;
+  background: #333;
+  margin: 0 auto;
+}
+
+.vulnerable-note {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+}
+
+footer {
+  background: #000;
+  padding: 3rem 0;
+  text-align: center;
+  color: #777;
+}
+
+.footer-links a {
+  color: #aaa;
+  text-decoration: none;
+  margin: 0 1rem;
+}
+
+.footer-links a:hover {
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+  
+  .content-section h2 {
+    font-size: 2.2rem;
+  }
+  
+  .team-tabs label {
+    display: block;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+  }
+  
+  .roadmap-step {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .roadmap-line {
+    height: 40px;
+  }
+}

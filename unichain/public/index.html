@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniChain - Instant Trust Infrastructure for Rwanda</title>
+    <link rel="stylesheet" href="styles.css"> 
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+</head>
+<body>
+
+    <nav>
+        <div class="container nav-content">
+            <div class="logo">UniChain.rw</div>
+            <ul class="nav-links">
+                <li><a href="#problem">Why Now?</a></li>
+                <li><a href="#solution">Your Benefits</a></li>
+                <li><a href="#team">Our Team</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#" class="nav-button" onclick="connectToBackend()">Login / Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="container">
+            <h1>Your Credentials. Your Control. Instant Verification.</h1>
+            <p>Skip the paper delays, eliminate fraud, and secure your financial future—all powered by a single, unified digital identity.</p>
+            <button class="cta-button" onclick="connectToBackend()">Get Started Today</button>
+        </div>
+    </header>
+
+    <main>
+        
+        <section id="problem" class="content-section">
+            <div class="container">
+                <h2>Why Is UniChain Essential Right Now?</h2>
+                <div class="problem-grid">
+                    <div class="problem-item">
+                        <h3>🔍 The End of Verification Delays</h3>
+                        <p>Waiting days for manual checks or dealing with paper documents (like AUCA's 2025 admissions process) slows down your career. UniChain makes verification instant.</p>
+                    </div>
+                    <div class="problem-item">
+                        <h3>🛡️ Stop Document Fraud Before It Starts</h3>
+                        <p>Active credential fraud (confirmed by RIB arrests in 2025 and tightened HEC rules) risks the trust in your valuable qualifications. We anchor your record securely.</p>
+                    </div>
+                    <div class="problem-item">
+                        <h3>💸 Secure Your Lending Agreements</h3>
+                        <p>Financial mismanagement (57% of SACCOs suffered losses) and the lack of enforceable digital agreements (like the Hakiza case) expose lenders and borrowers to massive risk. We automate trust.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solution" class="content-section solutions-section">
+            <div class="container">
+                <h2>Total Trust, Three Simple Benefits</h2>
+                <div class="features-grid">
+                    
+                    <div class="card">
+                        <h3>🎓 Benefit 1: Instant Proof of Education</h3>
+                        <p>Generate a tamper-proof digital credential that any employer or institution can verify instantly, anywhere in the world.</p>
+                        <button>Explore Credentials</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>🆔 Benefit 2: Your Secure Digital Passport</h3>
+                        <p>Leverage Rwanda's national Digital ID rollout to link your true identity to every transaction and credential.</p>
+                        <button>Manage Identity</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>💰 Benefit 3: Loans You Can Rely On</h3>
+                        <p>Use smart contracts to create agreements with automated repayment logic, bringing transparency and enforcement to lending.</p>
+                        <button>Secure Your Loans</button>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        
+        <section id="team" class="content-section team-section">
+    <div class="container">
+        <h2>Meet the Team Behind UniChain</h2>
+        <div class="team-tabs">
+            
+            <input type="radio" name="team-tab" id="tab-1" checked>
+            <label for="tab-1">Team Leader</label>
+            <div class="team-content" id="content-1">
+                <h3>Fabrice Ishimwe, Team Leader</h3>
+                <p>Fabrice coordinates the overall vision and execution of UniChain, ensuring seamless integration of blockchain technology with Rwanda's digital infrastructure needs.</p>
+            </div>
+
+            <input type="radio" name="team-tab" id="tab-2">
+            <label for="tab-2">Developer</label>
+            <div class="team-content" id="content-2">
+                <h3>Placide Shema, Developer</h3>
+                <p>Placide builds the core smart contracts and backend systems, focusing on secure, scalable blockchain solutions tailored for credential and lending applications.</p>
+            </div>
+
+            <input type="radio" name="team-tab" id="tab-3">
+            <label for="tab-3">Designer</label>
+            <div class="team-content" id="content-3">
+                <h3>Tuyizere Ibrahim, Designer</h3>
+                <p>Tuyizere crafts intuitive user interfaces and experiences, making UniChain accessible and trustworthy for all Rwandan users.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+        <section id="faq" class="content-section faq-section">
+            <div class="container">
+                <h2>Quick Facts & Frequently Asked Questions</h2>
+                
+                <details class="faq-item">
+                    <summary>Is my personal data stored on the UniChain platform?</summary>
+                    <p>No. UniChain uses a decentralized approach. Your personal data remains secured by NIDA, and we only store cryptographic proofs (hashes) of your credentials. You control who sees your data.</p>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>Who is responsible for issuing my digital credential?</summary>
+                    <p>The original issuer is responsible. For a diploma, it’s your university (e.g., AUCA). For a loan contract, it’s the lending institution (e.g., your SACCO). UniChain only verifies the authenticity of their issuance key.</p>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>How does this system stop financial fraud?</summary>
+                    <p>By using smart contracts, we automate loan agreements. This prevents human manipulation of ledgers—the primary cause of loss reported by 57% of SACCOs—and guarantees transparent repayment logic.</p>
+                </details>
+                
+            </div>
+        </section>
+
+        <section id="howitworks" class="content-section flow-section">
+    <div class="container">
+        <h2>How UniChain Works For You</h2>
+        <div class="roadmap">
+            <div class="roadmap-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Institution Issues Credential/Loan</h3>
+                    <p>University or SACCO issues your official digital document.</p>
+                </div>
+            </div>
+            <div class="roadmap-line"></div>
+            <div class="roadmap-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>You Bind to NIDA ID</h3>
+                    <p>Link the credential securely to your national Digital ID.</p>
+                </div>
+            </div>
+            <div class="roadmap-line"></div>
+            <div class="roadmap-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Secured on UniChain</h3>
+                    <p>Tamper-proof record stored on blockchain.</p>
+                </div>
+            </div>
+            <div class="roadmap-line"></div>
+            <div class="roadmap-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>You Share (1-Click)</h3>
+                    <p>Send verifiable proof to anyone instantly.</p>
+                </div>
+            </div>
+            <div class="roadmap-line"></div>
+            <div class="roadmap-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>Instant Verification</h3>
+                    <p>Employer or lender confirms authenticity in seconds.</p>
+                </div>
+            </div>
+        </div>
+        <p class="vulnerable-note">UniChain is the unified trust infrastructure that Rwanda needs, aligning perfectly with the nation's digital trajectory.</p>
+    </div>
+</section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 UniChain - Cardano Group 7 | Building Trust. Powering Rwanda's Future.</p>
+            <p class="footer-links"><a href="#problem">About</a> | <a href="#solution">Features</a> | <a href="#" onclick="connectToBackend()">Support</a></p>
+        </div>
+    </footer>
+
+    <script src="app.js">
+        function connectToBackend() {
+            // This is where your app.js logic will eventually be placed.
+            console.log("Initiating secure handshake...");
+            alert("Redirecting to the secure application login...");
+        }
+    </script>
+
+</body>
+</html>
