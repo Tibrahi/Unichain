@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniChain Verification Suite</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+</head>
+<body class="dark-mode">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">UniChain.rw</div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <header class="hero">
+            <h1>UniChain Verification Suite</h1>
+            <p>Instantly verify tamper-proof credentials, loans, and identities on the Cardano blockchain for Rwanda</p>
+        </header>
+
+        <div class="tab-controls">
+            <button class="tab-btn active" data-tab="education">🎓 Education Credential</button>
+            <button class="tab-btn" data-tab="loan">💰 Loan Agreement</button>
+            <button class="tab-btn" data-tab="identity">🆔 Digital ID Binding</button>
+            <button class="tab-btn" data-tab="general">🔗 General Verification</button>
+        </div>
+
+        <section id="education" class="tab-content active">
+            <div class="verification-panel">
+                <div class="info-block">
+                    <h2>How It Works: Credentials</h2>
+                    <p>Universities issue a tamper-proof digital record (Verifiable Credential) signed by their private key. This is stored securely, and only the *hash* is locked onto the Cardano blockchain.</p>
+                    <p class="unique-benefit"><strong>✅ Value:</strong> Eliminates fake degrees and long paper trails. Instant, global verification.</p>
+                    <h3>Exceptions & Info for You:</h3>
+                    <ul>
+                        <li>**What you see:** Verification confirms the Hash exists and was issued by the *correct entity* at a *specific time*.</li>
+                        <li>**What you DON'T see:** We don't store personal data (names, grades) on the public blockchain. Your privacy is safe.</li>
+                    </ul>
+                </div>
+                <div class="verify-block">
+                    <h2>Verify Education Credential</h2>
+                    <input type="text" id="tx-education" class="tx-hash-input" placeholder="Paste Cardano Transaction Hash (64 chars)" />
+                    <button class="verify-btn" data-output="output-education">Verify Now</button>
+                    <p class="sample-tx-area">Sample Tx: 
+                        <a href="#" class="sample-tx-link" data-target="tx-education" 
+                        data-hash="8ae88d7ee59eda5a7a95dd66e9cf123a89758f2ec31e73a5c65b4d9cf312f71c">
+                            8ae88d7e...312f71c
+                        </a>
+                    </p>
+                    <div id="output-education" class="output-area">Awaiting input...</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="loan" class="tab-content">
+            <div class="verification-panel reverse-layout">
+                <div class="info-block">
+                    <h2>How It Works: Loan Agreements</h2>
+                    <p>A legally-binding loan agreement's *digest* is processed via an on-chain smart contract (Plutus script) and recorded on Cardano.</p>
+                    <p class="unique-benefit"><strong>✅ Value:</strong> Prevents fraud losses and ensures transparent, enforceable terms for both lenders (SACCOs/Banks) and borrowers.</p>
+                    <h3>Exceptions & Info for You:</h3>
+                    <div class="agreement-note">
+                        <div class="warning">⚠️ **Disclaimer:** This tool verifies the cryptographic integrity and current on-chain *status* of the contract (e.g., active, paid, defaulted). **It is NOT financial advice, a credit score, or a substitute for legal due diligence.**</div>
+                        <label class="agreement-check">
+                            <input type="checkbox" id="loan-agree"> 
+                            I understand the terms and agree to verify for information purposes only.
+                        </label>
+                    </div>
+                </div>
+                <div class="verify-block">
+                    <h2>Verify Loan Agreement</h2>
+                    <input type="text" id="tx-loan" class="tx-hash-input" placeholder="Paste Cardano Transaction Hash (64 chars)" />
+                    <button class="verify-btn" disabled id="loan-verify-btn" data-output="output-loan">Verify (Agree first)</button>
+                    <div id="output-loan" class="output-area">Awaiting input...</div>
+                    <p class="sample-tx-area">Sample Tx: 
+                        <a href="#" class="sample-tx-link" data-target="tx-loan" 
+                        data-hash="0000000000000000000000000000000000000000000000000000000000000001">
+                            00000000...0000001
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="identity" class="tab-content">
+            <div class="verification-panel">
+                <div class="info-block">
+                    <h2>How It Works: Digital ID Binding</h2>
+                    <p>Links a user's NIDA Digital ID to a verifiable credential (Decentralized Identifier or DID). The link is cryptographically bound and recorded.</p>
+                    <p class="unique-benefit"><strong>✅ Value:</strong> Guarantees the verified transaction is tied to a real, unique national identity. Essential for KYC/AML compliance.</p>
+                    <h3>Exceptions & Info for You:</h3>
+                    <ul>
+                        <li>**Privacy:** We only verify the *binding* (Proof of Control), not the ID data itself.</li>
+                        <li>**Source:** ID verification relies on a trusted process with NIDA.</li>
+                    </ul>
+                </div>
+                <div class="verify-block">
+                    <h2>Verify Digital ID Binding</h2>
+                    <input type="text" id="tx-identity" class="tx-hash-input" placeholder="Paste Cardano Transaction Hash (64 chars)" />
+                    <button class="verify-btn" data-output="output-identity">Verify Now</button>
+                    <p class="sample-tx-area">Sample Tx: 
+                        <a href="#" class="sample-tx-link" data-target="tx-identity" 
+                        data-hash="1111111111111111111111111111111111111111111111111111111111111111">
+                            11111111...1111111
+                        </a>
+                    </p>
+                    <div id="output-identity" class="output-area">Awaiting input...</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="result-display-section hidden" id="persistent-result-section">
+            <h2 class="result-heading">🧾 Last Verification Result</h2>
+            <div class="result-summary">
+                <span id="result-status-icon"></span>
+                <span id="result-status-text"></span>
+            </div>
+            
+            <div class="result-table-container">
+                <table class="result-table">
+                    <tr>
+                        <th>Hash Used</th>
+                        <td id="res-hash"></td>
+                    </tr>
+                    <tr>
+                        <th>Type Verified</th>
+                        <td id="res-type"></td>
+                    </tr>
+                    <tr>
+                        <th>Issuer/Source</th>
+                        <td id="res-issuer"></td>
+                    </tr>
+                    <tr>
+                        <th>Blockchain Status</th>
+                        <td id="res-chain-status"></td>
+                    </tr>
+                    <tr>
+                        <th>Issue Date</th>
+                        <td id="res-date"></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            <p>UniChain: Building Rwanda's unified trust infrastructure (2025). Built on Cardano Preprod Testnet.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
