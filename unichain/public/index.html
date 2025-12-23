@@ -1,200 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniChain - Instant Trust Infrastructure for Rwanda</title>
-    <link rel="stylesheet" href="styles.css"> 
-<link rel="icon" type="image/svg+xml" href="logo.svg">
+    <title>UniChain | Rwanda's Digital Trust Layer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@lucid-evolution/lucid@0.4.29/dist/index.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="bg-[#050505] text-white antialiased selection:bg-blue-500/30">
 
-    <nav>
-        <div class="container nav-content">
-            <div class="logo">UniChain.rw</div>
-            <ul class="nav-links">
-                <li><a href="#problem">Why Now?</a></li>
-                <li><a href="#solution">Your Benefits</a></li>
-                <li><a href="#team">Our Team</a></li>
-                <li><a href="#faq">FAQ</a></li>
-                <li><a href="#" class="nav-button" onclick="connectToBackend()">Login / Sign Up</a></li>
-            </ul>
+    <nav class="fixed w-full z-[100] border-b border-white/5 bg-black/40 backdrop-blur-2xl">
+        <div class="max-w-7xl mx-auto px-6 h-24 flex justify-between items-center">
+            <div class="text-2xl font-black tracking-tighter uppercase italic">UniChain<span class="text-blue-500">.rw</span></div>
+            <div class="hidden md:flex gap-12 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
+                <a href="#howitworks" class="hover:text-blue-400 transition">Network</a>
+                <a href="#problem" class="hover:text-blue-400 transition">Problem</a>
+                <a href="#team" class="hover:text-blue-400 transition">Architects</a>
+            </div>
+            <button id="walletBtn" class="bg-blue-600 px-7 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-500 shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+                Connect Wallet
+            </button>
         </div>
     </nav>
 
-    <header class="hero-section">
-        <div class="container">
-            <h1>Your Credentials. Your Control. Instant Verification.</h1>
-            <p>Skip the paper delays, eliminate fraud, and secure your financial future—all powered by a single, unified digital identity.</p>
-            <button class="cta-button" onclick="connectToBackend()"><a  class="getstartedtoday" href="home.html">Started Today</a> </button>
+    <header class="relative h-screen flex items-center overflow-hidden border-b border-white/5">
+        <div id="hero-carousel" class="absolute inset-0 w-full h-full">
+            <div class="slide active absolute inset-0 flex items-center justify-center px-6">
+                <div class="max-w-6xl text-center">
+                    <h1 class="text-6xl md:text-[120px] font-black leading-[0.85] tracking-tighter uppercase mb-8">
+                        Agreements Without Enforcement <br><span class="text-blue-600">Solution.</span>
+                    </h1>
+                    <p class="text-lg text-gray-400 max-w-xl mx-auto mb-10">informal lending lacks identity-bound proof, leaving lenders with no way to recover funds when trust is broken.</p>
+                    <a href="pages/home.html" class="inline-block bg-white text-black px-12 py-5 rounded-full font-black text-sm uppercase tracking-widest hover:scale-105 transition-transform">Get Started</a>
+                </div>
+            </div>
+            <div class="slide absolute inset-0 flex items-center justify-center px-6 opacity-0">
+                <div class="max-w-6xl text-center">
+                    <h1 class="text-6xl md:text-[120px] font-black leading-[0.85] tracking-tighter uppercase mb-8">
+                        Rwanda’s Hidden Identity Crisis <br><span class="outline-text">mismanagement and manual bookkeeping.</span>
+                    </h1>
+                    <p class="text-lg text-gray-400 max-w-xl mx-auto mb-10">Despite digital progress, manual processes continue to slow down verification and expose records to fraud.</p>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-4 z-50">
+            <div class="indicator w-16 h-1 bg-white/10 overflow-hidden"><div class="fill h-full bg-blue-600 w-0"></div></div>
+            <div class="indicator w-16 h-1 bg-white/10 overflow-hidden"><div class="fill h-full bg-blue-600 w-0"></div></div>
         </div>
     </header>
 
-    <main>
-        
-        <section id="problem" class="content-section">
-            <div class="container">
-                <h2>Why Is UniChain Essential Right Now?</h2>
-                <div class="problem-grid">
-                    <div class="problem-item">
-                        <h3>🔍 The End of Verification Delays</h3>
-                        <p>Waiting days for manual checks or dealing with paper documents (like AUCA's 2025 admissions process) slows down your career. UniChain makes verification instant.</p>
-                    </div>
-                    <div class="problem-item">
-                        <h3>🛡️ Stop Document Fraud Before It Starts</h3>
-                        <p>Active credential fraud (confirmed by RIB arrests in 2025 and tightened HEC rules) risks the trust in your valuable qualifications. We anchor your record securely.</p>
-                    </div>
-                    <div class="problem-item">
-                        <h3>💸 Secure Your Lending Agreements</h3>
-                        <p>Financial mismanagement (57% of SACCOs suffered losses) and the lack of enforceable digital agreements (like the Hakiza case) expose lenders and borrowers to massive risk. We automate trust.</p>
-                    </div>
+    <section id="howitworks" class="py-32 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20">
+                <h2 class="text-sm font-bold tracking-[0.4em] text-blue-500 uppercase mb-4">The Protocol</h2>
+                <h3 class="text-5xl font-black uppercase tracking-tighter italic leading-none">How It Works</h3>
+            </div>
+            <div class="grid md:grid-cols-4 gap-8 relative">
+                <div class="group p-8 rounded-3xl bg-white/[0.03] border border-white/10 hover:border-blue-500/50 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center font-black mb-6 italic">01</div>
+                    <h4 class="text-xl font-bold mb-4">Institution Issues</h4>
+                    <p class="text-sm text-gray-400">Your University or SACCO issues a digital document signed with their private key.</p>
                 </div>
-            </div>
-        </section>
-
-        <section id="solution" class="content-section solutions-section">
-            <div class="container">
-                <h2>Total Trust, Three Simple Benefits</h2>
-                <div class="features-grid">
-                    
-                    <div class="card">
-                        <h3>🎓 Benefit 1: Instant Proof of Education</h3>
-                        <p>Generate a tamper-proof digital credential that any employer or institution can verify instantly, anywhere in the world.</p>
-                        <button>Explore Credentials</button>
-                    </div>
-
-                    <div class="card">
-                        <h3>🆔 Benefit 2: Your Secure Digital Passport</h3>
-                        <p>Leverage Rwanda's national Digital ID rollout to link your true identity to every transaction and credential.</p>
-                        <button>Manage Identity</button>
-                    </div>
-
-                    <div class="card">
-                        <h3>💰 Benefit 3: Loans You Can Rely On</h3>
-                        <p>Use smart contracts to create agreements with automated repayment logic, bringing transparency and enforcement to lending.</p>
-                        <button>Secure Your Loans</button>
-                    </div>
-                    
+                <div class="group p-8 rounded-3xl bg-white/[0.03] border border-white/10 hover:border-blue-500/50 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center font-black mb-6 italic">02</div>
+                    <h4 class="text-xl font-bold mb-4">NIDA Binding</h4>
+                    <p class="text-sm text-gray-400">The credential is securely linked to your official Rwandan National Digital ID.</p>
                 </div>
-            </div>
-        </section>
-        
-        <section id="team" class="content-section team-section">
-    <div class="container">
-        <h2>Meet the Team Behind UniChain</h2>
-        <div class="team-tabs">
-            
-            <input type="radio" name="team-tab" id="tab-1" checked>
-            <label for="tab-1">Team Leader</label>
-            <div class="team-content" id="content-1">
-                <h3>Fabrice Ishimwe, Team Leader</h3>
-                <p>Fabrice coordinates the overall vision and execution of UniChain, ensuring seamless integration of blockchain technology with Rwanda's digital infrastructure needs.</p>
-            </div>
-
-            <input type="radio" name="team-tab" id="tab-2">
-            <label for="tab-2">Developer</label>
-            <div class="team-content" id="content-2">
-                <h3>Placide Shema, Developer</h3>
-                <p>Placide builds the core smart contracts and backend systems, focusing on secure, scalable blockchain solutions tailored for credential and lending applications.</p>
-            </div>
-
-            <input type="radio" name="team-tab" id="tab-3">
-            <label for="tab-3">Designer</label>
-            <div class="team-content" id="content-3">
-                <h3>Tuyizere Ibrahim, Designer</h3>
-                <p>Tuyizere crafts intuitive user interfaces and experiences, making UniChain accessible and trustworthy for all Rwandan users.</p>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-        <section id="faq" class="content-section faq-section">
-            <div class="container">
-                <h2>Quick Facts & Frequently Asked Questions</h2>
-                
-                <details class="faq-item">
-                    <summary>Is my personal data stored on the UniChain platform?</summary>
-                    <p>No. UniChain uses a decentralized approach. Your personal data remains secured by NIDA, and we only store cryptographic proofs (hashes) of your credentials. You control who sees your data.</p>
-                </details>
-                
-                <details class="faq-item">
-                    <summary>Who is responsible for issuing my digital credential?</summary>
-                    <p>The original issuer is responsible. For a diploma, it’s your university (e.g., AUCA). For a loan contract, it’s the lending institution (e.g., your SACCO). UniChain only verifies the authenticity of their issuance key.</p>
-                </details>
-                
-                <details class="faq-item">
-                    <summary>How does this system stop financial fraud?</summary>
-                    <p>By using smart contracts, we automate loan agreements. This prevents human manipulation of ledgers—the primary cause of loss reported by 57% of SACCOs—and guarantees transparent repayment logic.</p>
-                </details>
-                
-            </div>
-        </section>
-
-        <section id="howitworks" class="content-section flow-section">
-    <div class="container">
-        <h2>How UniChain Works For You</h2>
-        <div class="roadmap">
-            <div class="roadmap-step">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h3>Institution Issues Credential/Loan</h3>
-                    <p>University or SACCO issues your official digital document.</p>
+                <div class="group p-8 rounded-3xl bg-white/[0.03] border border-white/10 hover:border-blue-500/50 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center font-black mb-6 italic">03</div>
+                    <h4 class="text-xl font-bold mb-4">Blockchain Anchor</h4>
+                    <p class="text-sm text-gray-400">A cryptographic hash is sent to the Cardano ledger via Plutus scripts for 100% permanence.</p>
                 </div>
-            </div>
-            <div class="roadmap-line"></div>
-            <div class="roadmap-step">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h3>You Bind to NIDA ID</h3>
-                    <p>Link the credential securely to your national Digital ID.</p>
-                </div>
-            </div>
-            <div class="roadmap-line"></div>
-            <div class="roadmap-step">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h3>Secured on UniChain</h3>
-                    <p>Tamper-proof record stored on blockchain.</p>
-                </div>
-            </div>
-            <div class="roadmap-line"></div>
-            <div class="roadmap-step">
-                <div class="step-number">4</div>
-                <div class="step-content">
-                    <h3>You Share (1-Click)</h3>
-                    <p>Send verifiable proof to anyone instantly.</p>
-                </div>
-            </div>
-            <div class="roadmap-line"></div>
-            <div class="roadmap-step">
-                <div class="step-number">5</div>
-                <div class="step-content">
-                    <h3>Instant Verification</h3>
-                    <p>Employer or lender confirms authenticity in seconds.</p>
+                <div class="group p-8 rounded-3xl bg-blue-600 text-white transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-white text-blue-600 flex items-center justify-center font-black mb-6 italic">04</div>
+                    <h4 class="text-xl font-bold mb-4">Instant Trust</h4>
+                    <p class="text-sm opacity-90 text-white">Employers or lenders verify you instantly with one click. No more paper delays.</p>
                 </div>
             </div>
         </div>
-        <p class="vulnerable-note">UniChain is the unified trust infrastructure that Rwanda needs, aligning perfectly with the nation's digital trajectory.</p>
-    </div>
-</section>
+    </section>
 
-    </main>
+    <section id="problem" class="py-32 px-6 bg-zinc-950">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl font-black mb-16 italic uppercase text-center tracking-tighter">Solving Rwanda's Trust Gap</h2>
+            <div class="grid md:grid-cols-6 md:grid-rows-2 gap-4 h-full md:h-[600px]">
+                <div class="md:col-span-3 md:row-span-2 p-10 rounded-[40px] bg-zinc-900 border border-white/5 flex flex-col justify-end">
+                    <span class="text-blue-500 font-bold mb-4 uppercase tracking-[0.3em] text-[10px]">Challenge 01</span>
+                    <h3 class="text-4xl font-bold mb-6 italic leading-tight">Eliminating Manual Verification Delays</h3>
+                    <p class="text-gray-400">Waiting days for manual checks (like AUCA's 2025 admissions) slows your career. We make it instant.</p>
+                </div>
+                <div class="md:col-span-3 p-10 rounded-[40px] bg-white text-black flex flex-col justify-center">
+                    <h3 class="text-2xl font-black mb-4 uppercase">Anti-Fraud Protocol</h3>
+                    <p class="text-sm opacity-70">Active fraud confirmed by RIB arrests in 2025 risks the trust of your degrees. We anchor them in code.</p>
+                </div>
+                <div class="md:col-span-3 p-10 rounded-[40px] bg-blue-600 flex flex-col justify-center">
+                    <h3 class="text-2xl font-black mb-4 uppercase">Lending Security</h3>
+                    <p class="text-sm text-white/90">57% of SACCOs suffered losses due to a lack of digital agreements. Plutus solves this.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 UniChain - Cardano Group 7 | Building Trust. Powering Rwanda's Future.</p>
-            <p class="footer-links"><a href="#problem">About</a> | <a href="#solution">Features</a> | <a href="#" onclick="connectToBackend()">Support</a></p>
+    <section id="team" class="py-32 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-5xl font-black mb-20 italic uppercase">The Architects</h2>
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="group">
+                    <div class="w-24 h-24 bg-zinc-900 rounded-full mx-auto mb-6 border-2 border-white/10 group-hover:border-blue-500 transition duration-500 flex items-center justify-center font-black text-2xl">FI</div>
+                    <h3 class="text-2xl font-bold">Fabrice Ishimwe</h3>
+                    <p class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mb-4">Team Leader</p>
+                    <p class="text-gray-500 text-sm">Coordinates overall vision and integration of blockchain with national systems.</p>
+                </div>
+                <div class="group">
+                    <div class="w-24 h-24 bg-zinc-900 rounded-full mx-auto mb-6 border-2 border-white/10 group-hover:border-blue-500 transition duration-500 flex items-center justify-center font-black text-2xl">PS</div>
+                    <h3 class="text-2xl font-bold">Placide Shema</h3>
+                    <p class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mb-4">Developer</p>
+                    <p class="text-gray-500 text-sm">Builds core Plutus smart contracts and secure backend systems for lending.</p>
+                </div>
+                <div class="group">
+                    <div class="w-24 h-24 bg-zinc-900 rounded-full mx-auto mb-6 border-2 border-white/10 group-hover:border-blue-500 transition duration-500 flex items-center justify-center font-black text-2xl">TI</div>
+                    <h3 class="text-2xl font-bold">Tuyizere Ibrahim</h3>
+                    <p class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mb-4">Designer</p>
+                    <p class="text-gray-500 text-sm">Crafts intuitive user experiences for the Rwanda Digital Trajectory.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="pt-24 pb-12 px-6 bg-[#080808] border-t border-white/5">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-20">
+            <div class="col-span-2">
+                <div class="text-2xl font-black mb-6 uppercase tracking-tighter">UniChain</div>
+                <p class="text-gray-500 max-w-sm">"UniChain is the unified trust infrastructure that Rwanda needs, aligning perfectly with the nation's digital trajectory."</p>
+            </div>
+            <div>
+                <h4 class="text-xs font-black uppercase tracking-widest text-blue-500 mb-6">Explore</h4>
+                <ul class="space-y-4 text-sm text-gray-400 font-medium">
+                    <li><a href="#" class="hover:text-white transition">Network Explorer</a></li>
+                    <li><a href="#" class="hover:text-white transition">Governance</a></li>
+                    <li><a href="#" class="hover:text-white transition">Developer Docs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs font-black uppercase tracking-widest text-blue-500 mb-6">Connect</h4>
+                <ul class="space-y-4 text-sm text-gray-400 font-medium">
+                    <li>Kigali, Rwanda</li>
+                    <li>Twitter (X)</li>
+                    <li>Discord Community</li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between text-[10px] font-bold uppercase tracking-widest text-gray-600">
+            <p>&copy; 2025 UniChain - Cardano Group 7</p>
+            <p>Secured by Cardano (ADA)</p>
         </div>
     </footer>
 
-    <script src="app.js">
-        function connectToBackend() {
-            // This is where your app.js logic will eventually be placed.
-            console.log("Initiating secure handshake...");
-            alert("Redirecting to the secure application login...");
-        }
-    </script>
+    <script>
+        /**
+ * UI State Management
+ */
+const slides = document.querySelectorAll('.slide');
+const indicators = document.querySelectorAll('.indicator .fill');
+let currentSlide = 0;
+const slideDuration = 6000;
 
+function moveSlide(index) {
+    // Reset all
+    slides.forEach(s => s.classList.remove('active'));
+    indicators.forEach(ind => {
+        ind.style.transition = 'none';
+        ind.style.width = '0%';
+    });
+
+    // Activate next
+    currentSlide = (index >= slides.length) ? 0 : index;
+    
+    slides[currentSlide].classList.add('active');
+    
+    // Trigger progress bar
+    setTimeout(() => {
+        indicators[currentSlide].style.transition = `width ${slideDuration}ms linear`;
+        indicators[currentSlide].style.width = '100%';
+    }, 50);
+}
+
+// Auto Cycle
+setInterval(() => moveSlide(currentSlide + 1), slideDuration);
+moveSlide(0);
+
+/**
+ * Cardano Wallet Interaction (Match Functionality)
+ */
+async function toggleWallet() {
+    const btn = document.getElementById('walletBtn');
+    
+    if (!window.cardano) {
+        alert("Cardano extension (Nami/Eternl) required.");
+        return;
+    }
+
+    try {
+        btn.innerText = "Connecting...";
+        const api = await window.cardano.nami.enable();
+        
+        btn.innerText = "Wallet Linked ✓";
+        btn.classList.replace('bg-blue-600', 'bg-green-600');
+        
+        console.log("Cardano CIP-30 Handshake Successful");
+    } catch (err) {
+        btn.innerText = "Connect Wallet";
+        console.error("User rejected connection.");
+    }
+}
+
+document.getElementById('walletBtn').addEventListener('click', toggleWallet);
+    </script>
 </body>
 </html>
