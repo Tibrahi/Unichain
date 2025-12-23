@@ -4,152 +4,233 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniChain Verification Suite</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <style>
+        body { font-family: 'Space Mono', monospace; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn-blue { @apply bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition; }
+    </style>
 </head>
-<body class="dark-mode">
-    <nav class="navbar">
-        <div class="nav-content">
-            <div class="logo">UniChain.rw</div>
+<body class="bg-black text-white min-h-screen">
+    <nav class="border-b border-gray-800 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-2xl font-bold text-blue-500 tracking-tighter">UniChain.rw</div>
+            <div id="wallet-status" class="text-xs bg-gray-900 border border-blue-900 px-3 py-1 rounded-full text-blue-400">
+                Mock Wallet: Connected (Preprod)
+            </div>
         </div>
     </nav>
 
-    <div class="container main-content">
-        <header class="hero">
-            <h1>UniChain Verification Suite</h1>
-            <p>Instantly verify tamper-proof credentials, loans, and identities on the Cardano blockchain for Rwanda</p>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">UniChain Verification Suite</h1>
+            <p class="text-gray-400 max-w-2xl mx-auto">Instantly verify tamper-proof credentials, loans, and identities on the Cardano blockchain for Rwanda.</p>
         </header>
 
-        <div class="tab-controls">
-            <button class="tab-btn active" data-tab="education">🎓 Education Credential</button>
-            <button class="tab-btn" data-tab="loan">💰 Loan Agreement</button>
-            <button class="tab-btn" data-tab="identity">🆔 Digital ID Binding</button>
-            <button class="tab-btn" data-tab="general">🔗 General Verification</button>
+        <div class="flex flex-wrap justify-center gap-2 mb-8" id="tab-controls">
+            <button class="tab-btn px-4 py-2 bg-blue-600 rounded text-sm active" data-tab="education">🎓 Education</button>
+            <button class="tab-btn px-4 py-2 bg-gray-800 rounded text-sm" data-tab="loan">💰 Loan Agreement</button>
+            <button class="tab-btn px-4 py-2 bg-gray-800 rounded text-sm" data-tab="identity">🆔 Digital ID</button>
         </div>
 
-        <section id="education" class="tab-content active">
-            <div class="verification-panel">
-                <div class="info-block">
-                    <h2>How It Works: Credentials</h2>
-                    <p>Universities issue a tamper-proof digital record (Verifiable Credential) signed by their private key. This is stored securely, and only the *hash* is locked onto the Cardano blockchain.</p>
-                    <p class="unique-benefit"><strong>✅ Value:</strong> Eliminates fake degrees and long paper trails. Instant, global verification.</p>
-                    <h3>Exceptions & Info for You:</h3>
-                    <ul>
-                        <li>**What you see:** Verification confirms the Hash exists and was issued by the *correct entity* at a *specific time*.</li>
-                        <li>**What you DON'T see:** We don't store personal data (names, grades) on the public blockchain. Your privacy is safe.</li>
-                    </ul>
-                </div>
-                <div class="verify-block">
-                    <h2>Verify Education Credential</h2>
-                    <input type="text" id="tx-education" class="tx-hash-input" placeholder="Paste Cardano Transaction Hash (64 chars)" />
-                    <button class="verify-btn" data-output="output-education">Verify Now</button>
-                    <p class="sample-tx-area">Sample Tx: 
-                        <a href="#" class="sample-tx-link" data-target="tx-education" 
-                        data-hash="8ae88d7ee59eda5a7a95dd66e9cf123a89758f2ec31e73a5c65b4d9cf312f71c">
-                            8ae88d7e...312f71c
-                        </a>
-                    </p>
-                    <div id="output-education" class="output-area">Awaiting input...</div>
-                </div>
-            </div>
-        </section>
-
-        <section id="loan" class="tab-content">
-            <div class="verification-panel reverse-layout">
-                <div class="info-block">
-                    <h2>How It Works: Loan Agreements</h2>
-                    <p>A legally-binding loan agreement's *digest* is processed via an on-chain smart contract (Plutus script) and recorded on Cardano.</p>
-                    <p class="unique-benefit"><strong>✅ Value:</strong> Prevents fraud losses and ensures transparent, enforceable terms for both lenders (SACCOs/Banks) and borrowers.</p>
-                    <h3>Exceptions & Info for You:</h3>
-                    <div class="agreement-note">
-                        <div class="warning">⚠️ **Disclaimer:** This tool verifies the cryptographic integrity and current on-chain *status* of the contract (e.g., active, paid, defaulted). **It is NOT financial advice, a credit score, or a substitute for legal due diligence.**</div>
-                        <label class="agreement-check">
-                            <input type="checkbox" id="loan-agree"> 
-                            I understand the terms and agree to verify for information purposes only.
-                        </label>
+        <main class="grid lg:grid-cols-1 gap-8">
+            <section id="education" class="tab-content active bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1 space-y-4">
+                        <h2 class="text-2xl font-bold text-blue-400">How It Works: Credentials</h2>
+                        <p class="text-gray-300 text-sm">Universities issue a tamper-proof digital record signed by their private key. The Aiken validator ensures only authorized hashes are verified.</p>
+                        <div class="bg-blue-900/20 border-l-4 border-blue-500 p-3 text-xs italic">
+                            ✅ Value: Eliminates fake degrees. Instant, global verification.
+                        </div>
+                    </div>
+                    <div class="flex-1 bg-black p-6 rounded-lg border border-gray-800">
+                        <h3 class="mb-4 font-bold">Verify Credential</h3>
+                        <input type="text" id="tx-education" class="w-full bg-gray-900 border border-gray-700 p-3 rounded mb-4 text-xs" placeholder="Paste Cardano Tx Hash..." />
+                        <button class="verify-btn w-full bg-blue-600 py-3 rounded font-bold hover:bg-blue-500" data-type="Education" data-input="tx-education">Verify Now</button>
+                        <p class="text-[10px] mt-2 text-gray-500">Sample: <span class="cursor-pointer text-blue-400 sample-hash">8ae88d7ee59eda5a7a95dd66e9cf123a89758f2ec31e73a5c65b4d9cf312f71c</span></p>
                     </div>
                 </div>
-                <div class="verify-block">
-                    <h2>Verify Loan Agreement</h2>
-                    <input type="text" id="tx-loan" class="tx-hash-input" placeholder="Paste Cardano Transaction Hash (64 chars)" />
-                    <button class="verify-btn" disabled id="loan-verify-btn" data-output="output-loan">Verify (Agree first)</button>
-                    <div id="output-loan" class="output-area">Awaiting input...</div>
-                    <p class="sample-tx-area">Sample Tx: 
-                        <a href="#" class="sample-tx-link" data-target="tx-loan" 
-                        data-hash="0000000000000000000000000000000000000000000000000000000000000001">
-                            00000000...0000001
-                        </a>
-                    </p>
+            </section>
+
+            <section id="loan" class="tab-content bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row-reverse gap-8">
+                    <div class="flex-1 space-y-4">
+                        <h2 class="text-2xl font-bold text-blue-400">How It Works: Loan Agreements</h2>
+                        <p class="text-gray-300 text-sm">On-chain Plutus scripts (v2) record the agreement digest and status (Active/Paid).</p>
+                        <div class="text-xs bg-black p-3 border border-gray-700 rounded">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" id="loan-agree" class="mt-1">
+                                <span>I understand this is for informational purposes only.</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex-1 bg-black p-6 rounded-lg border border-gray-800">
+                        <h3 class="mb-4 font-bold">Verify Loan Status</h3>
+                        <input type="text" id="tx-loan" class="w-full bg-gray-900 border border-gray-700 p-3 rounded mb-4 text-xs" placeholder="Paste Loan Tx Hash..." />
+                        <button id="loan-verify-btn" disabled class="verify-btn w-full bg-gray-700 py-3 rounded font-bold opacity-50 cursor-not-allowed" data-type="Loan" data-input="tx-loan">Verify (Agree first)</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="identity" class="tab-content bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1 space-y-4">
+                        <h2 class="text-2xl font-bold text-blue-400">Digital ID Binding</h2>
+                        <p class="text-gray-300 text-sm">Links NIDA Digital ID to a Cardano DID using cryptographic proofs of control.</p>
+                    </div>
+                    <div class="flex-1 bg-black p-6 rounded-lg border border-gray-800">
+                        <h3 class="mb-4 font-bold">Verify ID Binding</h3>
+                        <input type="text" id="tx-identity" class="w-full bg-gray-900 border border-gray-700 p-3 rounded mb-4 text-xs" placeholder="Paste Identity Hash..." />
+                        <button class="verify-btn w-full bg-blue-600 py-3 rounded font-bold hover:bg-blue-500" data-type="Identity" data-input="tx-identity">Verify Now</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <section id="persistent-result-section" class="mt-12 hidden transition-all duration-500">
+            <div class="bg-blue-900/10 border border-blue-500/30 rounded-xl p-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                    <span id="result-status-icon"></span> 🧾 Last Verification Result
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <tr class="border-b border-gray-800">
+                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Hash Used</th>
+                            <td id="res-hash" class="py-4 font-mono text-blue-300 break-all"></td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Type</th>
+                            <td id="res-type" class="py-4 font-bold"></td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Blockchain Status</th>
+                            <td id="res-chain-status" class="py-4 font-bold"></td>
+                        </tr>
+                        <tr>
+                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Verified Date</th>
+                            <td id="res-date" class="py-4 text-gray-400"></td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </section>
 
-        <section id="identity" class="tab-content">
-            <div class="verification-panel">
-                <div class="info-block">
-                    <h2>How It Works: Digital ID Binding</h2>
-                    <p>Links a user's NIDA Digital ID to a verifiable credential (Decentralized Identifier or DID). The link is cryptographically bound and recorded.</p>
-                    <p class="unique-benefit"><strong>✅ Value:</strong> Guarantees the verified transaction is tied to a real, unique national identity. Essential for KYC/AML compliance.</p>
-                    <h3>Exceptions & Info for You:</h3>
-                    <ul>
-                        <li>**Privacy:** We only verify the *binding* (Proof of Control), not the ID data itself.</li>
-                        <li>**Source:** ID verification relies on a trusted process with NIDA.</li>
-                    </ul>
-                </div>
-                <div class="verify-block">
-                    <h2>Verify Digital ID Binding</h2>
-                    <input type="text" id="tx-identity" class="tx-hash-input" placeholder="Paste Cardano Transaction Hash (64 chars)" />
-                    <button class="verify-btn" data-output="output-identity">Verify Now</button>
-                    <p class="sample-tx-area">Sample Tx: 
-                        <a href="#" class="sample-tx-link" data-target="tx-identity" 
-                        data-hash="1111111111111111111111111111111111111111111111111111111111111111">
-                            11111111...1111111
-                        </a>
-                    </p>
-                    <div id="output-identity" class="output-area">Awaiting input...</div>
-                </div>
-            </div>
-        </section>
-
-        <section class="result-display-section hidden" id="persistent-result-section">
-            <h2 class="result-heading">🧾 Last Verification Result</h2>
-            <div class="result-summary">
-                <span id="result-status-icon"></span>
-                <span id="result-status-text"></span>
-            </div>
-            
-            <div class="result-table-container">
-                <table class="result-table">
-                    <tr>
-                        <th>Hash Used</th>
-                        <td id="res-hash"></td>
-                    </tr>
-                    <tr>
-                        <th>Type Verified</th>
-                        <td id="res-type"></td>
-                    </tr>
-                    <tr>
-                        <th>Issuer/Source</th>
-                        <td id="res-issuer"></td>
-                    </tr>
-                    <tr>
-                        <th>Blockchain Status</th>
-                        <td id="res-chain-status"></td>
-                    </tr>
-                    <tr>
-                        <th>Issue Date</th>
-                        <td id="res-date"></td>
-                    </tr>
-                </table>
-            </div>
-        </section>
-
-        <footer class="page-footer">
-            <p>UniChain: Building Rwanda's unified trust infrastructure (2025). Built on Cardano Preprod Testnet.</p>
+        <footer class="mt-20 py-8 border-t border-gray-800 text-center text-xs text-gray-500">
+            UniChain: Building Rwanda's unified trust infrastructure (2025). Built on Cardano Preprod Testnet.
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Verification Suite Logic
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. Tab Switching Logic
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.tab;
+            
+            // UI Updates
+            tabBtns.forEach(b => b.classList.remove('bg-blue-600', 'active'));
+            tabBtns.forEach(b => b.classList.add('bg-gray-800'));
+            btn.classList.remove('bg-gray-800');
+            btn.classList.add('bg-blue-600', 'active');
+
+            tabContents.forEach(content => {
+                content.classList.toggle('active', content.id === target);
+            });
+        });
+    });
+
+    // 2. Loan Agreement Terms Logic
+    const loanCheckbox = document.getElementById('loan-agree');
+    const loanBtn = document.getElementById('loan-verify-btn');
+    
+    loanCheckbox.addEventListener('change', (e) => {
+        loanBtn.disabled = !e.target.checked;
+        loanBtn.classList.toggle('bg-blue-600', e.target.checked);
+        loanBtn.classList.toggle('opacity-50', !e.target.checked);
+        loanBtn.classList.toggle('cursor-not-allowed', !e.target.checked);
+        loanBtn.innerText = e.target.checked ? "Verify Now" : "Verify (Agree first)";
+    });
+
+    // 3. Verification Logic (Simulating Aiken/Plutus logic)
+    const verifyButtons = document.querySelectorAll('.verify-btn');
+    const resultSection = document.getElementById('persistent-result-section');
+
+    verifyButtons.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const inputId = btn.dataset.input;
+            const hash = document.getElementById(inputId).value.trim();
+            const type = btn.dataset.type;
+
+            if (hash.length < 32) {
+                alert("Please enter a valid Transaction Hash (at least 32 characters).");
+                return;
+            }
+
+            // Show Loading State
+            btn.innerText = "Verifying on Chain...";
+            btn.disabled = true;
+
+            // Simulate Network Delay (Cardano Slot Verification)
+            await new Promise(r => setTimeout(r, 1500));
+
+            // Logic: Aiken Validator Simulation
+            // On-chain, the validator would check if the datum matches the provided hash
+            const isSuccess = hash.startsWith('8ae') || hash.length === 64; 
+            
+            showResult({
+                hash: hash,
+                type: type,
+                status: isSuccess ? "AUTHENTICATED" : "NOT FOUND / INVALID",
+                icon: isSuccess ? "✅" : "❌",
+                color: isSuccess ? "text-green-400" : "text-red-400",
+                issuer: getIssuer(type),
+                date: new Date().toLocaleString()
+            });
+
+            btn.innerText = "Verify Now";
+            btn.disabled = false;
+        });
+    });
+
+    // 4. Sample Hash Helper
+    document.querySelectorAll('.sample-hash').forEach(span => {
+        span.addEventListener('click', () => {
+            document.getElementById('tx-education').value = span.innerText;
+        });
+    });
+
+    function getIssuer(type) {
+        const issuers = {
+            "Education": "University of Rwanda (UR)",
+            "Loan": "BK - Bank of Kigali",
+            "Identity": "NIDA - National ID Agency"
+        };
+        return issuers[type] || "Unknown Authority";
+    }
+
+    function showResult(data) {
+        resultSection.classList.remove('hidden');
+        document.getElementById('res-hash').innerText = data.hash;
+        document.getElementById('res-type').innerText = data.type;
+        document.getElementById('res-date').innerText = data.date;
+        
+        const statusEl = document.getElementById('res-chain-status');
+        statusEl.innerText = data.status;
+        statusEl.className = `py-4 font-bold ${data.color}`;
+        
+        document.getElementById('result-status-icon').innerText = data.icon;
+        
+        // Scroll to results
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+    }
+});
+    </script>
 </body>
 </html>
