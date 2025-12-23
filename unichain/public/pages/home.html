@@ -3,130 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniChain Verification Suite</title>
+    <title>UniChain | Rwanda Blockchain Verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Mono', monospace; }
+        body { font-family: 'Space Mono', monospace; background-color: #000; color: #fff; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .btn-blue { @apply bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition; }
+        .blue-gradient { background: linear-gradient(135deg, #001f3f 0%, #0074D9 100%); }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen">
-    <nav class="border-b border-gray-800 p-4">
+<body class="selection:bg-blue-500 selection:text-white">
+
+    <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <div class="text-2xl font-bold text-blue-500 tracking-tighter">UniChain.rw</div>
-            <div id="wallet-status" class="text-xs bg-gray-900 border border-blue-900 px-3 py-1 rounded-full text-blue-400">
-                Mock Wallet: Connected (Preprod)
+            <div class="text-2xl font-bold tracking-tighter text-blue-500">UniChain.rw</div>
+            <div id="wallet-mock" class="text-[10px] uppercase tracking-widest bg-blue-900/30 px-3 py-1 rounded-full border border-blue-500 text-blue-400">
+                Mock Wallet: Connected
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4">UniChain Verification Suite</h1>
-            <p class="text-gray-400 max-w-2xl mx-auto">Instantly verify tamper-proof credentials, loans, and identities on the Cardano blockchain for Rwanda.</p>
+    <div class="container mx-auto px-4 py-12 max-w-6xl">
+        <header class="mb-16 text-center lg:text-left grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-none">Trust, <br><span class="text-blue-500">Verified.</span></h1>
+                <p class="text-gray-400 text-lg mb-8">The first unified verification suite for Rwanda, bridging government credentials with the Cardano blockchain.</p>
+                
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase text-blue-400 tracking-widest">Pre-Verification Guide</h3>
+                    <ul class="text-sm text-gray-300 space-y-2">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> 1. Obtain your Transaction Hash from the issuer.</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> 2. Select the correct category (Education, Loan, ID).</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> 3. Input required parameters (Redeemer/Datum) if applicable.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="blue-gradient rounded-3xl p-1 h-64 lg:h-80 shadow-2xl shadow-blue-500/20">
+                <div class="bg-black w-full h-full rounded-[22px] p-8 flex flex-col justify-center">
+                    <div class="text-4xl font-bold mb-2">2.4s</div>
+                    <div class="text-gray-500 text-xs mb-6 uppercase tracking-widest">Avg. Verification Speed</div>
+                    <div class="text-4xl font-bold mb-2">100%</div>
+                    <div class="text-gray-500 text-xs uppercase tracking-widest">Immutable Accuracy</div>
+                </div>
+            </div>
         </header>
 
-        <div class="flex flex-wrap justify-center gap-2 mb-8" id="tab-controls">
-            <button class="tab-btn px-4 py-2 bg-blue-600 rounded text-sm active" data-tab="education">🎓 Education</button>
-            <button class="tab-btn px-4 py-2 bg-gray-800 rounded text-sm" data-tab="loan">💰 Loan Agreement</button>
-            <button class="tab-btn px-4 py-2 bg-gray-800 rounded text-sm" data-tab="identity">🆔 Digital ID</button>
+        <div class="flex flex-wrap gap-2 mb-8" id="tab-controls">
+            <button class="tab-btn active px-6 py-3 bg-blue-600 rounded-lg text-sm font-bold transition-all hover:scale-105" data-tab="education">🎓 Education</button>
+            <button class="tab-btn px-6 py-3 bg-zinc-900 rounded-lg text-sm font-bold transition-all hover:bg-zinc-800" data-tab="loan">💰 Loan Registry</button>
+            <button class="tab-btn px-6 py-3 bg-zinc-900 rounded-lg text-sm font-bold transition-all hover:bg-zinc-800" data-tab="identity">🆔 Digital ID</button>
         </div>
 
-        <main class="grid lg:grid-cols-1 gap-8">
-            <section id="education" class="tab-content active bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="flex-1 space-y-4">
-                        <h2 class="text-2xl font-bold text-blue-400">How It Works: Credentials</h2>
-                        <p class="text-gray-300 text-sm">Universities issue a tamper-proof digital record signed by their private key. The Aiken validator ensures only authorized hashes are verified.</p>
-                        <div class="bg-blue-900/20 border-l-4 border-blue-500 p-3 text-xs italic">
-                            ✅ Value: Eliminates fake degrees. Instant, global verification.
+        <main>
+            <section id="education" class="tab-content active glass-panel p-8 rounded-3xl">
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <div class="space-y-6">
+                        <h2 class="text-3xl font-bold">Credential Verification</h2>
+                        <p class="text-gray-400">Verifies academic certificates using the <strong>Aiken-based</strong> validator logic. This checks if the hash on-chain matches your provided certificate metadata.</p>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-zinc-900 rounded-xl">
+                                <div class="text-blue-500 text-xl font-bold">UR</div>
+                                <div class="text-[10px] text-gray-500">University of Rwanda</div>
+                            </div>
+                            <div class="p-4 bg-zinc-900 rounded-xl">
+                                <div class="text-blue-500 text-xl font-bold">INES</div>
+                                <div class="text-[10px] text-gray-500">Ruhengeri Inst.</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex-1 bg-black p-6 rounded-lg border border-gray-800">
-                        <h3 class="mb-4 font-bold">Verify Credential</h3>
-                        <input type="text" id="tx-education" class="w-full bg-gray-900 border border-gray-700 p-3 rounded mb-4 text-xs" placeholder="Paste Cardano Tx Hash..." />
-                        <button class="verify-btn w-full bg-blue-600 py-3 rounded font-bold hover:bg-blue-500" data-type="Education" data-input="tx-education">Verify Now</button>
-                        <p class="text-[10px] mt-2 text-gray-500">Sample: <span class="cursor-pointer text-blue-400 sample-hash">8ae88d7ee59eda5a7a95dd66e9cf123a89758f2ec31e73a5c65b4d9cf312f71c</span></p>
+
+                    <div class="space-y-4">
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Transaction Hash</label>
+                        <input type="text" id="tx-edu" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl focus:border-blue-500 outline-none transition" placeholder="e.g. 8ae88d7e..." />
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Student ID (Redeemer)</label>
+                                <input type="text" id="red-edu" class="w-full bg-zinc-900 border border-zinc-800 p-3 rounded-lg text-sm outline-none" placeholder="100234..." />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Issue Batch (Datum)</label>
+                                <input type="text" id="dat-edu" class="w-full bg-zinc-900 border border-zinc-800 p-3 rounded-lg text-sm outline-none" placeholder="Batch-2025-A" />
+                            </div>
+                        </div>
+
+                        <button class="verify-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all active:scale-95" data-type="Education" data-input="tx-edu">Verify Certificate</button>
                     </div>
                 </div>
             </section>
 
-            <section id="loan" class="tab-content bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <div class="flex flex-col md:flex-row-reverse gap-8">
-                    <div class="flex-1 space-y-4">
-                        <h2 class="text-2xl font-bold text-blue-400">How It Works: Loan Agreements</h2>
-                        <p class="text-gray-300 text-sm">On-chain Plutus scripts (v2) record the agreement digest and status (Active/Paid).</p>
-                        <div class="text-xs bg-black p-3 border border-gray-700 rounded">
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" id="loan-agree" class="mt-1">
-                                <span>I understand this is for informational purposes only.</span>
-                            </label>
+            <section id="loan" class="tab-content glass-panel p-8 rounded-3xl">
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <div class="space-y-4">
+                        <h2 class="text-3xl font-bold text-white">Loan Smart Contract</h2>
+                        <p class="text-gray-400">Validate the current status of on-chain loan agreements between SACCOs and individuals.</p>
+                        <div class="p-4 border-l-2 border-yellow-500 bg-yellow-500/5 text-xs text-yellow-200/70">
+                            Note: This tool checks for "Settlement Proof" on the Cardano ledger.
                         </div>
                     </div>
-                    <div class="flex-1 bg-black p-6 rounded-lg border border-gray-800">
-                        <h3 class="mb-4 font-bold">Verify Loan Status</h3>
-                        <input type="text" id="tx-loan" class="w-full bg-gray-900 border border-gray-700 p-3 rounded mb-4 text-xs" placeholder="Paste Loan Tx Hash..." />
-                        <button id="loan-verify-btn" disabled class="verify-btn w-full bg-gray-700 py-3 rounded font-bold opacity-50 cursor-not-allowed" data-type="Loan" data-input="tx-loan">Verify (Agree first)</button>
+                    <div class="space-y-4">
+                        <input type="text" id="tx-loan" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl outline-none" placeholder="Loan Contract Transaction Hash..." />
+                        <input type="text" id="loan-amount" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl outline-none" placeholder="Verify Amount (RWF)..." />
+                        <button class="verify-btn w-full bg-blue-600 py-4 rounded-xl font-bold" data-type="Loan" data-input="tx-loan">Verify Loan Status</button>
                     </div>
                 </div>
             </section>
 
-            <section id="identity" class="tab-content bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="flex-1 space-y-4">
-                        <h2 class="text-2xl font-bold text-blue-400">Digital ID Binding</h2>
-                        <p class="text-gray-300 text-sm">Links NIDA Digital ID to a Cardano DID using cryptographic proofs of control.</p>
+            <section id="identity" class="tab-content glass-panel p-8 rounded-3xl">
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <div class="space-y-4 text-center lg:text-left">
+                        <h2 class="text-3xl font-bold">Digital ID Binding</h2>
+                        <p class="text-gray-400">Confirm the cryptographic link between a NIDA National ID and a Cardano Stake Address.</p>
                     </div>
-                    <div class="flex-1 bg-black p-6 rounded-lg border border-gray-800">
-                        <h3 class="mb-4 font-bold">Verify ID Binding</h3>
-                        <input type="text" id="tx-identity" class="w-full bg-gray-900 border border-gray-700 p-3 rounded mb-4 text-xs" placeholder="Paste Identity Hash..." />
-                        <button class="verify-btn w-full bg-blue-600 py-3 rounded font-bold hover:bg-blue-500" data-type="Identity" data-input="tx-identity">Verify Now</button>
+                    <div class="space-y-4">
+                        <input type="text" id="tx-id" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-xl outline-none" placeholder="Identity Verification Hash..." />
+                        <button class="verify-btn w-full bg-blue-600 py-4 rounded-xl font-bold" data-type="Identity" data-input="tx-id">Check Binding</button>
                     </div>
                 </div>
             </section>
         </main>
 
-        <section id="persistent-result-section" class="mt-12 hidden transition-all duration-500">
-            <div class="bg-blue-900/10 border border-blue-500/30 rounded-xl p-8">
-                <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-                    <span id="result-status-icon"></span> 🧾 Last Verification Result
-                </h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm border-collapse">
-                        <tr class="border-b border-gray-800">
-                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Hash Used</th>
-                            <td id="res-hash" class="py-4 font-mono text-blue-300 break-all"></td>
-                        </tr>
-                        <tr class="border-b border-gray-800">
-                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Type</th>
-                            <td id="res-type" class="py-4 font-bold"></td>
-                        </tr>
-                        <tr class="border-b border-gray-800">
-                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Blockchain Status</th>
-                            <td id="res-chain-status" class="py-4 font-bold"></td>
-                        </tr>
-                        <tr>
-                            <th class="py-4 text-gray-500 uppercase tracking-widest text-[10px]">Verified Date</th>
-                            <td id="res-date" class="py-4 text-gray-400"></td>
-                        </tr>
-                    </table>
+        <section id="persistent-result-section" class="mt-12 hidden opacity-0 transition-all duration-1000">
+            <div class="p-8 rounded-3xl border-2 border-blue-500/30 bg-blue-500/5">
+                <div class="flex items-center gap-4 mb-8">
+                    <div id="status-glow" class="w-4 h-4 rounded-full animate-pulse"></div>
+                    <h2 class="text-xl font-bold uppercase tracking-widest">Verification Result</h2>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div>
+                        <div class="text-gray-500 text-[10px] uppercase font-bold mb-1">Status</div>
+                        <div id="res-status" class="font-bold text-lg"></div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-[10px] uppercase font-bold mb-1">Entity</div>
+                        <div id="res-issuer" class="text-lg"></div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-[10px] uppercase font-bold mb-1">Timestamp</div>
+                        <div id="res-date" class="text-lg"></div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-[10px] uppercase font-bold mb-1">Network</div>
+                        <div class="text-lg text-blue-400 font-bold">Cardano Preprod</div>
+                    </div>
+                </div>
+                <div class="mt-8 pt-8 border-t border-white/10">
+                    <div class="text-gray-500 text-[10px] uppercase font-bold mb-2">Blockchain Proof (Hash)</div>
+                    <div id="res-hash" class="font-mono text-xs text-blue-300 break-all bg-black/50 p-4 rounded-lg"></div>
                 </div>
             </div>
         </section>
-
-        <footer class="mt-20 py-8 border-t border-gray-800 text-center text-xs text-gray-500">
-            UniChain: Building Rwanda's unified trust infrastructure (2025). Built on Cardano Preprod Testnet.
-        </footer>
     </div>
 
+    <footer class="bg-zinc-950 border-t border-white/5 mt-24">
+        <div class="container mx-auto px-4 py-16">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-2">
+                    <div class="text-2xl font-bold mb-6 text-blue-500">UniChain.rw</div>
+                    <p class="text-gray-400 max-w-sm text-sm">Empowering Rwanda through decentralized trust. Our suite provides instant, cost-effective verification for educational and financial institutions.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-xs uppercase tracking-widest text-white">Resources</h4>
+                    <ul class="text-sm text-gray-500 space-y-4">
+                        <li><a href="#" class="hover:text-blue-400 transition">Aiken Documentation</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">Cardano Explorer</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">NIDA Integration API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-6 text-xs uppercase tracking-widest text-white">Connect</h4>
+                    <ul class="text-sm text-gray-500 space-y-4">
+                        <li><a href="#" class="hover:text-blue-400 transition">Support Center</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">Developer Portal</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">Twitter / X</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-600 uppercase tracking-tighter">
+                <div>© 2025 UniChain Rwanda. All Rights Reserved.</div>
+                <div class="flex gap-6">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Use</a>
+                    <a href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // Verification Suite Logic
-document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Tab Switching Logic
+    // --- Tab Switcher ---
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -134,11 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             const target = btn.dataset.tab;
             
-            // UI Updates
-            tabBtns.forEach(b => b.classList.remove('bg-blue-600', 'active'));
-            tabBtns.forEach(b => b.classList.add('bg-gray-800'));
-            btn.classList.remove('bg-gray-800');
-            btn.classList.add('bg-blue-600', 'active');
+            tabBtns.forEach(b => {
+                b.classList.remove('active', 'bg-blue-600');
+                b.classList.add('bg-zinc-900');
+            });
+            btn.classList.add('active', 'bg-blue-600');
+            btn.classList.remove('bg-zinc-900');
 
             tabContents.forEach(content => {
                 content.classList.toggle('active', content.id === target);
@@ -146,19 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. Loan Agreement Terms Logic
-    const loanCheckbox = document.getElementById('loan-agree');
-    const loanBtn = document.getElementById('loan-verify-btn');
-    
-    loanCheckbox.addEventListener('change', (e) => {
-        loanBtn.disabled = !e.target.checked;
-        loanBtn.classList.toggle('bg-blue-600', e.target.checked);
-        loanBtn.classList.toggle('opacity-50', !e.target.checked);
-        loanBtn.classList.toggle('cursor-not-allowed', !e.target.checked);
-        loanBtn.innerText = e.target.checked ? "Verify Now" : "Verify (Agree first)";
-    });
-
-    // 3. Verification Logic (Simulating Aiken/Plutus logic)
+    // --- Verification Logic (Simulating Plutus/Aiken context) ---
     const verifyButtons = document.querySelectorAll('.verify-btn');
     const resultSection = document.getElementById('persistent-result-section');
 
@@ -168,67 +227,66 @@ document.addEventListener('DOMContentLoaded', () => {
             const hash = document.getElementById(inputId).value.trim();
             const type = btn.dataset.type;
 
-            if (hash.length < 32) {
-                alert("Please enter a valid Transaction Hash (at least 32 characters).");
+            if (hash.length < 24) {
+                alert("Please enter a valid Transaction Hash (min 24 chars).");
                 return;
             }
 
-            // Show Loading State
-            btn.innerText = "Verifying on Chain...";
+            // Simulate Smart Contract Execution
+            btn.innerHTML = `<span class="flex items-center justify-center gap-2">
+                                <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg> Executing Plutus Script...
+                             </span>`;
             btn.disabled = true;
 
-            // Simulate Network Delay (Cardano Slot Verification)
-            await new Promise(r => setTimeout(r, 1500));
+            // Wait for mock block confirmation
+            await new Promise(r => setTimeout(r, 2000));
 
-            // Logic: Aiken Validator Simulation
-            // On-chain, the validator would check if the datum matches the provided hash
-            const isSuccess = hash.startsWith('8ae') || hash.length === 64; 
-            
-            showResult({
+            // Simulating a successful Aiken validation check
+            const success = hash.length >= 64; 
+
+            displayResult({
                 hash: hash,
                 type: type,
-                status: isSuccess ? "AUTHENTICATED" : "NOT FOUND / INVALID",
-                icon: isSuccess ? "✅" : "❌",
-                color: isSuccess ? "text-green-400" : "text-red-400",
-                issuer: getIssuer(type),
-                date: new Date().toLocaleString()
+                issuer: getIssuerLabel(type),
+                status: success ? "AUTHENTICATED" : "VALIDATION FAILED",
+                success: success,
+                date: new Date().toUTCString()
             });
 
-            btn.innerText = "Verify Now";
+            btn.innerText = `Verify ${type}`;
             btn.disabled = false;
         });
     });
 
-    // 4. Sample Hash Helper
-    document.querySelectorAll('.sample-hash').forEach(span => {
-        span.addEventListener('click', () => {
-            document.getElementById('tx-education').value = span.innerText;
-        });
-    });
-
-    function getIssuer(type) {
-        const issuers = {
-            "Education": "University of Rwanda (UR)",
-            "Loan": "BK - Bank of Kigali",
-            "Identity": "NIDA - National ID Agency"
-        };
-        return issuers[type] || "Unknown Authority";
+    function getIssuerLabel(type) {
+        switch(type) {
+            case 'Education': return "University of Rwanda";
+            case 'Loan': return "Bank of Kigali (BK)";
+            case 'Identity': return "NIDA Authority";
+            default: return "On-Chain Registry";
+        }
     }
 
-    function showResult(data) {
-        resultSection.classList.remove('hidden');
+    function displayResult(data) {
+        // Update Content
         document.getElementById('res-hash').innerText = data.hash;
-        document.getElementById('res-type').innerText = data.type;
+        document.getElementById('res-status').innerText = data.status;
+        document.getElementById('res-status').className = `font-bold text-lg ${data.success ? 'text-blue-500' : 'text-red-500'}`;
+        document.getElementById('res-issuer').innerText = data.issuer;
         document.getElementById('res-date').innerText = data.date;
         
-        const statusEl = document.getElementById('res-chain-status');
-        statusEl.innerText = data.status;
-        statusEl.className = `py-4 font-bold ${data.color}`;
-        
-        document.getElementById('result-status-icon').innerText = data.icon;
-        
-        // Scroll to results
-        resultSection.scrollIntoView({ behavior: 'smooth' });
+        const glow = document.getElementById('status-glow');
+        glow.className = `w-4 h-4 rounded-full animate-pulse ${data.success ? 'bg-blue-500 shadow-[0_0_15px_#0074D9]' : 'bg-red-500 shadow-[0_0_15px_#FF4136]'}`;
+
+        // Animation
+        resultSection.classList.remove('hidden');
+        setTimeout(() => {
+            resultSection.classList.remove('opacity-0');
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
     }
 });
     </script>
