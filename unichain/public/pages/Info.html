@@ -3,314 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniChain | Rwanda Blockchain Verification</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>How it Works | UniChain Infrastructure</title>
     <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Mono', monospace; scroll-behavior: smooth; background-color: #000; }
-        .blue-glow:focus { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
-        .step-inactive { border-color: #374151; color: #4b5563; }
-        .step-active { border-color: #3b82f6; color: #3b82f6; animation: pulse 2s infinite; border-width: 2px; }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } }
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
-        .glass { background: rgba(17, 24, 39, 0.7); backdrop-blur: 12px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .bg-uni-blue { background-color: #0033AD; }
+        .text-uni-blue { color: #0033AD; }
+        .bg-uni-black { background-color: #0a0a0a; }
+        .glass-card { background: white; border: 1px solid rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
+        .tech-icon { width: 48px; height: 48px; object-fit: contain; }
     </style>
 </head>
-<body class="text-white min-h-screen selection:bg-blue-500">
-    
-    <nav class="border-b border-gray-900 sticky top-0 bg-black/80 backdrop-blur-md z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-bold tracking-tighter text-blue-500">UniChain<span class="text-white">.rw</span></div>
-            <div class="hidden md:flex items-center gap-4">
-                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Network: Cardano Preprod</span>
-                <div class="text-[10px] bg-blue-900/20 px-3 py-1 rounded-full border border-blue-500/30 text-blue-400 font-bold uppercase tracking-widest">
-                    <span class="inline-block w-2 h-2 bg-blue-500 rounded-full animate-ping mr-2"></span> Wallet Linked
-                </div>
+<body class="bg-[#F8FAFC] text-gray-900 antialiased">
+
+    <nav class="bg-uni-black text-white sticky top-0 z-50 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-20">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-uni-blue rounded-xl flex items-center justify-center font-bold">U</div>
+                <span class="font-bold text-2xl tracking-tight">UniChain<span class="text-uni-blue">.rw</span></span>
             </div>
+            <a href="../index.html" class="text-sm font-bold uppercase tracking-widest hover:text-uni-blue transition-colors">← Back to Dashboard</a>
         </div>
     </nav>
 
-    <main class="container mx-auto px-6 py-12 max-w-6xl">
-        <header class="mb-16">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter">Verification <span class="text-blue-600 italic">Suite</span></h1>
-            <p class="text-gray-500 border-l-4 border-blue-600 pl-6 max-w-2xl text-lg leading-relaxed">
-                The gateway to Rwanda's decentralized trust layer. Select a verified record from the registry to execute the Aiken Plutus script.
-            </p>
-        </header>
-
-        <div class="grid lg:grid-cols-12 gap-12">
-            <div class="lg:col-span-7 space-y-8">
-                <div class="flex gap-6 border-b border-gray-900 pb-2 overflow-x-auto">
-                    <button class="tab-btn px-2 py-2 font-bold text-blue-500 border-b-2 border-blue-500 transition-all" data-tab="education">🎓 Education</button>
-                    <button class="tab-btn px-2 py-2 font-bold text-gray-600 hover:text-gray-300 transition-all" data-tab="loan">💰 Loan</button>
-                    <button class="tab-btn px-2 py-2 font-bold text-gray-600 hover:text-gray-300 transition-all" data-tab="identity">🆔 ID Binding</button>
+    <main class="max-w-5xl mx-auto px-6 py-16">
+        
+        <section class="mb-24">
+            <h2 class="text-uni-blue font-bold tracking-widest uppercase text-sm mb-4">Core Infrastructure</h2>
+            <h3 class="text-4xl font-extrabold text-uni-black mb-12">The Tech Stack</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+                <div class="flex flex-col items-center p-6 glass-card rounded-3xl text-center">
+                    <img src="https://aiken-lang.org/img/logo.png" alt="Aiken" class="tech-icon mb-4">
+                    <span class="text-xs font-bold uppercase">Aiken Smart Contracts</span>
                 </div>
-
-                <div id="tab-description" class="min-h-[80px] text-gray-400 leading-relaxed text-sm">
-                    Universities issue digital records signed by private keys. The *hash* is locked on Cardano using Aiken-built Plutus scripts.
+                <div class="flex flex-col items-center p-6 glass-card rounded-3xl text-center">
+                    <img src="https://cardano.org/img/cardano-logo.svg" alt="Cardano" class="tech-icon mb-4">
+                    <span class="text-xs font-bold uppercase">Cardano Blockchain</span>
                 </div>
-
-                <div class="p-8 glass rounded-3xl border-blue-500/10">
-                    <h3 class="text-xs font-bold text-blue-500 uppercase tracking-[0.2em] mb-6 italic">Verified Registry (Sandbox Mode)</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="group cursor-pointer bg-black/40 p-5 rounded-2xl border border-gray-800 hover:border-blue-600 transition-all hover:bg-blue-600/5 flex justify-between items-center" 
-                             onclick="autoVerify('8ae88d7ee59eda5a7a95dd66e9cf123a89758f2ec31e73a5c65b4d9cf312f71c', 'University of Rwanda')">
-                            <div>
-                                <p class="text-[10px] text-gray-500 uppercase font-black mb-1">Graduation Certificate #992</p>
-                                <code class="text-blue-400 text-xs">8ae88d7e...312f71c</code>
-                            </div>
-                            <span class="text-[10px] font-bold text-blue-600 uppercase group-hover:underline">Quick Verify →</span>
-                        </div>
-
-                        <div class="group cursor-pointer bg-black/40 p-5 rounded-2xl border border-gray-800 hover:border-red-600 transition-all hover:bg-red-600/5 flex justify-between items-center" 
-                             onclick="autoVerify('0000000000000000000000000000000000000000000000000000000000000001', 'Bank of Kigali')">
-                            <div>
-                                <p class="text-[10px] text-gray-500 uppercase font-black mb-1 italic">Mangled Loan Record #BK-04</p>
-                                <code class="text-red-400 text-xs font-bold">00000000...0000001</code>
-                            </div>
-                            <span class="text-[10px] font-bold text-red-600 uppercase group-hover:underline">Test Rejection →</span>
-                        </div>
-                    </div>
+                <div class="flex flex-col items-center p-6 glass-card rounded-3xl text-center">
+                    <img src="https://blockfrost.io/images/logo.svg" alt="Blockfrost" class="tech-icon mb-4">
+                    <span class="text-xs font-bold uppercase">Blockfrost API</span>
+                </div>
+                <div class="flex flex-col items-center p-6 glass-card rounded-3xl text-center">
+                    <img src="https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png" alt="Firestore" class="tech-icon mb-4">
+                    <span class="text-xs font-bold uppercase">Firebase Firestore</span>
+                </div>
+                <div class="flex flex-col items-center p-6 glass-card rounded-3xl text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="Vanilla JS" class="tech-icon mb-4">
+                    <span class="text-xs font-bold uppercase">Vanilla JS & Tailwind</span>
+                </div>
+                <div class="flex flex-col items-center p-6 glass-card rounded-3xl text-center">
+                    <img src="https://raw.githubusercontent.com/lucid-evolution/lucid/main/assets/logo.png" alt="Lucid" class="tech-icon mb-4">
+                    <span class="text-xs font-bold uppercase">Lucid Evolution</span>
                 </div>
             </div>
+        </section>
 
-            <div class="lg:col-span-5">
-                <div class="bg-gray-900 border border-gray-800 p-8 rounded-3xl sticky top-24 shadow-2xl">
-                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2 tracking-tight">
-                        <span class="w-2 h-6 bg-blue-600 rounded"></span> Verification Gateway
-                    </h2>
-                    
-                    <div class="space-y-6">
-                        <div class="relative">
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Target Tx Hash</label>
-                            <input type="text" id="tx-hash" class="w-full bg-black border border-gray-800 p-4 rounded-xl text-blue-400 font-mono text-xs outline-none blue-glow transition-all placeholder:text-gray-800" placeholder="Awaiting Selection...">
-                            <div id="loading-spinner" class="hidden absolute right-4 bottom-4">
-                                <svg class="animate-spin h-4 w-4 text-blue-500" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <div class="space-y-6 py-6 border-y border-gray-800/50">
-                            <div class="flex items-center gap-4 group" id="v-step-1">
-                                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] step-inactive font-black transition-all" id="icon-1">1</div>
-                                <span class="text-xs font-bold uppercase text-gray-600 tracking-wider">Mesh Node Connector</span>
-                            </div>
-                            <div class="flex items-center gap-4" id="v-step-2">
-                                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] step-inactive font-black transition-all" id="icon-2">2</div>
-                                <span class="text-xs font-bold uppercase text-gray-600 tracking-wider">Aiken Blueprint Match</span>
-                            </div>
-                            <div class="flex items-center gap-4" id="v-step-3">
-                                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] step-inactive font-black transition-all" id="icon-3">3</div>
-                                <span class="text-xs font-bold uppercase text-gray-600 tracking-wider">Witness Verification</span>
-                            </div>
-                        </div>
-
-                        <button id="verify-btn" class="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-blue-600 hover:text-white transition-all transform active:scale-95 uppercase text-xs tracking-[0.2em]">
-                            Manual Run
-                        </button>
-                        
-                        <div id="status-msg" class="text-[10px] text-center uppercase tracking-widest text-gray-600 font-black">Ready for script execution</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <section id="result-view" class="mt-32 hidden opacity-0 transition-all duration-1000">
-            <div class="text-center mb-12">
-                <span class="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] mb-4 block" id="proof-label">Cardano Ledger Proof</span>
-                <h2 class="text-4xl font-black uppercase tracking-tighter" id="final-headline">Verification <span class="text-blue-600">Complete</span></h2>
-            </div>
+        <section class="mb-24">
+            <h2 class="text-uni-blue font-bold tracking-widest uppercase text-sm mb-4">Operational Flow</h2>
+            <h3 class="text-4xl font-extrabold text-uni-black mb-12">System Architecture: End-to-End</h3>
             
-            <div id="result-card" class="glass border border-blue-500/30 rounded-[40px] p-12 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-8 opacity-10" id="result-icon-bg">
-                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            
+            <div class="space-y-12">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="w-12 h-12 bg-uni-blue rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold">01</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-3">Identity Binding & Issuance</h4>
+                        <p class="text-gray-600 leading-relaxed">
+                            Following the 2025 Digital ID rollout by NIDA[cite: 23, 104], UniChain binds a user's verified identity to a Cardano wallet. Institutions (like UR or HEC) issue academic credentials as tamper-proof metadata on the blockchain[cite: 65, 79].
+                        </p>
+                    </div>
                 </div>
-                
-                <table class="w-full text-left">
-                    <tbody class="divide-y divide-gray-800">
-                        <tr>
-                            <th class="py-8 text-gray-500 uppercase text-[10px] font-black tracking-widest">Transaction Hash</th>
-                            <td id="res-hash" class="py-8 text-blue-400 font-mono text-sm break-all leading-relaxed"></td>
-                        </tr>
-                        <tr>
-                            <th class="py-8 text-gray-500 uppercase text-[10px] font-black tracking-widest">Verified Issuer</th>
-                            <td id="res-type" class="py-8 text-white text-lg font-black tracking-tight"></td>
-                        </tr>
-                        <tr>
-                            <th class="py-8 text-gray-500 uppercase text-[10px] font-black tracking-widest">Smart Contract</th>
-                            <td class="py-8 text-gray-400 text-sm italic" id="sc-version">Aiken v1.0.21 [Plutus V3 Compatible]</td>
-                        </tr>
-                        <tr>
-                            <th class="py-8 text-gray-500 uppercase text-[10px] font-black tracking-widest">Status</th>
-                            <td id="res-status-cell" class="py-8 text-green-500 font-black text-sm flex items-center gap-3">
-                                <span id="status-dot" class="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></span>
-                                <span id="status-text">DEPLOYED & VALIDATED</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="w-12 h-12 bg-uni-blue rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold">02</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-3">Immutable Storage via Blockfrost</h4>
+                        <p class="text-gray-600 leading-relaxed">
+                            Using <strong>Blockfrost.io</strong>, we interact with the Cardano ledger to store and retrieve metadata. This replaces manual, paper-based records that currently cause 57% of SACCOs to suffer financial losses due to mismanagement[cite: 27, 75].
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="w-12 h-12 bg-uni-blue rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold">03</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-3">Aiken-Powered Enforcement</h4>
+                        <p class="text-gray-600 leading-relaxed">
+                            For P2P loans—like the case of Hakiza who lost funds in November 2025 due to lack of proof [cite: 33, 76]—we use <strong>Aiken smart contracts</strong>. These contracts provide automated, immutable proof-of-agreement and enforcement[cite: 70, 82].
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="w-12 h-12 bg-uni-blue rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold">04</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-3">One-Click Verification</h4>
+                        <p class="text-gray-500 leading-relaxed italic">
+                            *Note: During current development, we use mock verification to demonstrate the final user experience.*
+                        </p>
+                        <p class="text-gray-600 mt-2 leading-relaxed">
+                            Employers and verifiers can instantly check a credential's authenticity. This solves the "7-day wait period" currently required by Irembo for manual equivalences[cite: 12, 73].
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 border-t border-gray-100 pt-16">
+            <div>
+                <h3 class="text-2xl font-bold mb-6">Project Aims</h3>
+                <ul class="space-y-4">
+                    <li class="flex gap-3 text-gray-600">
+                        <span class="text-uni-blue font-bold">✓</span> Eliminate forgeries like the 2025 Rutsiro teacher cases[cite: 15, 98].
+                    </li>
+                    <li class="flex gap-3 text-gray-600">
+                        <span class="text-uni-blue font-bold">✓</span> Digitize manual processes at universities like AUCA to reduce tampering risks[cite: 111, 112].
+                    </li>
+                    <li class="flex gap-3 text-gray-600">
+                        <span class="text-uni-blue font-bold">✓</span> Provide legal, digital protection for informal lenders[cite: 36, 61].
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-bold mb-6">System FAQ</h3>
+                <div class="space-y-6">
+                    <div>
+                        <h5 class="font-bold text-uni-black">Where is our data stored?</h5>
+                        <p class="text-sm text-gray-500 mt-1">Operational data is managed via Firestore for speed, while the "Source of Truth" (certificates/contracts) is anchored on the Cardano blockchain.</p>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-uni-black">How does it help someone like Hakiza?</h5>
+                        <p class="text-sm text-gray-500 mt-1">It creates a time-stamped contract between a borrower and lender. If the borrower refuses to pay, the lender has immutable proof of debt for legal authorities[cite: 83, 90].</p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
-    <script>
-        const content = {
-            education: "Universities issue digital records signed by private keys. The *hash* is locked on Cardano using Aiken-built Plutus scripts.",
-            loan: "Loan agreements are converted into unique Datums. Verification ensures that repayment terms and SACCO signatures are immutable.",
-            identity: "Binds NIDA Digital IDs to Cardano addresses. Uses a decentralized identifier (DID) framework to prove identity ownership."
-        };
+    <footer class="bg-uni-black text-white py-12 border-t border-white/5 text-center">
+        <p class="text-xs text-gray-500">© 2025 UniChain.rw | Building Trust Infrastructure for Rwanda</p>
+    </footer>
 
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => {
-                    b.classList.remove('text-blue-500', 'border-b-2', 'border-blue-500');
-                    b.classList.add('text-gray-600');
-                });
-                btn.classList.add('text-blue-500', 'border-b-2', 'border-blue-500');
-                btn.classList.remove('text-gray-600');
-                document.getElementById('tab-description').innerText = content[btn.dataset.tab];
-            });
-        });
-
-        async function autoVerify(hash, issuer) {
-            const input = document.getElementById('tx-hash');
-            input.value = hash;
-            input.classList.add('ring-2', 'ring-blue-600');
-            await sleep(400);
-            input.classList.remove('ring-2', 'ring-blue-600');
-            startVerificationProcess(hash, issuer);
-        }
-
-        const verifyBtn = document.getElementById('verify-btn');
-        const txInput = document.getElementById('tx-hash');
-        const statusMsg = document.getElementById('status-msg');
-
-        verifyBtn.addEventListener('click', () => {
-            const activeTabLabel = document.querySelector('.tab-btn.text-blue-500').innerText.replace(/🎓|💰|🆔/g, '').trim();
-            startVerificationProcess(txInput.value.trim(), activeTabLabel);
-        });
-
-        async function startVerificationProcess(hash, source) {
-            if (!hash || hash.length < 10) {
-                txInput.classList.add('shake', 'border-red-500');
-                statusMsg.innerText = "❌ No valid hash in memory";
-                statusMsg.classList.add('text-red-500');
-                setTimeout(() => txInput.classList.remove('shake', 'border-red-500'), 500);
-                return;
-            }
-
-            resetUI();
-            verifyBtn.disabled = true;
-            verifyBtn.innerText = "ENGINE ACTIVE...";
-            document.getElementById('loading-spinner').classList.remove('hidden');
-
-            // Step 1: Connector
-            updateStep(1, 'active');
-            statusMsg.innerText = "Connecting to Cardano Mesh Node...";
-            await sleep(1000);
-            updateStep(1, 'done');
-
-            // Step 2: VALIDATION (THIS IS WHERE WE REJECT 000000)
-            updateStep(2, 'active');
-            statusMsg.innerText = "Validating Aiken Script Hash...";
-            await sleep(1200);
-
-            if (hash.startsWith("00000000")) {
-                updateStep(2, 'fail');
-                statusMsg.innerText = "❌ SCRIPT REJECTED: POLICY ID MISMATCH";
-                statusMsg.className = "text-[10px] text-center uppercase tracking-widest text-red-500 font-black";
-                document.getElementById('loading-spinner').classList.add('hidden');
-                revealResults(hash, source, false); // Pass 'false' for success
-                verifyBtn.disabled = false;
-                verifyBtn.innerText = "Manual Run";
-                return; // STOP EXECUTION
-            }
-
-            updateStep(2, 'done');
-
-            // Step 3: Witness
-            updateStep(3, 'active');
-            statusMsg.innerText = "Comparing Plutus Witnesses...";
-            await sleep(1000);
-            updateStep(3, 'done');
-
-            // Final Reveal (Success)
-            document.getElementById('loading-spinner').classList.add('hidden');
-            revealResults(hash, source, true);
-            statusMsg.innerText = "✅ IMMUTABLE PROOF FOUND";
-            statusMsg.className = "text-[10px] text-center uppercase tracking-widest text-green-500 font-black";
-            verifyBtn.disabled = false;
-            verifyBtn.innerText = "Manual Run";
-        }
-
-        function updateStep(id, state) {
-            const icon = document.getElementById(`icon-${id}`);
-            const row = document.getElementById(`v-step-${id}`);
-            if(state === 'active') {
-                icon.classList.add('step-active');
-            } else if (state === 'fail') {
-                icon.className = "w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] bg-red-600 border-red-600 text-white font-black";
-                icon.innerHTML = '✕';
-                row.querySelector('span').className = "text-xs font-bold uppercase text-red-500 tracking-wider";
-            } else {
-                icon.classList.replace('step-inactive', 'bg-blue-600');
-                icon.classList.remove('step-active');
-                icon.classList.add('border-blue-600', 'text-white');
-                icon.innerHTML = '✓';
-                row.querySelector('span').classList.replace('text-gray-600', 'text-blue-500');
-            }
-        }
-
-        function resetUI() {
-            document.getElementById('result-view').classList.add('hidden', 'opacity-0');
-            statusMsg.className = "text-[10px] text-center uppercase tracking-widest text-gray-700 font-bold";
-            for(let i=1; i<=3; i++) {
-                const icon = document.getElementById(`icon-${i}`);
-                const row = document.getElementById(`v-step-${i}`);
-                icon.className = "w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] step-inactive font-bold";
-                icon.innerHTML = i;
-                row.querySelector('span').className = "text-xs font-bold uppercase text-gray-600";
-            }
-        }
-
-        function revealResults(hash, source, isSuccess) {
-            const view = document.getElementById('result-view');
-            const card = document.getElementById('result-card');
-            const headline = document.getElementById('final-headline');
-            const dot = document.getElementById('status-dot');
-            const statusText = document.getElementById('status-text');
-            const statusCell = document.getElementById('res-status-cell');
-
-            document.getElementById('res-hash').innerText = hash;
-            document.getElementById('res-type').innerText = source;
-
-            if (isSuccess) {
-                card.className = "glass border border-blue-500/30 rounded-[40px] p-12 relative overflow-hidden";
-                headline.innerHTML = 'Verification <span class="text-blue-600">Complete</span>';
-                statusCell.className = "py-8 text-green-500 font-black text-sm flex items-center gap-3";
-                dot.className = "w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]";
-                statusText.innerText = "DEPLOYED & VALIDATED";
-                document.getElementById('proof-label').className = "text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] mb-4 block";
-            } else {
-                card.className = "glass border border-red-500/50 bg-red-900/10 rounded-[40px] p-12 relative overflow-hidden shake";
-                headline.innerHTML = 'Verification <span class="text-red-600">Rejected</span>';
-                statusCell.className = "py-8 text-red-500 font-black text-sm flex items-center gap-3";
-                dot.className = "w-3 h-3 bg-red-500 rounded-full shadow-[0_0_10px_#ef4444]";
-                statusText.innerText = "POLICY ID MISMATCH / REVOKED";
-                document.getElementById('proof-label').className = "text-[10px] font-black text-red-500 uppercase tracking-[0.5em] mb-4 block";
-            }
-
-            view.classList.remove('hidden');
-            setTimeout(() => view.classList.add('opacity-100'), 50);
-            window.scrollTo({ top: view.offsetTop - 50, behavior: 'smooth' });
-        }
-
-        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-    </script>
 </body>
 </html>
