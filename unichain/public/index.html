@@ -14,10 +14,10 @@
         .bg-uni-blue { background-color: #0033AD; }
         .text-uni-blue { color: #0033AD; }
         .border-uni-blue { border-color: #0033AD; }
-        .text-black-bold { color: #000000; font-weight: 700; }
         
         .bg-uni-black { background-color: #0a0a0a; }
         
+        /* Smooth Gradient Background for Header */
         .hero-gradient {
             background: radial-gradient(circle at top right, rgba(0, 51, 173, 0.05), transparent),
                         radial-gradient(circle at bottom left, rgba(0, 51, 173, 0.02), transparent);
@@ -29,6 +29,7 @@
             height: 300px;
         }
 
+        /* Modern Card Styling */
         .glass-card {
             background: white;
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -51,18 +52,18 @@
 </head>
 <body class="bg-[#F8FAFC] text-gray-900 antialiased">
 
-    <nav class="bg-uni-black/95 backdrop-blur-md text-white sticky top-0 z-50 border-b border-white/10">
+    <nav class="bg-uni-black/95 backdrop-blur-md text-black sticky top-0 z-50 border-b border-black/10">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center gap-3 group cursor-pointer">
-                    <div class="w-10 h-10 bg-uni-blue rounded-xl flex items-center justify-center font-bold text-white shadow-lg">U</div>
+                    <div class="w-10 h-10 bg-uni-blue rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-blue-900/20 group-hover:rotate-12 transition-transform">U</div>
                     <span class="font-bold text-2xl tracking-tight">UniChain<span class="text-uni-blue">.rw</span></span>
                 </div>
                 <div class="hidden md:flex items-center space-x-10">
-                    <button onclick="scrollToSection('dashboard')" class="text-gray-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Dashboard</button>
-                    <button onclick="scrollToSection('evidence')" class="text-gray-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Evidence</button>
-                    <button onclick="scrollToSection('impact')" class="text-gray-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Impact</button>
-                    <button class="bg-uni-blue hover:bg-blue-700 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg">
+                    <button onclick="scrollToSection('dashboard')" class="text-black-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Dashboard</button>
+                    <button onclick="scrollToSection('evidence')" class="text-black-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Evidence</button>
+                    <button onclick="scrollToSection('impact')" class="text-black-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Impact</button>
+                    <button class="bg-uni-blue hover:bg-blue-700 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-blue-600/20">
                         Connect Wallet
                     </button>
                 </div>
@@ -72,18 +73,22 @@
 
     <header class="relative overflow-hidden hero-gradient border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-6 py-24 lg:py-32 text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-uni-blue text-xs font-bold uppercase tracking-widest mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-uni-blue text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-uni-blue"></span>
+                </span>
                 Cardano Blockchain Project 2025
             </div>
-            <h1 class="text-5xl lg:text-7xl font-black text-black mb-8 leading-tight">
+            <h1 class="text-5xl lg:text-7xl font-extrabold text-uni-black mb-8 leading-tight">
                 Restoring Trust in <br/>
                 <span class="text-uni-blue">Rwanda's Digital Identity</span>
             </h1>
-            <p class="max-w-2xl mx-auto text-lg text-gray-600 mb-12 leading-relaxed font-medium">
+            <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
                 Solving critical gaps in academic verification and financial integrity. We turn physical friction into digital certainty.
             </p>
             <div class="flex justify-center gap-6">
-                <button onclick="scrollToSection('dashboard')" class="px-10 py-4 bg-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl">
+                <button onclick="scrollToSection('dashboard')" class="px-10 py-4 bg-uni-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl hover:shadow-gray-200">
                     Explore Stats
                 </button>
             </div>
@@ -94,17 +99,17 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="mb-16">
                 <h2 class="text-uni-blue font-bold tracking-widest uppercase text-sm mb-3">Analytics Engine</h2>
-                <h3 class="text-4xl font-black text-black tracking-tight">Quantifying the Trust Gap</h3>
+                <h3 class="text-4xl font-extrabold text-uni-black tracking-tight">Quantifying the Trust Gap</h3>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-white p-8 rounded-3xl glass-card">
                     <div class="flex items-center justify-between mb-10">
                         <div>
-                            <h4 class="text-xl font-black text-black">Severity Assessment</h4>
-                            <p class="text-sm text-gray-500 font-medium">Incident analysis 2024-2025</p>
+                            <h4 class="text-xl font-bold">Severity Assessment</h4>
+                            <p class="text-sm text-gray-400">Incident analysis 2024-2025</p>
                         </div>
-                        <div class="px-4 py-1.5 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-100 uppercase">Live Reports</div>
+                        <div class="px-4 py-1.5 bg-green-50 text-green-600 text-xs font-bold rounded-lg border border-green-100">Live Reports</div>
                     </div>
                     <div class="chart-container">
                         <canvas id="impactChart"></canvas>
@@ -112,15 +117,15 @@
                 </div>
 
                 <div class="space-y-6">
-                    <div class="bg-uni-blue p-8 rounded-3xl text-white shadow-xl">
-                        <span class="text-blue-100 text-xs font-bold uppercase tracking-widest opacity-80">Efficiency Gap</span>
-                        <div class="text-5xl font-black my-4">7 Days</div>
-                        <p class="text-blue-50 text-sm font-medium">Average delay for manual degree verification in Kigali.</p>
+                    <div class="bg-uni-blue p-8 rounded-3xl text-white shadow-xl shadow-blue-200">
+                        <span class="text-blue-200 text-xs font-bold uppercase tracking-widest">Efficiency Gap</span>
+                        <div class="text-5xl font-extrabold my-4">7 Days</div>
+                        <p class="text-blue-100 text-sm">Average delay for manual degree verification in Kigali.</p>
                     </div>
-                    <div class="bg-white p-8 rounded-3xl glass-card border-2 border-gray-50">
+                    <div class="bg-white p-8 rounded-3xl glass-card">
                         <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">Fraud Prevention</span>
-                        <div class="text-5xl font-black my-4 text-black">26+</div>
-                        <p class="text-gray-600 text-sm font-medium">Reported suspects paraded for document forgery this quarter.</p>
+                        <div class="text-5xl font-extrabold my-4 text-uni-black">26+</div>
+                        <p class="text-gray-500 text-sm">Reported suspects paraded for document forgery this quarter.</p>
                     </div>
                 </div>
             </div>
@@ -132,12 +137,12 @@
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                 <div>
                     <h2 class="text-uni-blue font-bold tracking-widest uppercase text-sm mb-3">Evidence Map</h2>
-                    <h3 class="text-4xl font-black text-black tracking-tight">Verified Field Data</h3>
+                    <h3 class="text-4xl font-extrabold text-uni-black tracking-tight">Verified Field Data</h3>
                 </div>
                 <div class="flex bg-gray-100 p-1.5 rounded-2xl">
-                    <button onclick="filterEvidence('all')" class="filter-btn active px-6 py-2 text-sm font-bold rounded-xl bg-white text-black shadow-sm transition-all">All</button>
-                    <button onclick="filterEvidence('Education')" class="filter-btn px-6 py-2 text-sm font-bold rounded-xl text-gray-500 hover:text-black transition-all">Education</button>
-                    <button onclick="filterEvidence('Finance')" class="filter-btn px-6 py-2 text-sm font-bold rounded-xl text-gray-500 hover:text-black transition-all">Finance</button>
+                    <button onclick="filterEvidence('all')" class="filter-btn active px-6 py-2 text-sm font-bold rounded-xl bg-white text-uni-black shadow-sm transition-all">All</button>
+                    <button onclick="filterEvidence('Education')" class="filter-btn px-6 py-2 text-sm font-bold rounded-xl text-gray-500 hover:text-uni-black transition-all">Education</button>
+                    <button onclick="filterEvidence('Finance')" class="filter-btn px-6 py-2 text-sm font-bold rounded-xl text-gray-500 hover:text-uni-black transition-all">Finance</button>
                 </div>
             </div>
             
@@ -147,80 +152,103 @@
     </section>
 
     <section id="impact" class="py-24 bg-uni-black">
-        <div class="max-w-7xl mx-auto px-6 text-center">
-            <div class="mb-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
                 <h2 class="text-uni-blue font-bold tracking-widest uppercase text-sm mb-3">Stakeholders</h2>
-                <h3 class="text-4xl font-black text-white">Who is Affected?</h3>
-                <p class="text-gray-400 mt-4 font-medium">Click to reveal specific field evidence for each group.</p>
+                <h3 class="text-4xl font-extrabold text-white">Who is Affected?</h3>
+                <p class="text-gray-400 mt-4">Click to reveal specific field evidence for each group.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
-                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl">🎓</div>
-                    <h4 class="text-xl font-bold text-white group-hover:text-black transition-colors">Students</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600 font-medium">Verification delays prevent timely employment.</p>
-                    <div class="hidden mt-6 pt-6 border-t border-gray-200 text-xs text-uni-blue font-black uppercase">
-                        HEC 7-day wait confirmation.
+                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🎓</div>
+                    <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Students</h4>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Verification delays prevent timely employment.</p>
+                    <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
+                        Field Report: HEC 7-day wait confirmation.
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
-                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl">🏫</div>
-                    <h4 class="text-xl font-bold text-white group-hover:text-black transition-colors">Institutions</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600 font-medium">Manual vetting burdens administrative staff.</p>
-                    <div class="hidden mt-6 pt-6 border-t border-gray-200 text-xs text-uni-blue font-black uppercase">
-                        AUCA manual vetting report.
+                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🏫</div>
+                    <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Institutions</h4>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Manual vetting burdens administrative staff.</p>
+                    <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
+                        Field Report: AUCA manual document requirement.
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
-                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl">🏦</div>
-                    <h4 class="text-xl font-bold text-white group-hover:text-black transition-colors">SACCOs</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600 font-medium">Inability to verify identity leads to financial loss.</p>
-                    <div class="hidden mt-6 pt-6 border-t border-gray-200 text-xs text-uni-blue font-black uppercase">
-                        KT Press 2025 Report.
+                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🏦</div>
+                    <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">SACCOs</h4>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Inability to verify identity leads to financial loss.</p>
+                    <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
+                        Source: KT Press 2025 Integrity Report.
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
-                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl">⚖️</div>
-                    <h4 class="text-xl font-bold text-white group-hover:text-black transition-colors">Regulators</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600 font-medium">RIB overwhelmed by investigation caseloads.</p>
-                    <div class="hidden mt-6 pt-6 border-t border-gray-200 text-xs text-uni-blue font-black uppercase">
-                        RIB 26-suspect data.
+                    <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⚖️</div>
+                    <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Regulators</h4>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">RIB overwhelmed by investigation caseloads.</p>
+                    <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
+                        Data: RIB 26-suspect parade (Sept).
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <section id="team" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h3 class="text-3xl font-extrabold mb-16">The Infrastructure Team</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="space-y-4">
+                    <div class="w-24 h-24 bg-uni-blue rounded-3xl mx-auto flex items-center justify-center text-white text-3xl font-bold shadow-2xl shadow-blue-200">FI</div>
+                    <h4 class="font-bold text-xl">Fabrice Ishimwe</h4>
+                    <p class="text-uni-blue font-bold text-sm">Project Manager</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="w-24 h-24 bg-uni-black rounded-3xl mx-auto flex items-center justify-center text-white text-3xl font-bold shadow-2xl shadow-gray-300">PS</div>
+                    <h4 class="font-bold text-xl">Placide Shema</h4>
+                    <p class="text-uni-blue font-bold text-sm">Developer</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="w-24 h-24 bg-gray-200 rounded-3xl mx-auto flex items-center justify-center text-uni-black text-3xl font-bold shadow-lg">TI</div>
+                    <h4 class="font-bold text-xl">Tuyizere Ibrahim</h4>
+                    <p class="text-uni-blue font-bold text-sm">Designer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-uni-black text-white py-20 border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6 text-center md:text-left">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
                 <div>
-                    <div class="flex items-center gap-3 mb-8 justify-center md:justify-start">
+                    <div class="flex items-center gap-3 mb-8">
                         <div class="w-8 h-8 bg-uni-blue rounded-lg flex items-center justify-center font-bold">U</div>
                         <span class="text-xl font-bold tracking-tight">UniChain</span>
                     </div>
-                    <p class="text-gray-500 text-sm font-medium leading-relaxed">
+                    <p class="text-gray-500 text-sm leading-relaxed">
                         Building immutable trust for Rwanda's academic and financial future using Cardano blockchain.
                     </p>
                 </div>
                 <div>
-                    <h5 class="text-uni-blue font-black uppercase text-xs tracking-widest mb-8">Navigation</h5>
-                    <ul class="space-y-4 text-sm text-gray-400 font-semibold">
+                    <h5 class="text-uni-blue font-bold uppercase text-xs tracking-widest mb-8">Navigation</h5>
+                    <ul class="space-y-4 text-sm text-gray-400">
                         <li><a href="#dashboard" class="hover:text-white transition-colors">Dashboard</a></li>
                         <li><a href="#evidence" class="hover:text-white transition-colors">Evidence Map</a></li>
                         <li><a href="#impact" class="hover:text-white transition-colors">Stakeholders</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h5 class="text-uni-blue font-black uppercase text-xs tracking-widest mb-8">Contact</h5>
-                    <p class="text-sm text-gray-400 font-semibold">Cardano Group 7<br/>Kigali, Rwanda</p>
+                    <h5 class="text-uni-blue font-bold uppercase text-xs tracking-widest mb-8">Contact</h5>
+                    <p class="text-sm text-gray-400 leading-relaxed">Cardano Group 7<br/>Kigali, Rwanda</p>
                 </div>
             </div>
-            <div class="pt-10 mt-10 border-t border-white/5 text-center text-xs text-gray-600 font-bold">
-                © 2025 UNICHAIN.RW • BUILT FOR TRUST
+            <div class="pt-10 border-t border-white/5 text-center text-xs text-gray-600">
+                © 2025 UniChain. Built for Trust.
             </div>
         </div>
     </footer>
@@ -264,11 +292,7 @@
                     plugins: { legend: { display: false } },
                     scales: { 
                         y: { display: false },
-                        x: { 
-                            grid: { display: false }, 
-                            border: { display: false },
-                            ticks: { color: '#000000', font: { weight: 'bold' } }
-                        }
+                        x: { grid: { display: false }, border: { display: false } }
                     }
                 }
             });
@@ -279,20 +303,20 @@
             container.innerHTML = items.map(item => `
                 <div class="p-6 bg-white rounded-3xl glass-card border border-gray-100">
                     <div class="flex justify-between items-center mb-4">
-                        <span class="px-3 py-1 bg-blue-50 text-uni-blue text-[10px] font-black uppercase rounded-md">${item.category}</span>
-                        <span class="text-[10px] text-gray-400 font-bold">${item.date}</span>
+                        <span class="px-3 py-1 bg-blue-50 text-uni-blue text-[10px] font-bold uppercase rounded-md">${item.category}</span>
+                        <span class="text-[10px] text-gray-400">${item.date}</span>
                     </div>
-                    <h4 class="font-black text-black mb-2 text-lg leading-tight">${item.title}</h4>
-                    <p class="text-sm text-gray-600 mb-4 font-medium leading-relaxed">${item.desc}</p>
-                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">${item.source}</div>
+                    <h4 class="font-bold text-gray-900 mb-2">${item.title}</h4>
+                    <p class="text-sm text-gray-500 mb-4">${item.desc}</p>
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">${item.source}</div>
                 </div>
             `).join('');
         }
 
         function filterEvidence(category) {
             const btns = document.querySelectorAll('.filter-btn');
-            btns.forEach(btn => btn.classList.remove('bg-white', 'text-black', 'shadow-sm'));
-            event.target.classList.add('bg-white', 'text-black', 'shadow-sm');
+            btns.forEach(btn => btn.classList.remove('bg-white', 'text-uni-black', 'shadow-sm'));
+            event.target.classList.add('bg-white', 'text-uni-black', 'shadow-sm');
             
             const filtered = category === 'all' ? evidenceData : evidenceData.filter(d => d.category === category);
             renderEvidence(filtered);
