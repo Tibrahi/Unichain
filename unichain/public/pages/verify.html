@@ -22,9 +22,22 @@
         input:focus, textarea:focus { border-color: #0033AD !important; outline: none; box-shadow: 0 0 10px rgba(0, 51, 173, 0.2); }
         .loading-dots:after { content: '.'; animation: dots 1s steps(5, end) infinite; }
         @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
+
+        /* Custom Modal Styles */
+        #custom-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
+        #custom-modal.active { display: flex; animation: fadeIn 0.2s ease-out; }
     </style>
 </head>
 <body>
+
+    <div id="custom-modal">
+        <div class="glass-card p-8 rounded-[2rem] max-w-sm w-full mx-6 border-uni-blue/30 text-center">
+            <div id="modal-icon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-uni-blue/10"></div>
+            <h3 id="modal-title" class="text-xl font-bold uppercase tracking-tighter mb-2">Notice</h3>
+            <p id="modal-msg" class="text-gray-400 text-sm mb-6"></p>
+            <button onclick="closeModal()" class="w-full bg-uni-blue py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest">Acknowledge</button>
+        </div>
+    </div>
 
     <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/5 h-20 flex items-center px-6 justify-between">
         <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('portal-selection')">
@@ -77,34 +90,47 @@
         <div id="view-p2p-loans" class="view-section">
             <div class="glass-card p-10 rounded-[2.5rem]">
                 <h2 class="text-3xl font-bold mb-2 uppercase tracking-tighter">P2P <span class="text-uni-blue">Finance & Enforcement</span></h2>
-                <p class="text-gray-500 mb-8 text-sm italic">Loans are issued based on your Trust Index. Non-repayment results in identity revocation.</p>
+                <p class="text-gray-500 mb-8 text-sm italic">Loans are issued based on your Trust Index.</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div class="space-y-6">
+                    <div id="p2p-inputs" class="space-y-6">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Loan Amount (RWF)</label>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Loan Amount (RWF)</label>
                             <input type="number" id="p2p-amount" placeholder="e.g. 50000" class="w-full p-4 rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Repayment Term (Days)</label>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Repayment Term (Days)</label>
                             <input type="number" id="p2p-days" placeholder="e.g. 30" class="w-full p-4 rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Collateral Agreement</label>
-                            <div class="p-4 bg-red-900/10 border border-red-900/30 rounded-xl">
-                                <p class="text-[10px] text-red-500 leading-relaxed uppercase font-bold">
-                                    Notice: By submitting, you authorize UniChain to revoke your Verified Identity and alert SACCO partners if repayment is not detected by the ledger.
-                                </p>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Purpose</label>
+                            <textarea id="p2p-purpose" placeholder="Why do you need funds?" class="w-full p-4 rounded-xl h-24"></textarea>
+                        </div>
+                        <button onclick="reviewLoan()" class="w-full bg-uni-blue py-5 rounded-xl font-bold text-white uppercase text-sm">Review & Submit</button>
+                    </div>
+
+                    <div id="p2p-review" class="hidden space-y-6 animate-fadeIn">
+                        <div class="p-6 bg-white/5 border border-white/10 rounded-2xl">
+                            <h4 class="text-[10px] font-bold text-uni-blue uppercase mb-4 tracking-widest">Proposal Detailed Review</h4>
+                            <div class="space-y-4">
+                                <div><span class="text-[9px] text-gray-500 block uppercase">Requested Amount</span><p id="rev-amt" class="text-xl font-bold">--</p></div>
+                                <div><span class="text-[9px] text-gray-500 block uppercase">Repayment Deadline</span><p id="rev-days" class="text-xl font-bold">--</p></div>
+                                <div><span class="text-[9px] text-gray-500 block uppercase">Risk Level</span><p class="text-xs text-green-500 font-bold uppercase">Standard Protocol</p></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Purpose of Loan</label>
-                            <textarea id="p2p-purpose" placeholder="Describe why you need the funds..." class="w-full p-4 rounded-xl h-32"></textarea>
+                        <div class="p-4 bg-red-900/10 border border-red-900/30 rounded-xl">
+                            <p class="text-[9px] text-red-500 uppercase font-bold leading-relaxed">
+                                Enforcement Active: Non-payment triggers automatic identity burn.
+                            </p>
                         </div>
-                        <button onclick="alert('Loan Proposal Submitted to Ledger. Enforcement protocols active.')" class="w-full bg-uni-blue py-5 rounded-xl font-bold hover:bg-blue-700 transition-all text-white uppercase tracking-widest text-sm">Submit Proposal</button>
-                        <button onclick="switchView('portal-selection')" class="w-full border border-white/10 py-4 rounded-xl text-[10px] font-bold uppercase text-gray-500">Cancel</button>
+                        <div class="flex gap-2">
+                            <button onclick="submitLoanProposal()" class="flex-1 bg-green-600 py-4 rounded-xl font-bold text-[10px] uppercase">Confirm Submission</button>
+                            <button onclick="toggleReview(false)" class="px-6 bg-white/5 border border-white/10 rounded-xl font-bold text-[10px] uppercase">Edit</button>
+                        </div>
+                    </div>
+                    
+                    <div id="p2p-placeholder" class="hidden md:flex items-center justify-center border-2 border-dashed border-white/5 rounded-3xl text-gray-600 text-[10px] uppercase font-bold">
+                        Awaiting input for review...
                     </div>
                 </div>
             </div>
@@ -176,12 +202,10 @@
     </main>
 
     <script type="module">
-        // Firebase Modular SDK Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-        // IMPORTANT: Replace this with your actual Firebase project config
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -194,15 +218,28 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        
         const COLLECTION_NAME = "verified_identities";
-
         let currentRole = "";
 
-        // Initialization
+        // UI HELPERS (MODALS)
+        window.showModal = (title, msg, type = 'info') => {
+            const modal = document.getElementById('custom-modal');
+            const icon = document.getElementById('modal-icon');
+            icon.innerHTML = type === 'success' ? '<i data-lucide="check-circle" class="text-green-500"></i>' : 
+                             type === 'error' ? '<i data-lucide="alert-triangle" class="text-red-500"></i>' : 
+                             '<i data-lucide="info" class="text-uni-blue"></i>';
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            modal.classList.add('active');
+            lucide.createIcons();
+        };
+
+        window.closeModal = () => document.getElementById('custom-modal').classList.remove('active');
+
         window.addEventListener('load', () => {
             lucide.createIcons();
             initAuth();
+            if(window.innerWidth > 768) document.getElementById('p2p-placeholder').classList.replace('hidden', 'flex');
         });
 
         const initAuth = async () => {
@@ -212,14 +249,48 @@
                 document.getElementById('auth-status').classList.replace('text-uni-blue', 'text-green-500');
             } catch (e) {
                 document.getElementById('status-text').innerText = "Auth Offline";
-                console.error("Auth Error", e);
             }
         };
 
         window.switchView = (id) => {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById(`view-${id}`).classList.add('active');
-            lucide.createIcons(); // Re-render icons for new view
+            lucide.createIcons();
+        };
+
+        // P2P LOGIC WITH DETAILED REVIEW
+        window.reviewLoan = () => {
+            const amt = document.getElementById('p2p-amount').value;
+            const days = document.getElementById('p2p-days').value;
+            const purp = document.getElementById('p2p-purpose').value;
+
+            if(!amt || !days || !purp) return showModal("Missing Data", "Please complete all fields before reviewing.", "error");
+
+            document.getElementById('rev-amt').innerText = `${parseInt(amt).toLocaleString()} RWF`;
+            document.getElementById('rev-days').innerText = `${days} Days`;
+            toggleReview(true);
+        };
+
+        window.toggleReview = (show) => {
+            const review = document.getElementById('p2p-review');
+            const placeholder = document.getElementById('p2p-placeholder');
+            if(show) {
+                review.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                review.classList.add('hidden');
+                if(window.innerWidth > 768) placeholder.classList.remove('hidden');
+            }
+        };
+
+        window.submitLoanProposal = () => {
+            showModal("Success", "Loan Proposal anchored to ledger. Monitoring repayment cycles...", "success");
+            switchView('portal-selection');
+            // Reset fields
+            document.getElementById('p2p-amount').value = "";
+            document.getElementById('p2p-days').value = "";
+            document.getElementById('p2p-purpose').value = "";
+            toggleReview(false);
         };
 
         window.openPortal = (role) => {
@@ -237,17 +308,12 @@
             };
 
             config[role].forEach(f => {
-                container.innerHTML += `
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-[0.2em]">${f.l}</label>
-                        <input type="text" id="inp-${f.id}" data-label="${f.l}" class="w-full p-4 rounded-xl outline-none" required>
-                    </div>
-                `;
+                container.innerHTML += `<div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">${f.l}</label>
+                <input type="text" id="inp-${f.id}" data-label="${f.l}" class="w-full p-4 rounded-xl outline-none"></div>`;
             });
             window.switchView('portal-form');
         };
 
-        // Hashing function for privacy
         async function generateHash(input) {
             const encoder = new TextEncoder();
             const data = encoder.encode(input.toLowerCase() + "UNICHAIN_SALT_2025");
@@ -257,14 +323,13 @@
 
         window.processOnboarding = async () => {
             const prompt = document.getElementById('user-prompt').value.trim();
-            if (!prompt) return alert("Secret phrase required to secure your identity.");
+            if (!prompt) return showModal("Identity Alert", "Secret phrase required to secure data.", "error");
 
             const btn = document.getElementById('btn-onboard');
             btn.disabled = true;
             btn.innerHTML = `<span class="loading-dots">Securing Ledger</span>`;
 
             const hashHex = await generateHash(prompt);
-            
             const meta = {};
             let hasEmpty = false;
             document.querySelectorAll('#form-content input').forEach(inp => {
@@ -273,30 +338,21 @@
             });
 
             if(hasEmpty) {
-                alert("Please fill all fields.");
+                showModal("Incomplete Form", "All fields are required.", "error");
                 btn.disabled = false;
                 btn.innerText = "Verify & Create Profile";
                 return;
             }
 
-            const profile = {
-                role: currentRole,
-                uid: hashHex.substring(0, 24),
-                metadata: meta,
-                timestamp: Date.now(),
-                verified: true
-            };
+            const profile = { role: currentRole, uid: hashHex.substring(0, 24), metadata: meta, timestamp: Date.now(), verified: true };
 
             try {
-                // Simplified Doc Reference for reliability
                 const docRef = doc(db, COLLECTION_NAME, hashHex.substring(0, 20));
                 await setDoc(docRef, profile);
-                
                 document.getElementById('display-id').innerText = profile.uid;
                 window.switchView('success');
             } catch (e) {
-                console.error(e);
-                alert("Permission Denied: Check Firebase Rules.");
+                showModal("Ledger Error", "Permission denied by firewall.", "error");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Verify & Create Profile";
@@ -305,33 +361,27 @@
 
         window.loginWithSeed = async () => {
             const seed = document.getElementById('login-seed').value.trim();
-            if (!seed) return alert("Seed phrase required.");
+            if (!seed) return showModal("Login Required", "Please enter seed phrase.", "error");
 
             const btn = document.getElementById('btn-login');
             btn.disabled = true;
             btn.innerHTML = `<span class="loading-dots">Searching</span>`;
 
             const hashHex = await generateHash(seed);
-            const docId = hashHex.substring(0, 20);
-
             try {
-                const snap = await getDoc(doc(db, COLLECTION_NAME, docId));
+                const snap = await getDoc(doc(db, COLLECTION_NAME, hashHex.substring(0, 20)));
                 if (snap.exists()) {
                     const d = snap.data();
                     document.getElementById('dash-role').innerText = `${d.role} Identity`;
                     document.getElementById('dash-data').innerHTML = Object.entries(d.metadata).map(([k, v]) => `
-                        <div class="border-b border-white/5 pb-4">
-                            <span class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">${k}</span>
-                            <p class="text-lg text-white font-semibold mt-1">${v}</p>
-                        </div>
-                    `).join('') + `<div class="pt-4 text-[9px] text-gray-600 uppercase tracking-tighter">Chain Entry: ${new Date(d.timestamp).toLocaleString()}</div>`;
+                        <div class="border-b border-white/5 pb-4"><span class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">${k}</span>
+                        <p class="text-lg text-white font-semibold mt-1">${v}</p></div>`).join('') + `<div class="pt-4 text-[9px] text-gray-600 uppercase">Chain Entry: ${new Date(d.timestamp).toLocaleString()}</div>`;
                     window.switchView('dashboard');
                 } else {
-                    alert("Profile not found. Please register first.");
+                    showModal("Not Found", "No profile associated with this phrase.", "error");
                 }
             } catch (e) { 
-                console.error(e);
-                alert("Connection error.");
+                showModal("Connection Error", "Check network settings.", "error");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Retrieve Identity";
