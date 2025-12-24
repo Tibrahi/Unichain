@@ -155,15 +155,7 @@
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyA3fqZErsTzw40F1n4nI0EjM50nkeooGxQ",
-        authDomain: "unichain-a30de.firebaseapp.com",
-        projectId: "unichain-a30de",
-        storageBucket: "unichain-a30de.firebasestorage.app",
-        messagingSenderId: "28358656144",
-        appId: "1:28358656144:web:6303bfe73ab3cb324f9815",
-        measurementId: "G-RRET7KRSG2"
-    };
+
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
