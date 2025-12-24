@@ -48,6 +48,11 @@
             background: #e5e7eb;
             border-radius: 10px;
         }
+
+        /* Carousel Display Logic */
+        .carousel-item { display: none; }
+        .carousel-item.active { display: block; animation: fadeIn 0.8s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-gray-900 antialiased">
@@ -63,7 +68,10 @@
                     <button onclick="scrollToSection('dashboard')" class="text-black-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Dashboard</button>
                     <button onclick="scrollToSection('evidence')" class="text-black-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Evidence</button>
                     <button onclick="scrollToSection('impact')" class="text-black-300 hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">Impact</button>
-                    <button class="bg-uni-blue hover:bg-blue-700 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-blue-600/20">
+                    <a href="pages/verify.html" class="bg-white border border-uni-blue text-uni-blue hover:bg-blue-50 px-6 py-2.5 rounded-full text-sm font-bold transition-all">
+                        Verify Credentials
+                    </a>
+                    <button class="bg-uni-blue hover:bg-blue-700 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-blue-600/20 text-white">
                         Connect Wallet
                     </button>
                 </div>
@@ -73,20 +81,34 @@
 
     <header class="relative overflow-hidden hero-gradient border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-6 py-24 lg:py-32 text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-uni-blue text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-uni-blue"></span>
-                </span>
-                Cardano Blockchain Project 2025
+            <div id="hero-carousel">
+                <div class="carousel-item active">
+                    <h1 class="text-5xl lg:text-7xl font-extrabold text-uni-black mb-8 leading-tight">
+                        Restoring Trust in <br/>
+                        <span class="text-uni-blue">Rwanda's Digital Identity</span>
+                    </h1>
+                    <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
+                        Solving critical gaps in academic verification and financial integrity. We turn physical friction into digital certainty. [cite: 30, 91]
+                    </p>
+                </div>
+                <div class="carousel-item">
+                    <h1 class="text-5xl lg:text-7xl font-extrabold text-uni-black mb-8 leading-tight">
+                        Eliminating <span class="text-uni-blue">Credential Forgery</span>
+                    </h1>
+                    <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
+                        Protecting employers and institutions from fraudulent academic documents and verification delays. [cite: 7, 74]
+                    </p>
+                </div>
+                <div class="carousel-item">
+                    <h1 class="text-5xl lg:text-7xl font-extrabold text-uni-black mb-8 leading-tight">
+                        Securing <span class="text-uni-blue">P2P Lending</span>
+                    </h1>
+                    <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
+                        Providing enforceable digital agreements for informal lending to prevent financial loss. [cite: 33, 76]
+                    </p>
+                </div>
             </div>
-            <h1 class="text-5xl lg:text-7xl font-extrabold text-uni-black mb-8 leading-tight">
-                Restoring Trust in <br/>
-                <span class="text-uni-blue">Rwanda's Digital Identity</span>
-            </h1>
-            <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
-                Solving critical gaps in academic verification and financial integrity. We turn physical friction into digital certainty.
-            </p>
+            
             <div class="flex justify-center gap-6">
                 <button onclick="scrollToSection('dashboard')" class="px-10 py-4 bg-uni-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl hover:shadow-gray-200">
                     Explore Stats
@@ -120,12 +142,12 @@
                     <div class="bg-uni-blue p-8 rounded-3xl text-white shadow-xl shadow-blue-200">
                         <span class="text-blue-200 text-xs font-bold uppercase tracking-widest">Efficiency Gap</span>
                         <div class="text-5xl font-extrabold my-4">7 Days</div>
-                        <p class="text-blue-100 text-sm">Average delay for manual degree verification in Kigali.</p>
+                        <p class="text-blue-100 text-sm">Average delay for manual degree verification in Kigali. [cite: 12]</p>
                     </div>
                     <div class="bg-white p-8 rounded-3xl glass-card">
                         <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">Fraud Prevention</span>
                         <div class="text-5xl font-extrabold my-4 text-uni-black">26+</div>
-                        <p class="text-gray-500 text-sm">Reported suspects paraded for document forgery this quarter.</p>
+                        <p class="text-gray-500 text-sm">Reported suspects paraded for document forgery this quarter. [cite: 19]</p>
                     </div>
                 </div>
             </div>
@@ -163,36 +185,36 @@
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🎓</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Students</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Verification delays prevent timely employment.</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Verification delays prevent timely employment. [cite: 38]</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Field Report: HEC 7-day wait confirmation.
+                        Field Report: HEC 7-day wait confirmation. [cite: 12]
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🏫</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Institutions</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Manual vetting burdens administrative staff.</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Manual vetting burdens administrative staff. [cite: 109]</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Field Report: AUCA manual document requirement.
+                        Field Report: AUCA manual document requirement. [cite: 111]
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🏦</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">SACCOs</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Inability to verify identity leads to financial loss.</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Inability to verify identity leads to financial loss. [cite: 26]</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Source: KT Press 2025 Integrity Report.
+                        Source: KT Press 2025 Integrity Report. [cite: 28]
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⚖️</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Regulators</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">RIB overwhelmed by investigation caseloads.</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">RIB overwhelmed by investigation caseloads. [cite: 14]</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Data: RIB 26-suspect parade (Sept).
+                        Data: RIB 26-suspect parade (Sept). [cite: 19]
                     </div>
                 </div>
             </div>
@@ -231,7 +253,7 @@
                         <span class="text-xl font-bold tracking-tight">UniChain</span>
                     </div>
                     <p class="text-gray-500 text-sm leading-relaxed">
-                        Building immutable trust for Rwanda's academic and financial future using Cardano blockchain.
+                        Building immutable trust for Rwanda's academic and financial future using Cardano blockchain. [cite: 78, 92]
                     </p>
                 </div>
                 <div>
@@ -258,18 +280,20 @@
             document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
 
+        // Updated Data: Added P2P Loan Issue (Hakiza Case)
         const evidenceData = [
             { id: 1, date: "Aug 2024", source: "University World News", category: "Education", title: "HEC Tightens Degree Rules", desc: "Widespread suspected fraudulent foreign degrees found.", impact: "High Friction" },
-            { id: 2, date: "2025", source: "KT Press", category: "Education", title: "5 Teachers Arrested", desc: "Use of forged academic documents in Rutsiro district.", impact: "Criminal" },
+            { id: 2, date: "Jan 2025", source: "IGIHE", category: "Education", title: "5 Teachers Arrested", desc: "Use of forged academic documents in Rutsiro district.", impact: "Criminal" },
             { id: 3, date: "May 2025", source: "Irembo", category: "Identity", title: "7-Day Wait Period", desc: "Confirmation of lengthy processing for qualifications.", impact: "Delay" },
             { id: 4, date: "Sept 2025", source: "KT Press", category: "Finance", title: "RIB Parades 26 Suspects", desc: "Large scale fraud bust indicating systemic weaknesses.", impact: "Systemic" },
-            { id: 5, date: "2025", source: "KT Press", category: "Finance", title: "SACCO Integrity Questioned", desc: "Huge losses reported due to lack of verified integrity.", impact: "Financial Loss" },
-            { id: 6, date: "Dec 2025", source: "Field Interview", category: "Education", title: "Manual Verification", desc: "Physical document requirement at AUCA due to lack of trust.", impact: "Trust Gap" }
+            { id: 5, date: "Feb 2025", source: "KT Press", category: "Finance", title: "SACCO Integrity Crisis", desc: "57% of SACCOs suffered losses due to fraud and manual records.", impact: "Financial Loss" },
+            { id: 6, date: "Dec 2025", source: "Field Interview", category: "Finance", title: "P2P Lending Failure", desc: "Case study: Hakiza (Gatenga) lost funds due to lack of enforceable digital agreements.", impact: "Enforcement Gap" }
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
             initImpactChart();
             renderEvidence(evidenceData);
+            startHeroCarousel();
         });
 
         function initImpactChart() {
@@ -277,10 +301,10 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Forgery Cases', 'Processing Lag', 'Manual Overhead'],
+                    labels: ['Forgery Cases', 'Processing Lag', 'Manual SACCOs'],
                     datasets: [{
                         label: 'Severity Level',
-                        data: [85, 92, 78],
+                        data: [85, 92, 57],
                         backgroundColor: '#0033AD',
                         borderRadius: 12,
                         barThickness: 40
@@ -328,6 +352,19 @@
                 extra.classList.toggle('hidden');
                 extra.classList.toggle('block');
             }
+        }
+
+        // New SlideShow Functionality
+        let currentSlide = 0;
+        function startHeroCarousel() {
+            const slides = document.querySelectorAll('.carousel-item');
+            if(slides.length === 0) return;
+            
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 5000); // Transitions every 5 seconds
         }
     </script>
 </body>
