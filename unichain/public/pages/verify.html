@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniChain  | Secure Verification</title>
+    <title>UniChain | Secure Verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -26,10 +26,9 @@
 </head>
 <body>
 
-    <!-- Nav -->
     <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/5 h-20 flex items-center px-6 justify-between">
         <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('portal-selection')">
-            <div class="w-10 h-10 bg-uni-blue rounded flex items-center justify-center font-bold">U</div>
+            <div class="w-10 h-10 bg-uni-blue rounded flex items-center justify-center font-bold text-white">U</div>
             <span class="font-bold text-xl tracking-tighter">UniChain.rw</span>
         </div>
         <div id="auth-status" class="text-[10px] font-bold text-uni-blue bg-uni-blue/10 px-4 py-2 rounded-full border border-uni-blue/20 uppercase tracking-widest">
@@ -39,7 +38,6 @@
 
     <main class="pt-32 pb-20 px-6 max-w-5xl mx-auto">
 
-        <!-- VIEW 1: ROLE SELECTION -->
         <div id="view-portal-selection" class="view-section active">
             <h1 class="text-4xl font-bold mb-2 uppercase tracking-tighter">Secure <span class="text-uni-blue">Verification</span></h1>
             <p class="text-gray-500 mb-12 italic">Cardano-backed identity for Rwanda's academic & financial growth.</p>
@@ -50,17 +48,17 @@
                     <h3 class="text-xl font-bold text-white">Student</h3>
                     <p class="text-gray-500 text-sm mt-2">Generate a tamper-proof profile for academic verification.</p>
                 </button>
-                <button onclick="openPortal('university')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all">
+                <button onclick="openPortal('university')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all group">
                     <i data-lucide="school" class="w-10 h-10 text-uni-blue mb-4"></i>
                     <h3 class="text-xl font-bold text-white">Institution</h3>
                     <p class="text-gray-500 text-sm mt-2">Verify and issue digital credentials to students.</p>
                 </button>
-                <button onclick="openPortal('sacco')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all">
+                <button onclick="openPortal('sacco')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all group">
                     <i data-lucide="landmark" class="w-10 h-10 text-uni-blue mb-4"></i>
                     <h3 class="text-xl font-bold text-white">SACCO</h3>
                     <p class="text-gray-500 text-sm mt-2">Check member integrity and verify financial status.</p>
                 </button>
-                <button onclick="openPortal('gov')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all">
+                <button onclick="openPortal('gov')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all group">
                     <i data-lucide="shield-check" class="w-10 h-10 text-uni-blue mb-4"></i>
                     <h3 class="text-xl font-bold text-white">Government</h3>
                     <p class="text-gray-500 text-sm mt-2">Oversee high-level fraud alerts and equivalence records.</p>
@@ -71,13 +69,10 @@
             </div>
         </div>
 
-        <!-- VIEW 2: DYNAMIC PORTAL FORM -->
         <div id="view-portal-form" class="view-section">
             <div class="glass-card p-10 rounded-[2.5rem]">
                 <h2 id="portal-title" class="text-3xl font-bold mb-6 uppercase tracking-tighter text-white">PORTAL</h2>
-                <div id="form-content" class="space-y-6">
-                    <!-- Dynamic fields -->
-                </div>
+                <div id="form-content" class="space-y-6"></div>
                 
                 <div class="mt-10 pt-10 border-t border-white/5">
                     <label class="block text-[10px] font-bold text-uni-blue uppercase mb-2 tracking-widest">Secret Recovery Phrase (Profile Key)</label>
@@ -89,7 +84,6 @@
             </div>
         </div>
 
-        <!-- VIEW 3: SUCCESS -->
         <div id="view-success" class="view-section">
             <div class="glass-card p-10 rounded-[2.5rem] border-uni-blue/50 text-center">
                 <div class="w-20 h-20 bg-uni-blue rounded-full flex items-center justify-center mb-6 mx-auto">
@@ -97,31 +91,25 @@
                 </div>
                 <h2 class="text-3xl font-bold mb-2">PROFILE CREATED</h2>
                 <p class="text-gray-500 mb-8 italic">Your identity has been stored in the UniChain ledger.</p>
-                
                 <div class="space-y-4 font-mono text-left max-w-lg mx-auto mb-10">
                     <div class="p-4 bg-black rounded-xl border border-white/5">
                         <span class="text-[10px] text-uni-blue block mb-1 uppercase">UniChain ID (Hashed)</span>
                         <p id="display-id" class="break-all text-xs text-white"></p>
                     </div>
                 </div>
-                
                 <button onclick="switchView('portal-selection')" class="w-full max-w-sm border border-white/20 py-4 rounded-xl font-bold hover:bg-white/5 text-white">Back to Home</button>
             </div>
         </div>
 
-        <!-- VIEW 4: WALLET LOGIN -->
         <div id="view-wallet-login" class="view-section max-w-md mx-auto">
             <div class="glass-card p-10 rounded-[2.5rem]">
                 <h2 class="text-2xl font-bold mb-2 text-white text-center">Wallet Authentication</h2>
                 <p class="text-[10px] text-gray-500 mb-8 uppercase tracking-widest text-center">Enter seed phrase to fetch record</p>
-                
                 <textarea id="login-seed" rows="4" placeholder="Enter your secret phrase..." class="w-full rounded-xl p-4 text-sm mb-6 font-mono"></textarea>
-                
-                <button onclick="loginWithSeed()" class="w-full bg-uni-blue py-4 rounded-xl font-bold hover:bg-blue-700 text-white uppercase tracking-widest text-sm">Retrieve Identity</button>
+                <button id="btn-login" onclick="loginWithSeed()" class="w-full bg-uni-blue py-4 rounded-xl font-bold hover:bg-blue-700 text-white uppercase tracking-widest text-sm">Retrieve Identity</button>
             </div>
         </div>
 
-        <!-- VIEW 5: DASHBOARD -->
         <div id="view-dashboard" class="view-section">
             <div class="flex justify-between items-end mb-8">
                 <div>
@@ -130,13 +118,10 @@
                 </div>
                 <button onclick="logout()" class="text-white/40 hover:text-red-500 text-[10px] font-bold uppercase">Logout</button>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="md:col-span-2 glass-card p-10 rounded-[2.5rem]">
                     <h4 class="text-[10px] font-bold text-gray-500 uppercase mb-8 tracking-[0.2em]">Verified Attributes</h4>
-                    <div id="dash-data" class="space-y-6">
-                        <!-- Data results -->
-                    </div>
+                    <div id="dash-data" class="space-y-6"></div>
                 </div>
                 <div class="glass-card p-10 rounded-[2.5rem] flex flex-col items-center justify-center text-center">
                     <div class="w-24 h-24 rounded-full border-4 border-uni-blue flex items-center justify-center mb-6">
@@ -147,144 +132,176 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        // Firebase Modular SDK Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    
-    // Explicitly set appId to match the rules exactly
-    const APP_ID_PATH = 'unichain-v1';
-
-    let currentRole = "";
-    let authenticatedUser = null;
-
-    const initAuth = async () => {
-        try {
-            const userCredential = await signInAnonymously(auth);
-            authenticatedUser = userCredential.user;
-            document.getElementById('status-text').innerText = "Online";
-            document.getElementById('auth-status').classList.replace('text-uni-blue', 'text-green-500');
-        } catch (e) {
-            document.getElementById('status-text').innerText = "Auth Error";
-        }
-    };
-
-    initAuth();
-
-    window.switchView = (id) => {
-        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-        document.getElementById(`view-${id}`).classList.add('active');
-        if(window.lucide) lucide.createIcons();
-    };
-
-    window.openPortal = (role) => {
-        currentRole = role;
-        const container = document.getElementById('form-content');
-        const title = document.getElementById('portal-title');
-        container.innerHTML = "";
-        title.innerText = `${role} Registration`;
-
-        const config = {
-            student: [{l:"Full Legal Name",id:"name"}, {l:"University / School",id:"uni"}, {l:"ID Number",id:"id"}],
-            university: [{l:"Institution Name",id:"name"}, {l:"Admin Code",id:"code"}],
-            sacco: [{l:"Member Name",id:"name"}, {l:"Credit ID",id:"cid"}],
-            gov: [{l:"Official Name",id:"name"}, {l:"Department",id:"dept"}]
+        // IMPORTANT: Replace this with your actual Firebase project config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
-        config[role].forEach(f => {
-            container.innerHTML += `
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-[0.2em]">${f.l}</label>
-                    <input type="text" id="inp-${f.id}" data-label="${f.l}" class="w-full p-4 rounded-xl outline-none" required>
-                </div>
-            `;
-        });
-        window.switchView('portal-form');
-    };
-
-    window.processOnboarding = async () => {
-        const prompt = document.getElementById('user-prompt').value.trim();
-        if (!prompt) return alert("Secret phrase required.");
-
-        const btn = document.getElementById('btn-onboard');
-        btn.disabled = true;
-        btn.innerHTML = `<span class="loading-dots">Securing Ledger</span>`;
-
-        const encoder = new TextEncoder();
-        const data = encoder.encode(prompt.toLowerCase() + "UNICHAIN_SALT_2025");
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
         
-        const meta = {};
-        document.querySelectorAll('#form-content input').forEach(inp => {
-            meta[inp.dataset.label] = inp.value;
+        const COLLECTION_NAME = "verified_identities";
+
+        let currentRole = "";
+
+        // Initialization
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            initAuth();
         });
 
-        const profile = {
-            role: currentRole,
-            uid: hashHex.substring(0, 24),
-            metadata: meta,
-            timestamp: Date.now(),
-            verified: true
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+                document.getElementById('status-text').innerText = "Online";
+                document.getElementById('auth-status').classList.replace('text-uni-blue', 'text-green-500');
+            } catch (e) {
+                document.getElementById('status-text').innerText = "Auth Offline";
+                console.error("Auth Error", e);
+            }
         };
 
-        try {
-            const docId = hashHex.substring(0, 20); 
-            // Fixed path logic
-            const docRef = doc(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'verified_identities', docId);
-            await setDoc(docRef, profile);
-            
-            document.getElementById('display-id').innerText = profile.uid;
-            window.switchView('success');
-        } catch (e) {
-            console.error(e);
-            alert("Database Error: " + e.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Verify & Create Profile";
-        }
-    };
+        window.switchView = (id) => {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${id}`).classList.add('active');
+            lucide.createIcons(); // Re-render icons for new view
+        };
 
-    window.loginWithSeed = async () => {
-        const seed = document.getElementById('login-seed').value.trim();
-        if (!seed) return alert("Seed phrase required.");
+        window.openPortal = (role) => {
+            currentRole = role;
+            const container = document.getElementById('form-content');
+            const title = document.getElementById('portal-title');
+            container.innerHTML = "";
+            title.innerText = `${role.toUpperCase()} REGISTRATION`;
 
-        const encoder = new TextEncoder();
-        const data = encoder.encode(seed.toLowerCase() + "UNICHAIN_SALT_2025");
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        const docId = hashHex.substring(0, 20);
+            const config = {
+                student: [{l:"Full Legal Name",id:"name"}, {l:"University / School",id:"uni"}, {l:"ID Number",id:"id"}],
+                university: [{l:"Institution Name",id:"name"}, {l:"Admin Code",id:"code"}],
+                sacco: [{l:"Member Name",id:"name"}, {l:"Credit ID",id:"cid"}],
+                gov: [{l:"Official Name",id:"name"}, {l:"Department",id:"dept"}]
+            };
 
-        try {
-            const snap = await getDoc(doc(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'verified_identities', docId));
-            if (snap.exists()) {
-                const d = snap.data();
-                document.getElementById('dash-role').innerText = `${d.role} Identity`;
-                document.getElementById('dash-data').innerHTML = Object.entries(d.metadata).map(([k, v]) => `
-                    <div class="border-b border-white/5 pb-4">
-                        <span class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">${k}</span>
-                        <p class="text-lg text-white font-semibold mt-1">${v}</p>
+            config[role].forEach(f => {
+                container.innerHTML += `
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-[0.2em]">${f.l}</label>
+                        <input type="text" id="inp-${f.id}" data-label="${f.l}" class="w-full p-4 rounded-xl outline-none" required>
                     </div>
-                `).join('') + `<div class="pt-4 text-[9px] text-gray-600 uppercase tracking-tighter">Chain Entry: ${new Date(d.timestamp).toLocaleString()}</div>`;
-                window.switchView('dashboard');
-            } else {
-                alert("Profile not found.");
-            }
-        } catch (e) { 
-            alert("Connection error.");
-        }
-    };
+                `;
+            });
+            window.switchView('portal-form');
+        };
 
-    window.logout = () => window.switchView('portal-selection');
-</script>
+        // Hashing function for privacy
+        async function generateHash(input) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(input.toLowerCase() + "UNICHAIN_SALT_2025");
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        window.processOnboarding = async () => {
+            const prompt = document.getElementById('user-prompt').value.trim();
+            if (!prompt) return alert("Secret phrase required to secure your identity.");
+
+            const btn = document.getElementById('btn-onboard');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="loading-dots">Securing Ledger</span>`;
+
+            const hashHex = await generateHash(prompt);
+            
+            const meta = {};
+            let hasEmpty = false;
+            document.querySelectorAll('#form-content input').forEach(inp => {
+                if(!inp.value) hasEmpty = true;
+                meta[inp.dataset.label] = inp.value;
+            });
+
+            if(hasEmpty) {
+                alert("Please fill all fields.");
+                btn.disabled = false;
+                btn.innerText = "Verify & Create Profile";
+                return;
+            }
+
+            const profile = {
+                role: currentRole,
+                uid: hashHex.substring(0, 24),
+                metadata: meta,
+                timestamp: Date.now(),
+                verified: true
+            };
+
+            try {
+                // Simplified Doc Reference for reliability
+                const docRef = doc(db, COLLECTION_NAME, hashHex.substring(0, 20));
+                await setDoc(docRef, profile);
+                
+                document.getElementById('display-id').innerText = profile.uid;
+                window.switchView('success');
+            } catch (e) {
+                console.error(e);
+                alert("Permission Denied: Check Firebase Rules.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Verify & Create Profile";
+            }
+        };
+
+        window.loginWithSeed = async () => {
+            const seed = document.getElementById('login-seed').value.trim();
+            if (!seed) return alert("Seed phrase required.");
+
+            const btn = document.getElementById('btn-login');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="loading-dots">Searching</span>`;
+
+            const hashHex = await generateHash(seed);
+            const docId = hashHex.substring(0, 20);
+
+            try {
+                const snap = await getDoc(doc(db, COLLECTION_NAME, docId));
+                if (snap.exists()) {
+                    const d = snap.data();
+                    document.getElementById('dash-role').innerText = `${d.role} Identity`;
+                    document.getElementById('dash-data').innerHTML = Object.entries(d.metadata).map(([k, v]) => `
+                        <div class="border-b border-white/5 pb-4">
+                            <span class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">${k}</span>
+                            <p class="text-lg text-white font-semibold mt-1">${v}</p>
+                        </div>
+                    `).join('') + `<div class="pt-4 text-[9px] text-gray-600 uppercase tracking-tighter">Chain Entry: ${new Date(d.timestamp).toLocaleString()}</div>`;
+                    window.switchView('dashboard');
+                } else {
+                    alert("Profile not found. Please register first.");
+                }
+            } catch (e) { 
+                console.error(e);
+                alert("Connection error.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Retrieve Identity";
+            }
+        };
+
+        window.logout = () => {
+            document.getElementById('user-prompt').value = "";
+            document.getElementById('login-seed').value = "";
+            window.switchView('portal-selection');
+        };
+    </script>
 </body>
 </html>
