@@ -82,6 +82,7 @@
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-8">
                         <button onclick="scrollToSection('dashboard')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium"> Dashboard</button>
+                        <button onclick="scrollToSection('how-it-works')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium">How it Works</button>
                         <button onclick="scrollToSection('evidence')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium">Evidence Map</button>
                         <button onclick="scrollToSection('solution')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium"> Demo</button>
                         <button onclick="scrollToSection('impact')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium">Impact</button>
@@ -113,6 +114,61 @@
             </div>
         </div>
     </header>
+
+    <section id="how-it-works" class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-uni-blue rounded-3xl p-8 md:p-12 text-white shadow-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-6">How UniChain Works</h2>
+                        <p class="text-blue-100 mb-8 leading-relaxed text-lg">
+                            UniChain acts as a digital "Trust Layer." Instead of carrying physical papers that can be faked, your credentials are secured on the Cardano Blockchain.
+                        </p>
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-white text-uni-blue rounded-full flex items-center justify-center font-bold">1</div>
+                                <div>
+                                    <h4 class="font-bold text-xl">Issue</h4>
+                                    <p class="text-blue-100">Institutions upload a unique digital fingerprint (hash) of your certificate to the blockchain.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-white text-uni-blue rounded-full flex items-center justify-center font-bold">2</div>
+                                <div>
+                                    <h4 class="font-bold text-xl">Store</h4>
+                                    <p class="text-blue-100">The record is permanent and unchangeable. No one can edit or delete your achievement.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="flex-shrink-0 w-10 h-10 bg-white text-uni-blue rounded-full flex items-center justify-center font-bold">3</div>
+                                <div>
+                                    <h4 class="font-bold text-xl">Verify</h4>
+                                    <p class="text-blue-100">Employers or SACCOs scan the credential. Our system checks the blockchain and gives an instant "Verified" checkmark.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                        <h3 class="font-bold mb-4 text-center">Quick Start Guide</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-3 bg-white/5 p-3 rounded-lg">
+                                <span class="text-2xl">📊</span>
+                                <span>Check the <strong>Dashboard</strong> for local trust stats.</span>
+                            </li>
+                            <li class="flex items-center gap-3 bg-white/5 p-3 rounded-lg">
+                                <span class="text-2xl">🔍</span>
+                                <span>Go to <strong>Evidence Map</strong> to see real-world case studies.</span>
+                            </li>
+                            <li class="flex items-center gap-3 bg-white/5 p-3 rounded-lg">
+                                <span class="text-2xl">⚡</span>
+                                <span>Try the <strong>Demo</strong> below to see instant verification.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section id="dashboard" class="py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -402,90 +458,36 @@
     </footer>
 
     <script>
+        // --- Navigation ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
         // --- Data Handling ---
-        
-        // Evidence Data extracted from report
         const evidenceData = [
-            {
-                id: 1,
-                date: "Aug 2024",
-                source: "University World News",
-                category: "Education",
-                title: "HEC Tightens Degree Rules",
-                desc: "Rules tightened due to widespread inconsistencies and suspected fraudulent foreign degrees.",
-                impact: "High Friction"
-            },
-            {
-                id: 2,
-                date: "2025",
-                source: "KT Press (Rutsiro)",
-                category: "Education",
-                title: "5 Teachers Arrested",
-                desc: "Alleged use of forged academic documents found in Rutsiro district.",
-                impact: "Criminal"
-            },
-            {
-                id: 3,
-                date: "May 2025",
-                source: "Irembo",
-                category: "Identity",
-                title: "7-Day Equivalence Wait",
-                desc: "Updated guidance confirms lengthy processing time for foreign qualifications.",
-                impact: "Delay"
-            },
-            {
-                id: 4,
-                date: "Sept 2025",
-                source: "KT Press",
-                category: "Finance",
-                title: "RIB Parades 26 Suspects",
-                desc: "Large scale fraud bust indicating systemic weaknesses.",
-                impact: "Systemic"
-            },
-            {
-                id: 5,
-                date: "2025",
-                source: "KT Press",
-                category: "Finance",
-                title: "SACCO Integrity Questioned",
-                desc: "Huge losses reported due to lack of verified integrity in personnel/transactions.",
-                impact: "Financial Loss"
-            },
-            {
-                id: 6,
-                date: "Dec 2025",
-                source: "Field Interview (Gatenga)",
-                category: "Education",
-                title: "Manual Verification at AUCA",
-                desc: "Applicants required to physically provide documents; online submissions distrusted.",
-                impact: "Trust Gap"
-            }
+            { id: 1, date: "Aug 2024", source: "University World News", category: "Education", title: "HEC Tightens Degree Rules", desc: "Rules tightened due to widespread inconsistencies and suspected fraudulent foreign degrees.", impact: "High Friction" },
+            { id: 2, date: "2025", source: "KT Press (Rutsiro)", category: "Education", title: "5 Teachers Arrested", desc: "Alleged use of forged academic documents found in Rutsiro district.", impact: "Criminal" },
+            { id: 3, date: "May 2025", source: "Irembo", category: "Identity", title: "7-Day Equivalence Wait", desc: "Updated guidance confirms lengthy processing time for foreign qualifications.", impact: "Delay" },
+            { id: 4, date: "Sept 2025", source: "KT Press", category: "Finance", title: "RIB Parades 26 Suspects", desc: "Large scale fraud bust indicating systemic weaknesses.", impact: "Systemic" },
+            { id: 5, date: "2025", source: "KT Press", category: "Finance", title: "SACCO Integrity Questioned", desc: "Huge losses reported due to lack of verified integrity in personnel/transactions.", impact: "Financial Loss" },
+            { id: 6, date: "Dec 2025", source: "Field Interview (Gatenga)", category: "Education", title: "Manual Verification at AUCA", desc: "Applicants required to physically provide documents; online submissions distrusted.", impact: "Trust Gap" }
         ];
 
         // --- Initialization ---
-
         document.addEventListener('DOMContentLoaded', () => {
             initImpactChart();
             renderEvidence(evidenceData);
         });
 
         // --- Chart.js Visualization ---
-
         function initImpactChart() {
             const ctx = document.getElementById('impactChart').getContext('2d');
-            
-            // Aggregating data for the chart (Conceptual quantification)
-            // Categories: Forgery Cases, Processing Delays (Days), Financial Trust Issues
             const data = {
                 labels: ['Forgery Incidents', 'Wait Times (Days)', 'Trust Issues'],
                 datasets: [{
                     label: 'Severity Level (Report Context)',
-                    data: [85, 40, 75], // Qualitative scoring: High Forgery (85), 7 Days (normalized to 40), High Trust Issues (75)
-                    backgroundColor: [
-                        '#0033AD', // Blue
-                        '#4B5563', // Gray
-                        '#0a0a0a'  // Black
-                    ],
+                    data: [85, 40, 75],
+                    backgroundColor: ['#0033AD', '#4B5563', '#0a0a0a'],
                     borderRadius: 4,
                     barThickness: 40
                 }]
@@ -510,36 +512,22 @@
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: '#f3f4f6' },
-                            ticks: { display: false } // Hiding numbers to emphasize relative severity
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Inter' } }
-                        }
+                        y: { beginAtZero: true, max: 100, grid: { color: '#f3f4f6' }, ticks: { display: false } },
+                        x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
                     }
                 }
             });
         }
 
         // --- DOM Interactions ---
-
         function renderEvidence(data) {
             const container = document.getElementById('evidence-container');
             container.innerHTML = '';
-
             data.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-uni-blue transition-colors group cursor-default';
-                
-                let badgeColor = 'bg-gray-200 text-gray-700';
-                if(item.category === 'Education') badgeColor = 'bg-blue-100 text-blue-800';
-                if(item.category === 'Finance') badgeColor = 'bg-green-100 text-green-800';
-                if(item.category === 'Identity') badgeColor = 'bg-purple-100 text-purple-800';
-
+                let badgeColor = item.category === 'Education' ? 'bg-blue-100 text-blue-800' : 
+                                 item.category === 'Finance' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800';
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold text-gray-400">${item.date}</span>
@@ -554,71 +542,30 @@
         }
 
         function filterEvidence(category) {
-            // Update buttons
+            const filtered = category === 'all' ? evidenceData : evidenceData.filter(e => e.category === category);
+            renderEvidence(filtered);
             document.querySelectorAll('.filter-btn').forEach(btn => {
-                if(btn.dataset.filter === category) {
-                    btn.classList.add('bg-uni-black', 'text-white');
-                    btn.classList.remove('text-gray-600');
-                } else {
-                    btn.classList.remove('bg-uni-black', 'text-white');
-                    btn.classList.add('text-gray-600');
-                }
+                btn.classList.toggle('bg-uni-black', btn.dataset.filter === category);
+                btn.classList.toggle('text-white', btn.dataset.filter === category);
             });
-
-            // Filter data
-            if (category === 'all') {
-                renderEvidence(evidenceData);
-            } else {
-                const filtered = evidenceData.filter(item => item.category === category);
-                renderEvidence(filtered);
-            }
         }
 
-        function toggleCard(element) {
-            // Simple accordion-like detail reveal
-            const detail = element.querySelector('div.hidden, div.block');
-            if (detail.classList.contains('hidden')) {
-                detail.classList.remove('hidden');
-                detail.classList.add('block');
-                element.classList.add('ring-2', 'ring-uni-blue');
-            } else {
-                detail.classList.add('hidden');
-                detail.classList.remove('block');
-                element.classList.remove('ring-2', 'ring-uni-blue');
-            }
+        function toggleCard(el) {
+            const hiddenDiv = el.querySelector('.hidden');
+            if (hiddenDiv) hiddenDiv.classList.toggle('hidden');
         }
 
         function switchTab(tab) {
-            const verifyBtn = document.getElementById('tab-verify');
-            const issueBtn = document.getElementById('tab-issue');
-            const verifyContent = document.getElementById('content-verify');
-            const issueContent = document.getElementById('content-issue');
-
-            if (tab === 'verify') {
-                verifyBtn.classList.add('text-uni-blue', 'border-uni-blue', 'bg-white');
-                verifyBtn.classList.remove('text-gray-500');
-                issueBtn.classList.remove('text-uni-blue', 'border-uni-blue', 'bg-white');
-                issueBtn.classList.add('text-gray-500');
-                verifyContent.classList.remove('hidden');
-                issueContent.classList.add('hidden');
-            } else {
-                issueBtn.classList.add('text-uni-blue', 'border-uni-blue', 'bg-white');
-                issueBtn.classList.remove('text-gray-500');
-                verifyBtn.classList.remove('text-uni-blue', 'border-uni-blue', 'bg-white');
-                verifyBtn.classList.add('text-gray-500');
-                issueContent.classList.remove('hidden');
-                verifyContent.classList.add('hidden');
-            }
+            document.getElementById('content-verify').classList.toggle('hidden', tab !== 'verify');
+            document.getElementById('content-issue').classList.toggle('hidden', tab !== 'issue');
+            document.getElementById('tab-verify').className = tab === 'verify' ? 'flex-1 py-4 text-sm font-bold text-uni-blue border-b-2 border-uni-blue bg-white' : 'flex-1 py-4 text-sm font-bold text-gray-500 hover:text-gray-700';
+            document.getElementById('tab-issue').className = tab === 'issue' ? 'flex-1 py-4 text-sm font-bold text-uni-blue border-b-2 border-uni-blue bg-white' : 'flex-1 py-4 text-sm font-bold text-gray-500 hover:text-gray-700';
         }
 
         function simulateVerification() {
             const result = document.getElementById('verification-result');
             result.classList.remove('hidden');
             result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
