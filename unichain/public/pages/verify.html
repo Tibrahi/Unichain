@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADA Mainnet Bridge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; color: #fff; }
+        .border-blue { border: 1px solid #1e40af; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6 text-center">
+
+    <div class="w-full max-w-md bg-zinc-950 border-blue p-8 rounded-3xl">
+        <h1 class="text-3xl font-black text-blue-500 mb-6">MAINNET SYNC</h1>
+        
+        <div class="bg-black border border-zinc-900 rounded-2xl p-6 mb-6">
+            <div id="balance" class="text-4xl font-bold">0.00 <span class="text-sm text-blue-600">ADA</span></div>
+            <div id="addr" class="text-[9px] text-zinc-700 mt-4 truncate">Disconnected</div>
+        </div>
+
+        <button id="connect-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">
+            CONNECT WALLET
+        </button>
+
+        <p id="status" class="text-[10px] text-zinc-500 mt-4 italic"></p>
+    </div>
+
+    <script type="module">
+        import { Lucid, Blockfrost } from "https://unpkg.com/lucid-cardano@0.10.7/web/mod.js";
+
+        const API_KEY = "mainnetYbSVZuCt0G2cY0oewNgWZczdr69Ntpfz";
+        const btn = document.getElementById('connect-btn');
+        const status = document.getElementById('status');
+
+        btn.onclick = async () => {
+            status.innerText = "Waking up wallet...";
+            
+            // WAIT 500ms to ensure the extension is injected
+            await new Promise(res => setTimeout(res, 500));
+
+            try {
+                if (!window.cardano) throw new Error("Wallet not found. Try 'Live Server' or enable 'File URL' access in settings.");
+
+                // Check for ANY available wallet
+                const available = Object.keys(window.cardano).filter(k => window.cardano[k].enable);
+                if (available.length === 0) throw new Error("No wallets detected.");
+                
+                const walletName = available[0];
+                const lucid = await Lucid.new(
+                    new Blockfrost("https://cardano-mainnet.blockfrost.io/api/v0", API_KEY),
+                    "Mainnet"
+                );
+
+                const api = await window.cardano[walletName].enable();
+                lucid.selectWalletFromApi(api);
+
+                const address = await lucid.wallet.address();
+                const utxos = await lucid.wallet.getUtxos();
+                const total = utxos.reduce((acc, u) => acc + BigInt(u.assets.lovelace), 0n);
+
+                document.getElementById('balance').innerHTML = `${(Number(total)/1000000).toFixed(2)} <span class="text-sm text-blue-600">ADA</span>`;
+                document.getElementById('addr').innerText = address;
+                status.innerText = "Connected to " + walletName;
+
+            } catch (err) {
+                status.innerText = "Error: " + err.message;
+            }
+        };
+    </script>
+</body>
+</html>
