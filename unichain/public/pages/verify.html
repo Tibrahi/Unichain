@@ -3,618 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniChain | Cardano Trust Infrastructure</title>
+    <title>UniChain Engine | Secure Verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* Custom Blue-Black-White Palette Utilities */
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #000000; color: #ffffff; overflow-x: hidden; }
         .bg-uni-blue { background-color: #0033AD; }
         .text-uni-blue { color: #0033AD; }
         .border-uni-blue { border-color: #0033AD; }
-        .hover-bg-uni-blue:hover { background-color: #00227a; }
+        .glass-card { background: #0a0a0a; border: 1px solid #1a1a1a; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .bg-uni-black { background-color: #0a0a0a; }
-        .text-uni-black { color: #0a0a0a; }
-        
-        /* Chart Container Styling - Critical for Responsiveness */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 100%;
-            height: 300px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
-
-        /* Timeline Styling */
-        .timeline-line {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 100%;
-            background-color: #e5e7eb;
-            z-index: 0;
-        }
-        
-        /* Hide scrollbar for cleaner UI in specific sections */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .card-shadow {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card-shadow:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
+        input, textarea { background: #000 !important; color: #fff !important; border: 1px solid #333 !important; transition: all 0.2s; }
+        input:focus, textarea:focus { border-color: #0033AD !important; outline: none; box-shadow: 0 0 10px rgba(0, 51, 173, 0.2); }
+        .loading-dots:after { content: '.'; animation: dots 1s steps(5, end) infinite; }
+        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
     </style>
-    <!-- Chosen Palette: Blue (#0033AD), Black (#0a0a0a), White (#ffffff) -->
-    <!-- Application Structure Plan: 
-         1. Hero Section: Introduces UniChain as the solution to the "Community Essence" problem defined in the report.
-         2. The Intelligence Dashboard: A split view. Left side visualizes the "Trust Gap" data (qualitative metrics derived from report). Right side is an interactive "Evidence Feed" of the specific news items (HEC, RIB, SACCOs).
-         3. The Interactive Network Map: A conceptual node-link diagram (built with HTML grid/flex) showing the breakdown of trust between Universities, Students, Employers, and Finance.
-         4. The Solution Simulation (Dapp Demo): A functional UI block that contrasts the "Manual Process" described in the interview with the "UniChain Verification" flow.
-         5. Stakeholder Impact: Interactive cards showing how specific groups (Teachers, Graduates, Banks) are affected.
-         Rationale: The report is a "Community Essence Map" defining a problem. The structure first establishes this problem with hard evidence, then visualizes the structural failure, and finally proposes the Dapp solution.
-    -->
-    <!-- Visualization & Content Choices:
-         - Chart.js Bar Chart: To visualize the "Severity of Trust Issues" based on the frequency of mentions in the report (Forgery vs. Delays vs. Financial Loss). Goal: Inform/Compare.
-         - Timeline Feed: To display the chronological evidence (2024-2025) clearly. Goal: Inform/Organize.
-         - Process Flow (HTML): Comparing "Current Manual" vs "UniChain". Goal: Change/Compare.
-         - Interactive Stakeholder Cards: To allow users to explore the specific pain points of different groups. Goal: Relationships.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+<body>
 
-    <!-- Navigation -->
-    <nav class="bg-uni-black text-white sticky top-0 z-50 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-uni-blue rounded-full flex items-center justify-center font-bold text-white">U</div>
-                    <span class="font-bold text-xl tracking-tight">UniChain</span>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <button onclick="scrollToSection('dashboard')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium">Intelligence Dashboard</button>
-                        <button onclick="scrollToSection('evidence')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium">Evidence Map</button>
-                        <button onclick="scrollToSection('solution')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium">Dapp Demo</button>
-                        <button onclick="scrollToSection('impact')" class="hover:text-uni-blue transition-colors px-3 py-2 rounded-md text-sm font-medium">Impact</button>
-                    </div>
-                </div>
-                <button class="bg-uni-blue hover:bg-white hover:text-uni-blue border border-uni-blue transition-all text-white px-4 py-2 rounded-md text-sm font-bold shadow-md">
-                    Connect Wallet
-                </button>
-            </div>
+    <!-- Nav -->
+    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/5 h-20 flex items-center px-6 justify-between">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('portal-selection')">
+            <div class="w-10 h-10 bg-uni-blue rounded flex items-center justify-center font-bold">U</div>
+            <span class="font-bold text-xl tracking-tighter">UniChain.rw</span>
+        </div>
+        <div id="auth-status" class="text-[10px] font-bold text-uni-blue bg-uni-blue/10 px-4 py-2 rounded-full border border-uni-blue/20 uppercase tracking-widest">
+            Identity Service: <span id="status-text">Connecting...</span>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 text-center">
-            <h1 class="text-4xl tracking-tight font-extrabold text-uni-black sm:text-5xl md:text-6xl mb-6">
-                <span class="block">Restoring Trust in</span>
-                <span class="block text-uni-blue">Rwanda's Digital Identity</span>
-            </h1>
-            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                Outcome 1: Community Essence Map (2024–2025). Addressing the critical gaps in academic verification, financial integrity, and identity validation using Cardano.
-            </p>
-            <div class="mt-10 flex justify-center gap-4">
-                <button onclick="scrollToSection('dashboard')" class="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-uni-black hover:bg-gray-900 md:py-4 md:text-lg shadow-lg transition-transform hover:-translate-y-1">
-                    Explore the Data
+    <main class="pt-32 pb-20 px-6 max-w-5xl mx-auto">
+
+        <!-- VIEW 1: ROLE SELECTION -->
+        <div id="view-portal-selection" class="view-section active">
+            <h1 class="text-4xl font-bold mb-2 uppercase tracking-tighter">Secure <span class="text-uni-blue">Verification</span></h1>
+            <p class="text-gray-500 mb-12 italic">Cardano-backed identity for Rwanda's academic & financial growth.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button onclick="openPortal('student')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all group">
+                    <i data-lucide="graduation-cap" class="w-10 h-10 text-uni-blue mb-4"></i>
+                    <h3 class="text-xl font-bold text-white">Student</h3>
+                    <p class="text-gray-500 text-sm mt-2">Generate a tamper-proof profile for academic verification.</p>
                 </button>
-                <button onclick="scrollToSection('solution')" class="px-8 py-3 border border-uni-black text-base font-medium rounded-md text-uni-black bg-transparent hover:bg-gray-50 md:py-4 md:text-lg transition-colors">
-                    Try Verification
+                <button onclick="openPortal('university')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all">
+                    <i data-lucide="school" class="w-10 h-10 text-uni-blue mb-4"></i>
+                    <h3 class="text-xl font-bold text-white">Institution</h3>
+                    <p class="text-gray-500 text-sm mt-2">Verify and issue digital credentials to students.</p>
+                </button>
+                <button onclick="openPortal('sacco')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all">
+                    <i data-lucide="landmark" class="w-10 h-10 text-uni-blue mb-4"></i>
+                    <h3 class="text-xl font-bold text-white">SACCO</h3>
+                    <p class="text-gray-500 text-sm mt-2">Check member integrity and verify financial status.</p>
+                </button>
+                <button onclick="openPortal('gov')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all">
+                    <i data-lucide="shield-check" class="w-10 h-10 text-uni-blue mb-4"></i>
+                    <h3 class="text-xl font-bold text-white">Government</h3>
+                    <p class="text-gray-500 text-sm mt-2">Oversee high-level fraud alerts and equivalence records.</p>
                 </button>
             </div>
-        </div>
-    </header>
-
-    <!-- Section 1: Intelligence Dashboard (Charts & Context) -->
-    <section id="dashboard" class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-base text-uni-blue font-semibold tracking-wide uppercase">The Problem Landscape</h2>
-                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-uni-black sm:text-4xl">
-                    Quantifying the Trust Gap
-                </p>
-                <p class="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-                    Based on verified local evidence collected across Kigali sectors (Gatenga, Remera, Kimironko) and districts (Gasabo, Rwamagana) in 2024-2025.
-                </p>
+            <div class="mt-12 text-center">
+                <button onclick="switchView('wallet-login')" class="bg-white text-black px-10 py-4 rounded-full font-bold text-sm hover:bg-uni-blue hover:text-white transition-all shadow-lg shadow-white/5">CONNECT EXISTING WALLET</button>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <!-- VIEW 2: DYNAMIC PORTAL FORM -->
+        <div id="view-portal-form" class="view-section">
+            <div class="glass-card p-10 rounded-[2.5rem]">
+                <h2 id="portal-title" class="text-3xl font-bold mb-6 uppercase tracking-tighter text-white">PORTAL</h2>
+                <div id="form-content" class="space-y-6">
+                    <!-- Dynamic fields -->
+                </div>
                 
-                <!-- Chart Column -->
-                <div class="bg-white p-6 rounded-xl card-shadow border border-gray-100">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                            Impact Severity Assessment (2024-2025)
-                        </h3>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-uni-blue">
-                            Live Data Source
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-500 mb-4">
-                        Analysis of reported incidents involving credential forgery, delays, and financial fraud.
-                    </p>
-                    <div class="chart-container">
-                        <canvas id="impactChart"></canvas>
-                    </div>
-                    <div class="mt-4 grid grid-cols-3 gap-4 text-center border-t border-gray-100 pt-4">
-                        <div>
-                            <span class="block text-2xl font-bold text-uni-black">26+</span>
-                            <span class="text-xs text-gray-500 uppercase">Suspects Paraded</span>
-                        </div>
-                        <div>
-                            <span class="block text-2xl font-bold text-uni-black">7 Days</span>
-                            <span class="text-xs text-gray-500 uppercase">Avg. Delay</span>
-                        </div>
-                        <div>
-                            <span class="block text-2xl font-bold text-uni-blue">High</span>
-                            <span class="text-xs text-gray-500 uppercase">Integrity Risk</span>
-                        </div>
-                    </div>
+                <div class="mt-10 pt-10 border-t border-white/5">
+                    <label class="block text-[10px] font-bold text-uni-blue uppercase mb-2 tracking-widest">Secret Recovery Phrase (Profile Key)</label>
+                    <textarea id="user-prompt" placeholder="Type a unique secret phrase to protect your data..." class="w-full p-4 rounded-xl text-white font-mono text-sm h-24 mb-6"></textarea>
+                    <button id="btn-onboard" onclick="processOnboarding()" class="w-full bg-uni-blue py-5 rounded-xl font-bold hover:bg-blue-700 transition-all text-white uppercase tracking-widest text-sm">
+                        Verify & Create Profile
+                    </button>
                 </div>
-
-                <!-- Interactive Evidence List -->
-                <div class="bg-white p-6 rounded-xl card-shadow border border-gray-100 h-full flex flex-col">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        Verified Evidence Feed
-                    </h3>
-                    <div class="flex space-x-2 mb-4">
-                        <button onclick="filterEvidence('all')" class="filter-btn active px-3 py-1 text-xs rounded-full border border-gray-300 hover:border-uni-blue transition-colors bg-uni-black text-white" data-filter="all">All</button>
-                        <button onclick="filterEvidence('Education')" class="filter-btn px-3 py-1 text-xs rounded-full border border-gray-300 hover:border-uni-blue transition-colors text-gray-600" data-filter="Education">Education</button>
-                        <button onclick="filterEvidence('Finance')" class="filter-btn px-3 py-1 text-xs rounded-full border border-gray-300 hover:border-uni-blue transition-colors text-gray-600" data-filter="Finance">Finance</button>
-                        <button onclick="filterEvidence('Identity')" class="filter-btn px-3 py-1 text-xs rounded-full border border-gray-300 hover:border-uni-blue transition-colors text-gray-600" data-filter="Identity">Identity</button>
-                    </div>
-                    
-                    <div id="evidence-container" class="flex-1 overflow-y-auto max-h-[400px] space-y-4 pr-2 custom-scrollbar">
-                        <!-- Evidence items injected by JS -->
-                    </div>
-                </div>
-
             </div>
         </div>
-    </section>
 
-    <!-- Section 2: The Process Gap (Diagram) -->
-    <section id="evidence" class="py-16 bg-white border-t border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-12 md:text-center">
-                <h2 class="text-3xl font-bold text-uni-black">The "Trust Gap" Mechanism</h2>
-                <p class="mt-4 text-gray-500 max-w-3xl mx-auto">
-                    Field interviews (e.g., Gatenga, 3 Dec 2025) reveal a reliance on physical documents due to a lack of digital trust. This creates a cycle of friction and fraud.
-                </p>
-            </div>
-
-            <div class="relative mt-10">
-                <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 z-0"></div>
+        <!-- VIEW 3: SUCCESS -->
+        <div id="view-success" class="view-section">
+            <div class="glass-card p-10 rounded-[2.5rem] border-uni-blue/50 text-center">
+                <div class="w-20 h-20 bg-uni-blue rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i data-lucide="check" class="text-white w-10 h-10"></i>
+                </div>
+                <h2 class="text-3xl font-bold mb-2">PROFILE CREATED</h2>
+                <p class="text-gray-500 mb-8 italic">Your identity has been stored in the UniChain ledger.</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-                    <!-- Step 1 -->
-                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:border-uni-blue transition-colors group">
-                        <div class="w-12 h-12 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center font-bold text-lg mb-4 group-hover:bg-uni-blue group-hover:text-white transition-colors">1</div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">Manual Submission</h4>
-                        <p class="text-sm text-gray-600">
-                            Applicants physically carry documents to institutions like AUCA.
-                            <br><span class="text-xs font-semibold text-red-500 mt-2 block">Risk: Forgery & Tampering</span>
-                        </p>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:border-uni-blue transition-colors group">
-                        <div class="w-12 h-12 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center font-bold text-lg mb-4 group-hover:bg-uni-blue group-hover:text-white transition-colors">2</div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">The "Verification Void"</h4>
-                        <p class="text-sm text-gray-600">
-                            Institutions struggle to verify foreign or local degrees instantly. HEC tightens rules, increasing delays (7+ days).
-                            <br><span class="text-xs font-semibold text-orange-500 mt-2 block">Risk: Bottlenecks & Corruption</span>
-                        </p>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:border-uni-blue transition-colors group">
-                        <div class="w-12 h-12 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center font-bold text-lg mb-4 group-hover:bg-uni-blue group-hover:text-white transition-colors">3</div>
-                        <h4 class="text-xl font-bold text-gray-900 mb-2">Financial Impact</h4>
-                        <p class="text-sm text-gray-600">
-                            Lack of trusted ID affects SACCOs and employers. Fraud suspects are paraded, but losses are already incurred.
-                            <br><span class="text-xs font-semibold text-red-600 mt-2 block">Result: Economic Loss</span>
-                        </p>
+                <div class="space-y-4 font-mono text-left max-w-lg mx-auto mb-10">
+                    <div class="p-4 bg-black rounded-xl border border-white/5">
+                        <span class="text-[10px] text-uni-blue block mb-1 uppercase">UniChain ID (Hashed)</span>
+                        <p id="display-id" class="break-all text-xs text-white"></p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 3: Interactive Stakeholder Impact -->
-    <section id="impact" class="py-16 bg-uni-black text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold mb-8">Who is Affected?</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
-                <div onclick="toggleCard(this)" class="cursor-pointer bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-uni-blue transition-all group">
-                    <div class="h-10 w-10 bg-blue-900 rounded-lg mb-4 flex items-center justify-center text-xl">🎓</div>
-                    <h3 class="text-lg font-bold group-hover:text-uni-blue">Students</h3>
-                    <p class="text-sm text-gray-400 mt-2">Delays in degree equivalence (HEC) prevent employment.</p>
-                    <div class="hidden mt-4 pt-4 border-t border-gray-800 text-xs text-gray-300">
-                        Evidence: "Credential delays... 7 working days once file is complete."
-                    </div>
-                </div>
-
-                <div onclick="toggleCard(this)" class="cursor-pointer bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-uni-blue transition-all group">
-                    <div class="h-10 w-10 bg-blue-900 rounded-lg mb-4 flex items-center justify-center text-xl">🏫</div>
-                    <h3 class="text-lg font-bold group-hover:text-uni-blue">Universities</h3>
-                    <p class="text-sm text-gray-400 mt-2">Burden of manual verification due to lack of trusted systems.</p>
-                    <div class="hidden mt-4 pt-4 border-t border-gray-800 text-xs text-gray-300">
-                        Evidence: "AUCA requires physical documents... online considered vulnerable."
-                    </div>
-                </div>
-
-                <div onclick="toggleCard(this)" class="cursor-pointer bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-uni-blue transition-all group">
-                    <div class="h-10 w-10 bg-blue-900 rounded-lg mb-4 flex items-center justify-center text-xl">🏦</div>
-                    <h3 class="text-lg font-bold group-hover:text-uni-blue">SACCOs</h3>
-                    <p class="text-sm text-gray-400 mt-2">Financial losses due to inability to verify identity/integrity.</p>
-                    <div class="hidden mt-4 pt-4 border-t border-gray-800 text-xs text-gray-300">
-                        Evidence: "Huge losses as SACCOs' integrity questioned (KT Press 2025)."
-                    </div>
-                </div>
-
-                <div onclick="toggleCard(this)" class="cursor-pointer bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-uni-blue transition-all group">
-                    <div class="h-10 w-10 bg-blue-900 rounded-lg mb-4 flex items-center justify-center text-xl">👮</div>
-                    <h3 class="text-lg font-bold group-hover:text-uni-blue">Gov Bodies</h3>
-                    <p class="text-sm text-gray-400 mt-2">RIB and HEC overwhelmed by fraud cases and investigations.</p>
-                    <div class="hidden mt-4 pt-4 border-t border-gray-800 text-xs text-gray-300">
-                        Evidence: "RIB Parades 26 Fraud Suspects (Sept 2025)."
-                    </div>
-                </div>
-
-            </div>
-            <p class="text-center text-gray-500 text-sm mt-8">Click cards to reveal specific evidence.</p>
-        </div>
-    </section>
-
-    <!-- Section 4: Solution Demo (Dapp Interface) -->
-    <section id="solution" class="py-16 bg-blue-50 relative overflow-hidden">
-        <!-- Decoration -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-uni-blue opacity-5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-uni-blue opacity-5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-10">
-                <span class="bg-uni-blue text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">UniChain Prototype</span>
-                <h2 class="text-3xl font-bold text-uni-black mt-4">The Solution: Immutable Verification</h2>
-                <p class="mt-2 text-gray-600">Simulating how the Cardano ledger solves the "Trust Gap" instantly.</p>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-                <div class="flex border-b border-gray-200 bg-gray-50">
-                    <button onclick="switchTab('verify')" id="tab-verify" class="flex-1 py-4 text-sm font-bold text-uni-blue border-b-2 border-uni-blue bg-white">Verify Credential</button>
-                    <button onclick="switchTab('issue')" id="tab-issue" class="flex-1 py-4 text-sm font-bold text-gray-500 hover:text-gray-700">Issue Credential (Admin)</button>
-                </div>
-
-                <!-- Verify Tab -->
-                <div id="content-verify" class="p-8">
-                    <div class="max-w-md mx-auto">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Credential Hash / ID</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="credential-input" value="8f4b2c...a9e1" class="flex-1 block w-full rounded-md border-gray-300 bg-gray-50 border px-4 py-2 text-gray-900 focus:border-uni-blue focus:ring-uni-blue sm:text-sm">
-                            <button onclick="simulateVerification()" class="bg-uni-blue text-white px-4 py-2 rounded-md hover:bg-blue-800 transition-colors shadow-sm font-medium">Verify</button>
-                        </div>
-                        
-                        <!-- Result Area -->
-                        <div id="verification-result" class="mt-8 hidden">
-                            <div class="rounded-md bg-green-50 p-4 border border-green-200">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <!-- Check icon -->
-                                        <div class="h-5 w-5 text-green-400 font-bold">✓</div>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-green-800">Credential Verified (Cardano Pre-prod)</h3>
-                                        <div class="mt-2 text-sm text-green-700">
-                                            <p><strong>Issuer:</strong> University of Rwanda</p>
-                                            <p><strong>Holder:</strong> Mugabo Jean</p>
-                                            <p><strong>Date:</strong> 2025-06-15</p>
-                                            <p><strong>Status:</strong> Valid & Untampered</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="mt-4 text-xs text-gray-500 text-center">
-                                Contrast: This takes 0.5 seconds vs. 7 days manual processing.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Issue Tab (Placeholder) -->
-                <div id="content-issue" class="p-8 hidden">
-                    <div class="text-center py-10">
-                        <div class="mx-auto h-12 w-12 text-gray-400 mb-4 text-2xl">🔒</div>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">Admin Access Required</h3>
-                        <p class="mt-1 text-sm text-gray-500">Only authorized Universities can mint credentials on UniChain.</p>
-                    </div>
-                </div>
-
+                <button onclick="switchView('portal-selection')" class="w-full max-w-sm border border-white/20 py-4 rounded-xl font-bold hover:bg-white/5 text-white">Back to Home</button>
             </div>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="bg-uni-black text-white py-12 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-            <div class="mb-4 md:mb-0">
-                <span class="text-2xl font-bold tracking-tight">UniChain</span>
-                <p class="text-gray-400 text-sm mt-1">Project Cardano Group 7</p>
-            </div>
-            <div class="flex space-x-6 text-sm text-gray-400">
-                <a href="#" class="hover:text-white">Privacy Policy</a>
-                <a href="#" class="hover:text-white">Terms of Service</a>
-                <a href="#" class="hover:text-white">Contact</a>
+        <!-- VIEW 4: WALLET LOGIN -->
+        <div id="view-wallet-login" class="view-section max-w-md mx-auto">
+            <div class="glass-card p-10 rounded-[2.5rem]">
+                <h2 class="text-2xl font-bold mb-2 text-white text-center">Wallet Authentication</h2>
+                <p class="text-[10px] text-gray-500 mb-8 uppercase tracking-widest text-center">Enter seed phrase to fetch record</p>
+                
+                <textarea id="login-seed" rows="4" placeholder="Enter your secret phrase..." class="w-full rounded-xl p-4 text-sm mb-6 font-mono"></textarea>
+                
+                <button onclick="loginWithSeed()" class="w-full bg-uni-blue py-4 rounded-xl font-bold hover:bg-blue-700 text-white uppercase tracking-widest text-sm">Retrieve Identity</button>
             </div>
         </div>
-    </footer>
 
-    <!-- JavaScript Logic -->
-    <script>
-        // --- Data Handling ---
+        <!-- VIEW 5: DASHBOARD -->
+        <div id="view-dashboard" class="view-section">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-4xl font-bold text-white tracking-tighter">Verified Profile</h2>
+                    <p id="dash-role" class="text-uni-blue font-bold uppercase text-[10px] tracking-[0.2em] mt-2"></p>
+                </div>
+                <button onclick="logout()" class="text-white/40 hover:text-red-500 text-[10px] font-bold uppercase">Logout</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 glass-card p-10 rounded-[2.5rem]">
+                    <h4 class="text-[10px] font-bold text-gray-500 uppercase mb-8 tracking-[0.2em]">Verified Attributes</h4>
+                    <div id="dash-data" class="space-y-6">
+                        <!-- Data results -->
+                    </div>
+                </div>
+                <div class="glass-card p-10 rounded-[2.5rem] flex flex-col items-center justify-center text-center">
+                    <div class="w-24 h-24 rounded-full border-4 border-uni-blue flex items-center justify-center mb-6">
+                        <span class="text-3xl font-bold">100</span>
+                    </div>
+                    <h4 class="font-bold text-white">Trust Index</h4>
+                    <p class="text-[10px] text-gray-500 mt-4 leading-relaxed uppercase tracking-wider">Blockchain Verified</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA3fqZErsTzw40F1n4nI0EjM50nkeooGxQ",
+        authDomain: "unichain-a30de.firebaseapp.com",
+        projectId: "unichain-a30de",
+        storageBucket: "unichain-a30de.firebasestorage.app",
+        messagingSenderId: "28358656144",
+        appId: "1:28358656144:web:6303bfe73ab3cb324f9815",
+        measurementId: "G-RRET7KRSG2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    
+    // Explicitly set appId to match the rules exactly
+    const APP_ID_PATH = 'unichain-v1';
+
+    let currentRole = "";
+    let authenticatedUser = null;
+
+    const initAuth = async () => {
+        try {
+            const userCredential = await signInAnonymously(auth);
+            authenticatedUser = userCredential.user;
+            document.getElementById('status-text').innerText = "Online";
+            document.getElementById('auth-status').classList.replace('text-uni-blue', 'text-green-500');
+        } catch (e) {
+            document.getElementById('status-text').innerText = "Auth Error";
+        }
+    };
+
+    initAuth();
+
+    window.switchView = (id) => {
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+        document.getElementById(`view-${id}`).classList.add('active');
+        if(window.lucide) lucide.createIcons();
+    };
+
+    window.openPortal = (role) => {
+        currentRole = role;
+        const container = document.getElementById('form-content');
+        const title = document.getElementById('portal-title');
+        container.innerHTML = "";
+        title.innerText = `${role} Registration`;
+
+        const config = {
+            student: [{l:"Full Legal Name",id:"name"}, {l:"University / School",id:"uni"}, {l:"ID Number",id:"id"}],
+            university: [{l:"Institution Name",id:"name"}, {l:"Admin Code",id:"code"}],
+            sacco: [{l:"Member Name",id:"name"}, {l:"Credit ID",id:"cid"}],
+            gov: [{l:"Official Name",id:"name"}, {l:"Department",id:"dept"}]
+        };
+
+        config[role].forEach(f => {
+            container.innerHTML += `
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-[0.2em]">${f.l}</label>
+                    <input type="text" id="inp-${f.id}" data-label="${f.l}" class="w-full p-4 rounded-xl outline-none" required>
+                </div>
+            `;
+        });
+        window.switchView('portal-form');
+    };
+
+    window.processOnboarding = async () => {
+        const prompt = document.getElementById('user-prompt').value.trim();
+        if (!prompt) return alert("Secret phrase required.");
+
+        const btn = document.getElementById('btn-onboard');
+        btn.disabled = true;
+        btn.innerHTML = `<span class="loading-dots">Securing Ledger</span>`;
+
+        const encoder = new TextEncoder();
+        const data = encoder.encode(prompt.toLowerCase() + "UNICHAIN_SALT_2025");
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
         
-        // Evidence Data extracted from report
-        const evidenceData = [
-            {
-                id: 1,
-                date: "Aug 2024",
-                source: "University World News",
-                category: "Education",
-                title: "HEC Tightens Degree Rules",
-                desc: "Rules tightened due to widespread inconsistencies and suspected fraudulent foreign degrees.",
-                impact: "High Friction"
-            },
-            {
-                id: 2,
-                date: "2025",
-                source: "KT Press (Rutsiro)",
-                category: "Education",
-                title: "5 Teachers Arrested",
-                desc: "Alleged use of forged academic documents found in Rutsiro district.",
-                impact: "Criminal"
-            },
-            {
-                id: 3,
-                date: "May 2025",
-                source: "Irembo",
-                category: "Identity",
-                title: "7-Day Equivalence Wait",
-                desc: "Updated guidance confirms lengthy processing time for foreign qualifications.",
-                impact: "Delay"
-            },
-            {
-                id: 4,
-                date: "Sept 2025",
-                source: "KT Press",
-                category: "Finance",
-                title: "RIB Parades 26 Suspects",
-                desc: "Large scale fraud bust indicating systemic weaknesses.",
-                impact: "Systemic"
-            },
-            {
-                id: 5,
-                date: "2025",
-                source: "KT Press",
-                category: "Finance",
-                title: "SACCO Integrity Questioned",
-                desc: "Huge losses reported due to lack of verified integrity in personnel/transactions.",
-                impact: "Financial Loss"
-            },
-            {
-                id: 6,
-                date: "Dec 2025",
-                source: "Field Interview (Gatenga)",
-                category: "Education",
-                title: "Manual Verification at AUCA",
-                desc: "Applicants required to physically provide documents; online submissions distrusted.",
-                impact: "Trust Gap"
-            }
-        ];
-
-        // --- Initialization ---
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initImpactChart();
-            renderEvidence(evidenceData);
+        const meta = {};
+        document.querySelectorAll('#form-content input').forEach(inp => {
+            meta[inp.dataset.label] = inp.value;
         });
 
-        // --- Chart.js Visualization ---
+        const profile = {
+            role: currentRole,
+            uid: hashHex.substring(0, 24),
+            metadata: meta,
+            timestamp: Date.now(),
+            verified: true
+        };
 
-        function initImpactChart() {
-            const ctx = document.getElementById('impactChart').getContext('2d');
+        try {
+            const docId = hashHex.substring(0, 20); 
+            // Fixed path logic
+            const docRef = doc(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'verified_identities', docId);
+            await setDoc(docRef, profile);
             
-            // Aggregating data for the chart (Conceptual quantification)
-            // Categories: Forgery Cases, Processing Delays (Days), Financial Trust Issues
-            const data = {
-                labels: ['Forgery Incidents', 'Wait Times (Days)', 'Trust Issues'],
-                datasets: [{
-                    label: 'Severity Level (Report Context)',
-                    data: [85, 40, 75], // Qualitative scoring: High Forgery (85), 7 Days (normalized to 40), High Trust Issues (75)
-                    backgroundColor: [
-                        '#0033AD', // Blue
-                        '#4B5563', // Gray
-                        '#0a0a0a'  // Black
-                    ],
-                    borderRadius: 4,
-                    barThickness: 40
-                }]
-            };
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    if (context.dataIndex === 1) return 'Avg: 7 Working Days';
-                                    if (context.dataIndex === 0) return 'Multiple Arrests (Rutsiro, RIB)';
-                                    return 'High Risk in SACCOs';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: '#f3f4f6' },
-                            ticks: { display: false } // Hiding numbers to emphasize relative severity
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Inter' } }
-                        }
-                    }
-                }
-            });
+            document.getElementById('display-id').innerText = profile.uid;
+            window.switchView('success');
+        } catch (e) {
+            console.error(e);
+            alert("Database Error: " + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Verify & Create Profile";
         }
+    };
 
-        // --- DOM Interactions ---
+    window.loginWithSeed = async () => {
+        const seed = document.getElementById('login-seed').value.trim();
+        if (!seed) return alert("Seed phrase required.");
 
-        function renderEvidence(data) {
-            const container = document.getElementById('evidence-container');
-            container.innerHTML = '';
+        const encoder = new TextEncoder();
+        const data = encoder.encode(seed.toLowerCase() + "UNICHAIN_SALT_2025");
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        const docId = hashHex.substring(0, 20);
 
-            data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'p-4 rounded-lg bg-gray-50 border border-gray-100 hover:border-uni-blue transition-colors group cursor-default';
-                
-                let badgeColor = 'bg-gray-200 text-gray-700';
-                if(item.category === 'Education') badgeColor = 'bg-blue-100 text-blue-800';
-                if(item.category === 'Finance') badgeColor = 'bg-green-100 text-green-800';
-                if(item.category === 'Identity') badgeColor = 'bg-purple-100 text-purple-800';
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <span class="text-xs font-bold text-gray-400">${item.date}</span>
-                        <span class="text-xs px-2 py-0.5 rounded-full ${badgeColor}">${item.category}</span>
+        try {
+            const snap = await getDoc(doc(db, 'artifacts', APP_ID_PATH, 'public', 'data', 'verified_identities', docId));
+            if (snap.exists()) {
+                const d = snap.data();
+                document.getElementById('dash-role').innerText = `${d.role} Identity`;
+                document.getElementById('dash-data').innerHTML = Object.entries(d.metadata).map(([k, v]) => `
+                    <div class="border-b border-white/5 pb-4">
+                        <span class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">${k}</span>
+                        <p class="text-lg text-white font-semibold mt-1">${v}</p>
                     </div>
-                    <h4 class="font-bold text-gray-900 mt-1 group-hover:text-uni-blue">${item.title}</h4>
-                    <p class="text-xs text-gray-600 mt-2 line-clamp-2">${item.desc}</p>
-                    <div class="mt-2 text-xs font-medium text-gray-400">Source: ${item.source}</div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function filterEvidence(category) {
-            // Update buttons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                if(btn.dataset.filter === category) {
-                    btn.classList.add('bg-uni-black', 'text-white');
-                    btn.classList.remove('text-gray-600');
-                } else {
-                    btn.classList.remove('bg-uni-black', 'text-white');
-                    btn.classList.add('text-gray-600');
-                }
-            });
-
-            // Filter data
-            if (category === 'all') {
-                renderEvidence(evidenceData);
+                `).join('') + `<div class="pt-4 text-[9px] text-gray-600 uppercase tracking-tighter">Chain Entry: ${new Date(d.timestamp).toLocaleString()}</div>`;
+                window.switchView('dashboard');
             } else {
-                const filtered = evidenceData.filter(item => item.category === category);
-                renderEvidence(filtered);
+                alert("Profile not found.");
             }
+        } catch (e) { 
+            alert("Connection error.");
         }
+    };
 
-        function toggleCard(element) {
-            // Simple accordion-like detail reveal
-            const detail = element.querySelector('div.hidden, div.block');
-            if (detail.classList.contains('hidden')) {
-                detail.classList.remove('hidden');
-                detail.classList.add('block');
-                element.classList.add('ring-2', 'ring-uni-blue');
-            } else {
-                detail.classList.add('hidden');
-                detail.classList.remove('block');
-                element.classList.remove('ring-2', 'ring-uni-blue');
-            }
-        }
-
-        function switchTab(tab) {
-            const verifyBtn = document.getElementById('tab-verify');
-            const issueBtn = document.getElementById('tab-issue');
-            const verifyContent = document.getElementById('content-verify');
-            const issueContent = document.getElementById('content-issue');
-
-            if (tab === 'verify') {
-                verifyBtn.classList.add('border-uni-blue', 'text-uni-blue');
-                verifyBtn.classList.remove('text-gray-500');
-                issueBtn.classList.remove('border-uni-blue', 'text-uni-blue');
-                issueBtn.classList.add('text-gray-500');
-                
-                verifyContent.classList.remove('hidden');
-                issueContent.classList.add('hidden');
-            } else {
-                issueBtn.classList.add('border-uni-blue', 'text-uni-blue');
-                issueBtn.classList.remove('text-gray-500');
-                verifyBtn.classList.remove('border-uni-blue', 'text-uni-blue');
-                verifyBtn.classList.add('text-gray-500');
-                
-                issueContent.classList.remove('hidden');
-                verifyContent.classList.add('hidden');
-            }
-        }
-
-        function simulateVerification() {
-            const btn = document.querySelector('button[onclick="simulateVerification()"]');
-            const input = document.getElementById('credential-input');
-            const result = document.getElementById('verification-result');
-
-            // Loading State
-            const originalText = btn.innerText;
-            btn.innerText = "Verifying...";
-            btn.disabled = true;
-            btn.classList.add('opacity-75');
-
-            // Simulation Delay
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.disabled = false;
-                btn.classList.remove('opacity-75');
-                result.classList.remove('hidden');
-                result.classList.add('animate-pulse');
-                setTimeout(() => result.classList.remove('animate-pulse'), 500);
-            }, 1200);
-        }
-
-        function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
-
-    </script>
+    window.logout = () => window.switchView('portal-selection');
+</script>
 </body>
 </html>
