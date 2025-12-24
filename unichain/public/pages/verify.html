@@ -59,13 +59,54 @@
                     <p class="text-gray-500 text-sm mt-2">Check member integrity and verify financial status.</p>
                 </button>
                 <button onclick="openPortal('gov')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all group">
-                    <i data-lucide="shield-check" class="w-10 h-10 text-uni-blue mb-4"></i>
+                    <i data-lucide="shield-check" class="text-uni-blue w-10 h-10 mb-4"></i>
                     <h3 class="text-xl font-bold text-white">Government</h3>
                     <p class="text-gray-500 text-sm mt-2">Oversee high-level fraud alerts and equivalence records.</p>
+                </button>
+                <button onclick="switchView('p2p-loans')" class="glass-card p-8 rounded-3xl text-left hover:border-uni-blue transition-all group border-uni-blue/30 md:col-span-2">
+                    <i data-lucide="hand-coins" class="w-10 h-10 text-uni-blue mb-4"></i>
+                    <h3 class="text-xl font-bold text-white">P2P Lending & Enforcement</h3>
+                    <p class="text-gray-500 text-sm mt-2">Submit loan proposals and agree to automated trust enforcement terms.</p>
                 </button>
             </div>
             <div class="mt-12 text-center">
                 <button onclick="switchView('wallet-login')" class="bg-white text-black px-10 py-4 rounded-full font-bold text-sm hover:bg-uni-blue hover:text-white transition-all shadow-lg shadow-white/5">CONNECT EXISTING WALLET</button>
+            </div>
+        </div>
+
+        <div id="view-p2p-loans" class="view-section">
+            <div class="glass-card p-10 rounded-[2.5rem]">
+                <h2 class="text-3xl font-bold mb-2 uppercase tracking-tighter">P2P <span class="text-uni-blue">Finance & Enforcement</span></h2>
+                <p class="text-gray-500 mb-8 text-sm italic">Loans are issued based on your Trust Index. Non-repayment results in identity revocation.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Loan Amount (RWF)</label>
+                            <input type="number" id="p2p-amount" placeholder="e.g. 50000" class="w-full p-4 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Repayment Term (Days)</label>
+                            <input type="number" id="p2p-days" placeholder="e.g. 30" class="w-full p-4 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Collateral Agreement</label>
+                            <div class="p-4 bg-red-900/10 border border-red-900/30 rounded-xl">
+                                <p class="text-[10px] text-red-500 leading-relaxed uppercase font-bold">
+                                    Notice: By submitting, you authorize UniChain to revoke your Verified Identity and alert SACCO partners if repayment is not detected by the ledger.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Purpose of Loan</label>
+                            <textarea id="p2p-purpose" placeholder="Describe why you need the funds..." class="w-full p-4 rounded-xl h-32"></textarea>
+                        </div>
+                        <button onclick="alert('Loan Proposal Submitted to Ledger. Enforcement protocols active.')" class="w-full bg-uni-blue py-5 rounded-xl font-bold hover:bg-blue-700 transition-all text-white uppercase tracking-widest text-sm">Submit Proposal</button>
+                        <button onclick="switchView('portal-selection')" class="w-full border border-white/10 py-4 rounded-xl text-[10px] font-bold uppercase text-gray-500">Cancel</button>
+                    </div>
+                </div>
             </div>
         </div>
 
