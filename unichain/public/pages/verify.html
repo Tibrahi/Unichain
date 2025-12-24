@@ -3,71 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADA Mainnet Bridge</title>
+    <title>Multi-Chain Auditor Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <style>
-        body { background-color: #000; color: #fff; }
-        .border-blue { border: 1px solid #1e40af; }
+        body { background-color: #050505; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .neon-border { border: 1px solid #1e40af; box-shadow: 0 0 15px rgba(30, 64, 175, 0.2); }
+        .log-entry { border-left: 2px solid #3b82f6; background: rgba(30, 64, 175, 0.05); }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-6 text-center">
+<body class="p-4 md:p-12 min-h-screen flex flex-col items-center">
 
-    <div class="w-full max-w-md bg-zinc-950 border-blue p-8 rounded-3xl">
-        <h1 class="text-3xl font-black text-blue-500 mb-6">MAINNET SYNC</h1>
-        
-        <div class="bg-black border border-zinc-900 rounded-2xl p-6 mb-6">
-            <div id="balance" class="text-4xl font-bold">0.00 <span class="text-sm text-blue-600">ADA</span></div>
-            <div id="addr" class="text-[9px] text-zinc-700 mt-4 truncate">Disconnected</div>
+    <div class="w-full max-w-5xl space-y-8">
+        <header class="flex flex-col md:flex-row justify-between items-center gap-6 border-b border-zinc-800 pb-8">
+            <div>
+                <h1 class="text-5xl font-black italic text-blue-500 tracking-tighter">AUDITOR_V3</h1>
+                <p id="status-bar" class="text-xs font-mono text-zinc-500 mt-2 uppercase tracking-[0.2em]">System Status: Awaiting Connection</p>
+            </div>
+            <div class="flex gap-4">
+                <button id="ada-link" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-900/40 text-sm">CARDANO (NAMI)</button>
+                <button id="eth-link" class="bg-orange-600 hover:bg-orange-700 px-8 py-3 rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-orange-900/40 text-sm">METAMASK (EVM)</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="neon-border p-6 rounded-3xl bg-zinc-950">
+                <h3 class="text-[10px] font-black text-blue-400 uppercase mb-4 tracking-widest">Public Key / Address</h3>
+                <div id="addr-val" class="text-[11px] font-mono break-all text-zinc-400">---</div>
+            </div>
+            <div class="neon-border p-6 rounded-3xl bg-zinc-950">
+                <h3 class="text-[10px] font-black text-blue-400 uppercase mb-4 tracking-widest">Verified Balance</h3>
+                <div id="bal-val" class="text-4xl font-black italic">0.00 <span class="text-xs text-zinc-700">UNIT</span></div>
+            </div>
+            <div id="pkh-card" class="neon-border p-6 rounded-3xl bg-zinc-950 opacity-50">
+                <h3 class="text-[10px] font-black text-blue-400 uppercase mb-4 tracking-widest">Cardano PKH</h3>
+                <div id="pkh-val" class="text-[11px] font-mono break-all text-zinc-500 italic">Not Derived</div>
+            </div>
         </div>
 
-        <button id="connect-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">
-            CONNECT WALLET
-        </button>
-
-        <p id="status" class="text-[10px] text-zinc-500 mt-4 italic"></p>
+        <div class="neon-border p-8 rounded-3xl bg-zinc-950 min-h-[300px]">
+            <h2 class="text-lg font-bold mb-6 flex items-center gap-3">
+                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                Protocol Action History
+            </h2>
+            <div id="ledger-log" class="space-y-4">
+                <p class="text-sm text-zinc-700 italic">Link a node to start auditing on-chain events...</p>
+            </div>
+        </div>
     </div>
 
     <script type="module">
-        import { Lucid, Blockfrost } from "https://unpkg.com/lucid-cardano@0.10.7/web/mod.js";
+        import { Lucid, Blockfrost, getAddressDetails } from "https://unpkg.com/lucid-cardano@0.10.7/web/mod.js";
 
-        const API_KEY = "mainnetYbSVZuCt0G2cY0oewNgWZczdr69Ntpfz";
-        const btn = document.getElementById('connect-btn');
-        const status = document.getElementById('status');
+        const BF_KEY = "mainnetYbSVZuCt0G2cY0oewNgWZczdr69Ntpfz";
+        const status = document.getElementById('status-bar');
+        const ledger = document.getElementById('ledger-log');
 
-        btn.onclick = async () => {
-            status.innerText = "Waking up wallet...";
+        // --- CORE: CARDANO LOGIC ---
+        document.getElementById('ada-link').onclick = async () => {
+            status.innerText = "System: Scanning for Nami...";
             
-            // WAIT 500ms to ensure the extension is injected
-            await new Promise(res => setTimeout(res, 500));
+            // Fail-safe: Wait for injection
+            await new Promise(r => setTimeout(r, 600));
+
+            if (!window.cardano?.nami) {
+                status.innerText = "Error: Nami Not Found. Please Refresh or unlock wallet.";
+                return;
+            }
 
             try {
-                if (!window.cardano) throw new Error("Wallet not found. Try 'Live Server' or enable 'File URL' access in settings.");
-
-                // Check for ANY available wallet
-                const available = Object.keys(window.cardano).filter(k => window.cardano[k].enable);
-                if (available.length === 0) throw new Error("No wallets detected.");
-                
-                const walletName = available[0];
-                const lucid = await Lucid.new(
-                    new Blockfrost("https://cardano-mainnet.blockfrost.io/api/v0", API_KEY),
-                    "Mainnet"
-                );
-
-                const api = await window.cardano[walletName].enable();
+                const api = await window.cardano.nami.enable();
+                const lucid = await Lucid.new(new Blockfrost("https://cardano-mainnet.blockfrost.io/api/v0", BF_KEY), "Mainnet");
                 lucid.selectWalletFromApi(api);
 
-                const address = await lucid.wallet.address();
+                const addr = await lucid.wallet.address();
                 const utxos = await lucid.wallet.getUtxos();
-                const total = utxos.reduce((acc, u) => acc + BigInt(u.assets.lovelace), 0n);
+                const balance = utxos.reduce((a, u) => a + BigInt(u.assets.lovelace), 0n);
+                const pkh = getAddressDetails(addr).paymentCredential.hash;
 
-                document.getElementById('balance').innerHTML = `${(Number(total)/1000000).toFixed(2)} <span class="text-sm text-blue-600">ADA</span>`;
-                document.getElementById('addr').innerText = address;
-                status.innerText = "Connected to " + walletName;
+                updateUI(addr, (Number(balance)/1000000).toFixed(2), "ADA", pkh);
+                fetchHistory(addr);
 
-            } catch (err) {
-                status.innerText = "Error: " + err.message;
-            }
+            } catch (err) { handleGlobalError(err); }
         };
+
+        // --- CORE: METAMASK LOGIC ---
+        document.getElementById('eth-link').onclick = async () => {
+            status.innerText = "System: Requesting MetaMask Access...";
+            
+            if (!window.ethereum) {
+                status.innerText = "Error: MetaMask Not Found.";
+                return;
+            }
+
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                const signer = await provider.getSigner();
+                const addr = await signer.getAddress();
+                const balance = await provider.getBalance(addr);
+
+                updateUI(addr, ethers.formatEther(balance).slice(0,6), "ETH", "N/A (EVM)");
+                ledger.innerHTML = `<div class="log-entry p-4 text-xs font-mono text-zinc-400">[AUDIT] MetaMask connected. Address ${addr} verified.</div>`;
+
+            } catch (err) { handleGlobalError(err); }
+        };
+
+        // --- HELPERS ---
+        function updateUI(addr, bal, unit, pkh) {
+            document.getElementById('addr-val').innerText = addr;
+            document.getElementById('bal-val').innerHTML = `${bal} <span class="text-xs text-zinc-700">${unit}</span>`;
+            document.getElementById('pkh-val').innerText = pkh;
+            document.getElementById('pkh-card').classList.remove('opacity-50');
+            status.innerText = `System: Verified ${unit} Connection`;
+        }
+
+        function handleGlobalError(err) {
+            if (err.code === 4001 || err.info?.includes("User declined")) {
+                status.innerText = "Status: Connection Rejected by User";
+            } else {
+                status.innerText = "Status: Critical Error - " + err.message.slice(0,30);
+                console.error(err);
+            }
+        }
+
+        async function fetchHistory(addr) {
+            ledger.innerHTML = '<p class="text-blue-500 animate-pulse text-xs">SCANNING LEDGER...</p>';
+            try {
+                const res = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/addresses/${addr}/transactions`, {
+                    headers: { 'project_id': BF_KEY }
+                }).then(r => r.json());
+
+                ledger.innerHTML = res.slice(0, 6).map(tx => `
+                    <div class="log-entry p-4 flex justify-between items-center">
+                        <span class="text-[10px] font-mono text-zinc-500">${tx.tx_hash}</span>
+                        <span class="text-[10px] bg-blue-900/20 text-blue-400 px-3 py-1 rounded border border-blue-800 font-bold">LENDER_ACTION</span>
+                    </div>
+                `).join('');
+            } catch (e) { ledger.innerHTML = '<p class="text-red-500 text-xs">Ledger Sync Failed</p>'; }
+        }
     </script>
 </body>
 </html>
