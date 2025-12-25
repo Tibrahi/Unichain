@@ -1,148 +1,287 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="IDApp">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blockchain Identity Verifier</title>
+    <title>Unichain L2 Protocol</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <style>
-        .bg-custom-blue { background-color: #1e3a8a; }
-        .text-custom-blue { color: #1e3a8a; }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600&display=swap');
+        
+        :root {
+            --bg-dark: #08080c;
+            --sidebar-bg: #0d0e12;
+            --accent-blue: #3b82f6;
+            --error-red: #ff4d4d;
+        }
+
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-dark); color: #e2e8f0; margin: 0; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Layout */
+        .app-container { display: grid; grid-template-columns: 280px 1fr; height: 100vh; }
+        .sidebar { background: var(--sidebar-bg); border-right: 1px solid #1e293b; padding: 2rem 0; display: flex; flex-col; justify-content: space-between; }
+        
+        /* Navigation */
+        .nav-item { 
+            padding: 1rem 1.5rem; cursor: pointer; border-left: 4px solid transparent; 
+            transition: 0.2s; color: #94a3b8; font-weight: 500;
+        }
+        .nav-item:hover { background: #1e293b; color: white; }
+        .nav-item.active { border-left-color: var(--accent-blue); background: #172554; color: white; }
+
+        /* Inputs */
+        input, select, textarea {
+            background: #000 !important; border: 1px solid #334155 !important;
+            color: white !important; padding: 0.75rem; border-radius: 0.5rem;
+            width: 100%; font-size: 0.875rem; transition: border 0.3s;
+        }
+        input:focus { border-color: var(--accent-blue) !important; outline: none; }
+        
+        /* Hide/Show logic */
+        .hidden-section { display: none; }
+        .blur-text { filter: blur(5px); transition: filter 0.3s; cursor: pointer; }
+        .blur-text:hover { filter: blur(0); }
+
+        .error-banner { 
+            background: rgba(255, 77, 77, 0.1); border: 1px solid var(--error-red);
+            color: var(--error-red); padding: 1rem; border-radius: 0.5rem; 
+            margin-bottom: 1rem; display: none; font-size: 0.8rem; font-weight: bold;
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-900" ng-controller="IDController">
+<body>
 
-    <nav class="bg-black text-white p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-widest">CHAIN-VERIFY</h1>
-            <span class="text-xs bg-blue-600 px-2 py-1 rounded">BLOCKCHAIN LAYER L1</span>
+<div class="app-container">
+    <aside class="sidebar flex flex-col h-full">
+        <div>
+            <div class="px-6 mb-10">
+                <h2 class="text-2xl font-bold text-white tracking-tighter">UNICHAIN</h2>
+                <span class="text-[10px] text-blue-500 font-bold mono">MAINNET-SHARD-01</span>
+            </div>
+            <nav id="sidebar-nav">
+                <div class="nav-item active" onclick="switchTab('Borrower')">BORROWER</div>
+                <div class="nav-item" onclick="switchTab('Lender')">LENDER</div>
+                <div class="nav-item" onclick="switchTab('Auditor')">NETWORK AUDITOR</div>
+            </nav>
         </div>
-    </nav>
-
-    <div class="container mx-auto max-w-2xl py-10 px-4">
         
-        <div ng-if="step === 1" class="bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-600">
-            <h2 class="text-2xl font-bold mb-6 text-custom-blue">Verify Your Identity</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold mb-1">Full Name</label>
-                    <input type="text" ng-model="user.name" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+        <div class="px-6">
+            <div class="p-4 bg-black/40 rounded-lg border border-gray-800">
+                <p class="text-[10px] text-gray-500 uppercase mb-1">Status</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span class="text-xs font-bold text-gray-300">EPOCH 482 ACTIVE</span>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-1">Category</label>
-                    <select ng-model="user.type" class="w-full p-2 border rounded">
-                        <option value="Student">Student</option>
-                        <option value="Citizen">Current Citizen</option>
-                        <option value="Worker">Professional/Worker</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-1">Document ID Number</label>
-                    <input type="text" ng-model="user.docId" class="w-full p-2 border rounded">
-                </div>
-                <div class="p-4 bg-blue-50 border-dashed border-2 border-blue-200 rounded text-center">
-                    <p class="text-sm text-blue-700">Upload Doc & Face Scan Simulation</p>
-                    <input type="file" class="mt-2 text-xs">
-                </div>
-                <button ng-click="goToReview()" class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition">Review Information</button>
             </div>
         </div>
+    </aside>
 
-        <div ng-if="step === 2" class="bg-white p-8 rounded-xl shadow-md border-t-4 border-black">
-            <h2 class="text-2xl font-bold mb-2 text-black">Review & Freeze</h2>
-            <p class="text-red-500 text-sm mb-6 font-medium">⚠️ Once saved to blockchain, this data cannot be edited.</p>
-            
-            <div class="bg-gray-50 p-6 rounded-lg space-y-3 mb-6">
-                <p><strong>Name:</strong> {{user.name}}</p>
-                <p><strong>Category:</strong> {{user.type}}</p>
-                <p><strong>Doc ID:</strong> {{user.docId}}</p>
-            </div>
+    <main class="p-10 overflow-y-auto">
+        <div id="error-display" class="error-banner"></div>
 
-            <div class="flex gap-4">
-                <button ng-click="step = 1" class="flex-1 border border-gray-300 py-3 rounded hover:bg-gray-100">Back</button>
-                <button ng-click="confirmAndGenerate()" class="flex-1 bg-black text-white py-3 rounded hover:bg-gray-800">Confirm & Encrypt</button>
-            </div>
-        </div>
+        <header class="mb-8 border-b border-gray-800 pb-6">
+            <h1 id="view-title" class="text-3xl font-bold text-white">Borrower Portal</h1>
+            <p class="text-gray-500 text-sm mt-1">Real-time collateralized debt position management.</p>
+        </header>
 
-        <div ng-if="step === 3" class="bg-white p-8 rounded-xl shadow-md border-t-4 border-green-500">
-            <div class="text-center mb-6">
-                <div class="inline-block p-3 bg-green-100 rounded-full mb-2">✅</div>
-                <h2 class="text-2xl font-bold">Identity Secured</h2>
-            </div>
-
-            <div class="space-y-6">
-                <div>
-                    <label class="text-xs font-bold uppercase text-gray-500">Your Private Key (Keep Secret!)</label>
-                    <div class="flex mt-1">
-                        <input readonly value="{{keys.private}}" class="bg-gray-100 p-2 text-xs w-full rounded-l border">
-                        <button ng-click="copy(keys.private)" class="bg-blue-600 text-white px-3 text-xs rounded-r">Copy</button>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <section class="space-y-6">
+                
+                <div id="common-inputs" class="space-y-4">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest">Legal Identity</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Entity Name</label>
+                            <input type="text" id="legal-name" placeholder="Full Legal Name">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Tax ID / SSN</label>
+                            <input type="password" id="tax-id" placeholder="Encrypted field">
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="text-xs font-bold uppercase text-gray-500">Shared Public Key (For Search)</label>
-                    <div class="flex mt-1">
-                        <input readonly value="{{keys.public}}" class="bg-gray-100 p-2 text-xs w-full rounded-l border">
-                        <button ng-click="copy(keys.public)" class="bg-blue-600 text-white px-3 text-xs rounded-r">Copy</button>
+                <div id="finance-inputs" class="space-y-4">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest">Loan Parameters</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Principal (ADA)</label>
+                            <input type="number" id="loan-amount" placeholder="0.00" oninput="updateCollateral()">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Leverage (LTV)</label>
+                            <select id="leverage-ratio" onchange="updateCollateral()">
+                                <option value="1.5">150% Collateralization</option>
+                                <option value="2.0">200% Collateralization</option>
+                                <option value="3.5">350% Collateralization</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-blue-900/10 border border-blue-900/20 rounded-lg">
+                        <span class="text-[10px] text-blue-400 font-bold">LOCKED COLLATERAL VALUE</span>
+                        <div class="text-2xl font-bold" id="collateral-display">0.00 ADA</div>
+                    </div>
+
+                    <div class="p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
+                        <h4 class="text-[10px] font-bold text-yellow-500 mb-2 uppercase">Legally Binding Agreement</h4>
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" id="agreement-check" class="w-4 h-4 mt-1">
+                            <span class="text-[10px] text-gray-400 leading-tight">
+                                I hereby authorize the smart contract to lock the specified amount of ADA. I understand that if the datum key is lost or the collateral value drops below liquidation thresholds, assets may be forfeited.
+                            </span>
+                        </label>
                     </div>
                 </div>
 
-                <hr>
+                <div id="auditor-inputs" class="hidden-section space-y-4">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest">Protocol Search (Cardano Standards)</h3>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Search by Key (skey/addr1/pk)</label>
+                        <input type="text" id="search-query" placeholder="Enter addr1... or vkey... or skey...">
+                    </div>
+                    <div class="p-4 bg-zinc-900 border border-zinc-800 rounded text-[10px] mono text-gray-500">
+                        INFO: Auditor mode bypasses UI filters to query the raw Unichain L2 State using Bech32 decoding.
+                    </div>
+                </div>
 
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <h3 class="font-bold text-sm mb-2">Search Simulation</h3>
-                    <p class="text-xs mb-3 text-gray-600">Input your Public Key to see what others see:</p>
-                    <input type="text" ng-model="searchInput" placeholder="Paste Public Key here" class="w-full p-2 text-sm border rounded">
+                <button onclick="executeTransaction()" class="w-full bg-white text-black font-bold py-4 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
+                    COMMIT TO LEDGER
+                </button>
+            </section>
+
+            <section class="space-y-6">
+                <div class="bg-black border border-gray-800 rounded-2xl p-6">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 pb-2 border-b border-gray-800">Keys & Datum</h3>
                     
-                    <div ng-if="searchInput === keys.public" class="mt-4 p-3 bg-white border rounded shadow-sm animate-pulse">
-                        <p class="text-xs font-bold text-green-600">VERIFIED RECORD FOUND:</p>
-                        <p class="text-sm">User: {{user.name}}</p>
-                        <p class="text-sm text-gray-500">Status: {{user.type}} Verified</p>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-blue-500">PUBLIC ADDRESS</span>
+                                <button onclick="copyText('public-key-val')" class="text-[10px] text-gray-600 hover:text-white">COPY</button>
+                            </div>
+                            <div id="public-key-val" class="mono text-[10px] bg-zinc-900 p-3 rounded break-all border border-zinc-800">----------------</div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-red-500">PRIVATE SPEND KEY</span>
+                                <div class="flex gap-2">
+                                    <button onclick="toggleVisibility('private-key-val')" id="toggle-btn" class="text-[10px] text-gray-600 hover:text-white">SHOW</button>
+                                    <button onclick="copyText('private-key-val')" class="text-[10px] text-gray-600 hover:text-white">COPY</button>
+                                </div>
+                            </div>
+                            <div id="private-key-val" class="mono text-[10px] bg-zinc-900 p-3 rounded break-all border border-zinc-800 blur-text">----------------</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <button ng-click="reset()" class="w-full mt-6 text-gray-400 text-sm underline">Start New Session</button>
+
+                <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 h-64 overflow-hidden flex flex-col">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4">Live Ledger History</h3>
+                    <div id="ledger-log" class="flex-1 overflow-y-auto space-y-2 mono text-[10px] text-gray-400">
+                        </div>
+                </div>
+            </section>
         </div>
+    </main>
+</div>
 
-    </div>
+<script>
+    let currentRole = 'Borrower';
 
-    <script>
-        var app = angular.module('IDApp', []);
-        app.controller('IDController', function($scope) {
-            $scope.step = 1;
-            $scope.user = { name: '', type: 'Student', docId: '' };
-            $scope.keys = { public: '', private: '' };
-            $scope.searchInput = '';
+    function switchTab(role) {
+        currentRole = role;
+        // Update Nav UI
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Update Content Headers
+        document.getElementById('view-title').innerText = role + " Portal";
+        
+        // Toggle Inputs
+        if(role === 'Auditor') {
+            document.getElementById('finance-inputs').classList.add('hidden-section');
+            document.getElementById('common-inputs').classList.add('hidden-section');
+            document.getElementById('auditor-inputs').classList.remove('hidden-section');
+        } else {
+            document.getElementById('finance-inputs').classList.remove('hidden-section');
+            document.getElementById('common-inputs').classList.remove('hidden-section');
+            document.getElementById('auditor-inputs').classList.add('hidden-section');
+        }
+        clearError();
+    }
 
-            $scope.goToReview = function() {
-                if($scope.user.name && $scope.user.docId) {
-                    $scope.step = 2;
-                } else {
-                    alert("Please fill all fields!");
-                }
-            };
+    function updateCollateral() {
+        const amount = document.getElementById('loan-amount').value || 0;
+        const lever = document.getElementById('leverage-ratio').value;
+        const total = (amount * lever).toFixed(2);
+        document.getElementById('collateral-display').innerText = total + " ADA";
+    }
 
-            $scope.confirmAndGenerate = function() {
-                // Simulating Key Generation Logic
-                const randomHash = () => Math.random().toString(36).substring(2, 15);
-                $scope.keys.private = 'PVT-' + randomHash() + randomHash();
-                $scope.keys.public = 'PUB-' + randomHash();
-                $scope.step = 3;
-            };
+    function executeTransaction() {
+        clearError();
+        const name = document.getElementById('legal-name').value;
+        const agree = document.getElementById('agreement-check').checked;
+        const query = document.getElementById('search-query').value;
 
-            $scope.copy = function(text) {
-                navigator.clipboard.writeText(text);
-                alert("Copied to clipboard!");
-            };
+        // Validation Logic (Real-world scenario)
+        if(currentRole !== 'Auditor') {
+            if(!name) return showError("IDENTITY FAILURE: Legal Name must be provided for KYC attestation.");
+            if(!agree) return showError("POLICY FAILURE: You must confirm the collateral agreement.");
+            const amt = document.getElementById('loan-amount').value;
+            if(!amt || amt <= 0) return showError("TRANSACTION FAILURE: Loan principal must be greater than 0.");
+        } else {
+            if(!query) return showError("AUDIT FAILURE: Search string (addr1/skey) is required.");
+        }
 
-            $scope.reset = function() {
-                $scope.step = 1;
-                $scope.user = { name: '', type: 'Student', docId: '' };
-                $scope.searchInput = '';
-            };
-        });
-    </script>
+        // Generate Mock ADA Keys
+        const genHex = (len) => [...Array(len)].map(() => Math.floor(Math.random()*16).toString(16)).join('');
+        const pubKey = "addr1q" + genHex(50);
+        const pvtKey = "skey1" + genHex(64);
+
+        document.getElementById('public-key-val').innerText = pubKey;
+        document.getElementById('private-key-val').innerText = pvtKey;
+
+        // Log to Ledger
+        const log = document.getElementById('ledger-log');
+        const entry = document.createElement('div');
+        entry.className = "border-l border-blue-500 pl-2 py-1 mb-1 bg-blue-500/5";
+        entry.innerHTML = `<span class="text-blue-400">[${new Date().toLocaleTimeString()}]</span> ${currentRole} Operation Hash: ${genHex(12)}...`;
+        log.prepend(entry);
+    }
+
+    function showError(msg) {
+        const err = document.getElementById('error-display');
+        err.innerText = msg;
+        err.style.display = 'block';
+    }
+
+    function clearError() {
+        document.getElementById('error-display').style.display = 'none';
+    }
+
+    function toggleVisibility(id) {
+        const el = document.getElementById(id);
+        const btn = document.getElementById('toggle-btn');
+        if(el.classList.contains('blur-text')) {
+            el.classList.remove('blur-text');
+            btn.innerText = "HIDE";
+        } else {
+            el.classList.add('blur-text');
+            btn.innerText = "SHOW";
+        }
+    }
+
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        if(text.includes('---')) return;
+        navigator.clipboard.writeText(text);
+        // Visual indicator
+        const original = event.target.innerText;
+        event.target.innerText = "COPIED!";
+        setTimeout(() => event.target.innerText = original, 1000);
+    }
+</script>
+
 </body>
 </html>
