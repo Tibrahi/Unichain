@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="IDApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Identity Verifier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .bg-custom-blue { background-color: #1e3a8a; }
+        .text-custom-blue { color: #1e3a8a; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-900" ng-controller="IDController">
+
+    <nav class="bg-black text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-widest">CHAIN-VERIFY</h1>
+            <span class="text-xs bg-blue-600 px-2 py-1 rounded">BLOCKCHAIN LAYER L1</span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto max-w-2xl py-10 px-4">
+        
+        <div ng-if="step === 1" class="bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-600">
+            <h2 class="text-2xl font-bold mb-6 text-custom-blue">Verify Your Identity</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Full Name</label>
+                    <input type="text" ng-model="user.name" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Category</label>
+                    <select ng-model="user.type" class="w-full p-2 border rounded">
+                        <option value="Student">Student</option>
+                        <option value="Citizen">Current Citizen</option>
+                        <option value="Worker">Professional/Worker</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Document ID Number</label>
+                    <input type="text" ng-model="user.docId" class="w-full p-2 border rounded">
+                </div>
+                <div class="p-4 bg-blue-50 border-dashed border-2 border-blue-200 rounded text-center">
+                    <p class="text-sm text-blue-700">Upload Doc & Face Scan Simulation</p>
+                    <input type="file" class="mt-2 text-xs">
+                </div>
+                <button ng-click="goToReview()" class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition">Review Information</button>
+            </div>
+        </div>
+
+        <div ng-if="step === 2" class="bg-white p-8 rounded-xl shadow-md border-t-4 border-black">
+            <h2 class="text-2xl font-bold mb-2 text-black">Review & Freeze</h2>
+            <p class="text-red-500 text-sm mb-6 font-medium">⚠️ Once saved to blockchain, this data cannot be edited.</p>
+            
+            <div class="bg-gray-50 p-6 rounded-lg space-y-3 mb-6">
+                <p><strong>Name:</strong> {{user.name}}</p>
+                <p><strong>Category:</strong> {{user.type}}</p>
+                <p><strong>Doc ID:</strong> {{user.docId}}</p>
+            </div>
+
+            <div class="flex gap-4">
+                <button ng-click="step = 1" class="flex-1 border border-gray-300 py-3 rounded hover:bg-gray-100">Back</button>
+                <button ng-click="confirmAndGenerate()" class="flex-1 bg-black text-white py-3 rounded hover:bg-gray-800">Confirm & Encrypt</button>
+            </div>
+        </div>
+
+        <div ng-if="step === 3" class="bg-white p-8 rounded-xl shadow-md border-t-4 border-green-500">
+            <div class="text-center mb-6">
+                <div class="inline-block p-3 bg-green-100 rounded-full mb-2">✅</div>
+                <h2 class="text-2xl font-bold">Identity Secured</h2>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="text-xs font-bold uppercase text-gray-500">Your Private Key (Keep Secret!)</label>
+                    <div class="flex mt-1">
+                        <input readonly value="{{keys.private}}" class="bg-gray-100 p-2 text-xs w-full rounded-l border">
+                        <button ng-click="copy(keys.private)" class="bg-blue-600 text-white px-3 text-xs rounded-r">Copy</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold uppercase text-gray-500">Shared Public Key (For Search)</label>
+                    <div class="flex mt-1">
+                        <input readonly value="{{keys.public}}" class="bg-gray-100 p-2 text-xs w-full rounded-l border">
+                        <button ng-click="copy(keys.public)" class="bg-blue-600 text-white px-3 text-xs rounded-r">Copy</button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-sm mb-2">Search Simulation</h3>
+                    <p class="text-xs mb-3 text-gray-600">Input your Public Key to see what others see:</p>
+                    <input type="text" ng-model="searchInput" placeholder="Paste Public Key here" class="w-full p-2 text-sm border rounded">
+                    
+                    <div ng-if="searchInput === keys.public" class="mt-4 p-3 bg-white border rounded shadow-sm animate-pulse">
+                        <p class="text-xs font-bold text-green-600">VERIFIED RECORD FOUND:</p>
+                        <p class="text-sm">User: {{user.name}}</p>
+                        <p class="text-sm text-gray-500">Status: {{user.type}} Verified</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button ng-click="reset()" class="w-full mt-6 text-gray-400 text-sm underline">Start New Session</button>
+        </div>
+
+    </div>
+
+    <script>
+        var app = angular.module('IDApp', []);
+        app.controller('IDController', function($scope) {
+            $scope.step = 1;
+            $scope.user = { name: '', type: 'Student', docId: '' };
+            $scope.keys = { public: '', private: '' };
+            $scope.searchInput = '';
+
+            $scope.goToReview = function() {
+                if($scope.user.name && $scope.user.docId) {
+                    $scope.step = 2;
+                } else {
+                    alert("Please fill all fields!");
+                }
+            };
+
+            $scope.confirmAndGenerate = function() {
+                // Simulating Key Generation Logic
+                const randomHash = () => Math.random().toString(36).substring(2, 15);
+                $scope.keys.private = 'PVT-' + randomHash() + randomHash();
+                $scope.keys.public = 'PUB-' + randomHash();
+                $scope.step = 3;
+            };
+
+            $scope.copy = function(text) {
+                navigator.clipboard.writeText(text);
+                alert("Copied to clipboard!");
+            };
+
+            $scope.reset = function() {
+                $scope.step = 1;
+                $scope.user = { name: '', type: 'Student', docId: '' };
+                $scope.searchInput = '';
+            };
+        });
+    </script>
+</body>
+</html>
