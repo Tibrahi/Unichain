@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="UniChainInfo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniChain | Technical Deep Dive & System Specs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .blue-gradient { background: linear-gradient(135deg, #0033ad 0%, #001a57 100%); }
+        .text-blue-brand { color: #0033ad; }
+        .bg-blue-brand { background-color: #0033ad; }
+        
+        /* Sidebar Active State Logic */
+        .sidebar-link { transition: all 0.3s; border-left: 3px solid transparent; }
+        .sidebar-link.active { 
+            border-left: 3px solid #0033ad; 
+            background: #f0f7ff; 
+            color: #0033ad; 
+            font-weight: 700;
+        }
+
+        .tech-card { border: 1px solid #eee; transition: all 0.3s ease; }
+        .tech-card:hover { border-color: #0033ad; transform: translateY(-3px); }
+        
+        /* Smooth Fade for Timeline */
+        .timeline-dot { width: 12px; height: 12px; background: #0033ad; border-radius: 50%; position: absolute; left: -6px; top: 8px; }
+    </style>
+</head>
+<body class="bg-white text-black" ng-controller="InfoController" id="scroll-container">
+
+    <header class="fixed top-0 w-full bg-white/90 backdrop-blur-md border-b z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 blue-gradient rounded-lg"></div>
+                <h1 class="text-xl font-extrabold tracking-tighter uppercase">UniChain <span class="text-gray-400 font-light">Protocol</span></h1>
+            </div>
+            <div class="flex items-center space-x-6">
+                <span class="text-[10px] font-bold bg-blue-100 text-blue-brand px-2 py-1 rounded">PHASE 1: ACTIVE</span>
+                <a href="index.html" class="text-sm font-bold flex items-center hover:text-blue-brand">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Back Home
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="pt-24 flex max-w-7xl mx-auto">
+        <aside class="hidden lg:block w-72 h-[calc(100vh-100px)] sticky top-24 p-6 overflow-y-auto">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">System Navigation</p>
+            <nav class="space-y-1">
+                <a ng-repeat="sec in sections" 
+                   href="#{{sec.id}}" 
+                   class="sidebar-link block px-4 py-3 text-sm"
+                   ng-class="{'active': activeSection === sec.id}">
+                   {{sec.name}}
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 px-6 lg:px-12 pb-32 border-l border-gray-50">
+            
+            <section id="philosophy" class="scroll-mt-32 mb-24">
+                <h2 class="text-5xl font-black mb-6 tracking-tight">The Pay‑Per‑Service <span class="text-blue-brand">Architecture.</span></h2>
+                <p class="text-xl text-gray-500 leading-relaxed max-w-3xl">
+                    UniChain eliminates the barrier of entry for blockchain verification. By utilizing a <strong>pure fee-per-service model</strong>, we ensure that users—whether individuals or enterprises—only incur costs upon successful cryptographic execution.
+                </p>
+            </section>
+
+            <section id="cardano" class="scroll-mt-32 mb-24">
+                <h3 class="text-2xl font-bold mb-8 border-b pb-4">Role of Cardano Technology</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <div class="p-5 bg-gray-50 rounded-xl">
+                            <h4 class="font-bold text-blue-brand">Deterministic Execution</h4>
+                            <p class="text-sm text-gray-600">Unlike account-based models, Cardano allows UniChain to predict gas fees and script success with 100% accuracy before submission.</p>
+                        </div>
+                        <div class="p-5 bg-gray-50 rounded-xl">
+                            <h4 class="font-bold text-blue-brand">UTXO Transparency</h4>
+                            <p class="text-sm text-gray-600">The Extended UTXO model provides a clear audit trail for document issuance without exposing sensitive user metadata.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-5 bg-gray-50 rounded-xl">
+                            <h4 class="font-bold text-blue-brand">Formal Verification Support</h4>
+                            <p class="text-sm text-gray-600">Cardano’s foundation in Haskell allows us to prove the correctness of our smart contracts, vital for legal agreements.</p>
+                        </div>
+                        <div class="p-5 bg-gray-50 rounded-xl">
+                            <h4 class="font-bold text-blue-brand">Sustainability</h4>
+                            <p class="text-sm text-gray-600">Proof-of-Stake ensures the platform remains eco-friendly and economically viable for long-term loan storage.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tech-stack" class="scroll-mt-32 mb-24">
+                <h3 class="text-2xl font-bold mb-8">Technology Stack (Actual Core)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div ng-repeat="t in stack" class="tech-card p-6 rounded-2xl text-center">
+                        <img ng-src="{{t.img}}" class="w-12 h-12 mx-auto mb-4 grayscale hover:grayscale-0 transition" alt="{{t.name}}">
+                        <h5 class="font-bold text-sm">{{t.name}}</h5>
+                        <p class="text-[10px] text-blue-brand font-bold uppercase">{{t.role}}</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="loans" class="scroll-mt-32 mb-24 bg-black text-white p-12 rounded-[40px]">
+                <h3 class="text-4xl font-bold mb-6">Loan Enforcement & Level Logic</h3>
+                <p class="text-gray-400 mb-10 leading-relaxed">
+                    Our uniqueness lies in how the system "hits" based on the loan lever. We don't just record debt; we enforce it through code-governed rules.
+                </p>
+                <div class="space-y-8">
+                    <div class="flex gap-6">
+                        <div class="text-blue-400 font-mono text-xl">01</div>
+                        <div>
+                            <h4 class="text-xl font-bold">Ownership Binding</h4>
+                            <p class="text-sm text-gray-400">Contracts bind a user's Stake Key to the debt. As long as that wallet exists on Cardano, the "Defaulter" flag is visible to any other protocol integrated with UniChain.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6">
+                        <div class="text-blue-400 font-mono text-xl">02</div>
+                        <div>
+                            <h4 class="text-xl font-bold">Smart Agreement Enforcement</h4>
+                            <p class="text-sm text-gray-600 italic">"The Logic Hit":</p>
+                            <p class="text-sm text-gray-400">For high-level loans, the Plutus script can restrict the movement of certain assets (NFTs/Tokens) within the user's wallet until the debt-clearance transaction is validated by Aiken business rules.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="roadmap" class="scroll-mt-32 mb-24">
+                <h3 class="text-2xl font-bold mb-8">System Completion (Phase 1)</h3>
+                <div class="border-l-2 border-gray-100 ml-2 space-y-10 relative">
+                    <div class="relative pl-8">
+                        <div class="timeline-dot"></div>
+                        <h4 class="font-bold">Designing & Research</h4>
+                        <p class="text-sm text-gray-500">Architecture of the EUTXO model for UniChain. Finalizing logic for Aiken scripts. (Current Status: 100%)</p>
+                    </div>
+                    <div class="relative pl-8">
+                        <div class="timeline-dot"></div>
+                        <h4 class="font-bold text-blue-brand">Frontend Development</h4>
+                        <p class="text-sm text-gray-500">Building the Vanilla JS/Angular interface with Mesh SDK wallet integration. (Current Status: 75%)</p>
+                    </div>
+                    <div class="relative pl-8">
+                        <div class="w-3 h-3 bg-gray-200 rounded-full absolute left-[-6px] top-2"></div>
+                        <h4 class="font-bold text-gray-300">Smart Contract Deployment</h4>
+                        <p class="text-sm text-gray-300">Deployment to Preprod testnet. Final audit of Haskell-based Plutus cores. (Estimated: 4-6 Weeks)</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="bg-gray-50 py-12 border-t">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-sm text-gray-400">&copy; 2025 UniChain. Built with Haskell, Aiken, and Cardano.</p>
+        </div>
+    </footer>
+
+    <script>
+        var app = angular.module('UniChainInfo', []);
+        app.controller('InfoController', function($scope, $window, $timeout) {
+            
+            $scope.activeSection = 'philosophy';
+
+            $scope.sections = [
+                { id: 'philosophy', name: 'System Philosophy' },
+                { id: 'cardano', name: 'Cardano Rationale' },
+                { id: 'tech-stack', name: 'Technology Stack' },
+                { id: 'loans', name: 'Loan Enforcement' },
+                { id: 'roadmap', name: 'System Completion' }
+            ];
+
+            $scope.stack = [
+                { name: "Haskell", role: "Plutus Core", img: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Haskell-Logo.svg" },
+                { name: "Aiken", role: "Business Logic", img: "https://aiken-lang.org/img/logo.png" },
+                { name: "Cardano", role: "Trust Layer", img: "https://cryptologos.cc/logos/cardano-ada-logo.svg" },
+                { name: "Mesh SDK", role: "Wallet Link", img: "https://meshjs.dev/logo-mesh/mesh-p-logo.svg" },
+                { name: "Angular", role: "Dynamic UI", img: "https://angular.io/assets/images/logos/angular/angular.svg" },
+                { name: "Blockfrost", role: "Data API", img: "https://blockfrost.io/images/logo.svg" },
+                { name: "Firestore", role: "Off-Chain Cache", img: "https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_96dp.png" },
+                { name: "JavaScript", role: "App Logic", img: "https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" }
+            ];
+
+            // Scroll Spy Logic
+            angular.element($window).bind("scroll", function() {
+                var scrollPos = $window.pageYOffset || document.documentElement.scrollTop;
+                
+                $scope.sections.forEach(function(section) {
+                    var element = document.getElementById(section.id);
+                    if (element) {
+                        var offset = element.offsetTop - 150;
+                        if (scrollPos >= offset && scrollPos < offset + element.offsetHeight) {
+                            $scope.$apply(function() {
+                                $scope.activeSection = section.id;
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
