@@ -3,285 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unichain L2 Protocol</title>
+    <title>Unichain | Secure Verification Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600&display=swap');
-        
-        :root {
-            --bg-dark: #08080c;
-            --sidebar-bg: #0d0e12;
-            --accent-blue: #3b82f6;
-            --error-red: #ff4d4d;
-        }
-
-        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-dark); color: #e2e8f0; margin: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        :root { --unichain-blue: #0052FF; --unichain-black: #0A0B0D; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfd; }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        
-        /* Layout */
-        .app-container { display: grid; grid-template-columns: 280px 1fr; height: 100vh; }
-        .sidebar { background: var(--sidebar-bg); border-right: 1px solid #1e293b; padding: 2rem 0; display: flex; flex-col; justify-content: space-between; }
-        
-        /* Navigation */
-        .nav-item { 
-            padding: 1rem 1.5rem; cursor: pointer; border-left: 4px solid transparent; 
-            transition: 0.2s; color: #94a3b8; font-weight: 500;
-        }
-        .nav-item:hover { background: #1e293b; color: white; }
-        .nav-item.active { border-left-color: var(--accent-blue); background: #172554; color: white; }
-
-        /* Inputs */
-        input, select, textarea {
-            background: #000 !important; border: 1px solid #334155 !important;
-            color: white !important; padding: 0.75rem; border-radius: 0.5rem;
-            width: 100%; font-size: 0.875rem; transition: border 0.3s;
-        }
-        input:focus { border-color: var(--accent-blue) !important; outline: none; }
-        
-        /* Hide/Show logic */
-        .hidden-section { display: none; }
-        .blur-text { filter: blur(5px); transition: filter 0.3s; cursor: pointer; }
-        .blur-text:hover { filter: blur(0); }
-
-        .error-banner { 
-            background: rgba(255, 77, 77, 0.1); border: 1px solid var(--error-red);
-            color: var(--error-red); padding: 1rem; border-radius: 0.5rem; 
-            margin-bottom: 1rem; display: none; font-size: 0.8rem; font-weight: bold;
-        }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(0, 0, 0, 0.05); }
+        .input-focus:focus { border-color: var(--unichain-blue); ring: 2px solid rgba(0, 82, 255, 0.1); }
+        .delay-notice { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
-<body>
+<body class="text-slate-900 min-h-screen">
 
-<div class="app-container">
-    <aside class="sidebar flex flex-col h-full">
-        <div>
-            <div class="px-6 mb-10">
-                <h2 class="text-2xl font-bold text-white tracking-tighter">UNICHAIN</h2>
-                <span class="text-[10px] text-blue-500 font-bold mono">MAINNET-SHARD-01</span>
+    <!-- Navbar -->
+    <nav class="border-b bg-white border-slate-200 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2 font-bold text-xl tracking-tight cursor-pointer" onclick="showView('select')">
+                <div class="w-7 h-7 bg-blue-600 rounded flex items-center justify-center text-white text-sm">U</div>
+                <span>Unichain<span class="text-blue-600">Portal</span></span>
             </div>
-            <nav id="sidebar-nav">
-                <div class="nav-item active" onclick="switchTab('Borrower')">BORROWER</div>
-                <div class="nav-item" onclick="switchTab('Lender')">LENDER</div>
-                <div class="nav-item" onclick="switchTab('Auditor')">NETWORK AUDITOR</div>
-            </nav>
+            <div class="flex gap-4">
+                <button onclick="showView('search')" class="text-sm font-semibold text-slate-500 hover:text-blue-600">Search Ledger</button>
+            </div>
         </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-10">
         
-        <div class="px-6">
-            <div class="p-4 bg-black/40 rounded-lg border border-gray-800">
-                <p class="text-[10px] text-gray-500 uppercase mb-1">Status</p>
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span class="text-xs font-bold text-gray-300">EPOCH 482 ACTIVE</span>
+        <!-- PHASE 1: SELECTION -->
+        <div id="view-select" class="view-content space-y-8">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-extrabold text-slate-900">Verification Gateway</h1>
+                <p class="text-slate-500">Select your credential class to begin on-chain anchoring.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div onclick="initForm('citizen')" class="glass-card p-8 rounded-3xl cursor-pointer hover:shadow-xl hover:border-blue-500 transition-all border-2 border-transparent">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-6"><i data-lucide="user"></i></div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-900">Citizen Identity</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">National ID verification, biometric cross-check, and residential proofing.</p>
+                </div>
+                <div onclick="initForm('student')" class="glass-card p-8 rounded-3xl cursor-pointer hover:shadow-xl hover:border-blue-500 transition-all border-2 border-transparent">
+                    <div class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-6"><i data-lucide="graduation-cap"></i></div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-900">Academic Credential</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">University enrollment, diploma verification, and student DApp access.</p>
                 </div>
             </div>
         </div>
-    </aside>
 
-    <main class="p-10 overflow-y-auto">
-        <div id="error-display" class="error-banner"></div>
-
-        <header class="mb-8 border-b border-gray-800 pb-6">
-            <h1 id="view-title" class="text-3xl font-bold text-white">Borrower Portal</h1>
-            <p class="text-gray-500 text-sm mt-1">Real-time collateralized debt position management.</p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <section class="space-y-6">
+        <!-- PHASE 2: COMPREHENSIVE INPUT -->
+        <div id="view-form" class="view-content hidden">
+            <button onclick="showView('select')" class="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Selection
+            </button>
+            
+            <div class="glass-card rounded-3xl p-8 shadow-sm">
+                <h2 id="form-title" class="text-2xl font-bold mb-2"></h2>
+                <p class="text-slate-500 text-sm mb-8">Please provide accurate information for manual auditing.</p>
                 
-                <div id="common-inputs" class="space-y-4">
-                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest">Legal Identity</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Entity Name</label>
-                            <input type="text" id="legal-name" placeholder="Full Legal Name">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Tax ID / SSN</label>
-                            <input type="password" id="tax-id" placeholder="Encrypted field">
-                        </div>
-                    </div>
-                </div>
+                <form id="main-form" class="space-y-6">
+                    <!-- Dynamic Inputs via JS -->
+                    <div id="form-fields" class="grid md:grid-cols-2 gap-6"></div>
 
-                <div id="finance-inputs" class="space-y-4">
-                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest">Loan Parameters</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Principal (ADA)</label>
-                            <input type="number" id="loan-amount" placeholder="0.00" oninput="updateCollateral()">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Leverage (LTV)</label>
-                            <select id="leverage-ratio" onchange="updateCollateral()">
-                                <option value="1.5">150% Collateralization</option>
-                                <option value="2.0">200% Collateralization</option>
-                                <option value="3.5">350% Collateralization</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-blue-900/10 border border-blue-900/20 rounded-lg">
-                        <span class="text-[10px] text-blue-400 font-bold">LOCKED COLLATERAL VALUE</span>
-                        <div class="text-2xl font-bold" id="collateral-display">0.00 ADA</div>
-                    </div>
-
-                    <div class="p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
-                        <h4 class="text-[10px] font-bold text-yellow-500 mb-2 uppercase">Legally Binding Agreement</h4>
-                        <label class="flex items-start gap-3 cursor-pointer">
-                            <input type="checkbox" id="agreement-check" class="w-4 h-4 mt-1">
-                            <span class="text-[10px] text-gray-400 leading-tight">
-                                I hereby authorize the smart contract to lock the specified amount of ADA. I understand that if the datum key is lost or the collateral value drops below liquidation thresholds, assets may be forfeited.
-                            </span>
-                        </label>
-                    </div>
-                </div>
-
-                <div id="auditor-inputs" class="hidden-section space-y-4">
-                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest">Protocol Search (Cardano Standards)</h3>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Search by Key (skey/addr1/pk)</label>
-                        <input type="text" id="search-query" placeholder="Enter addr1... or vkey... or skey...">
-                    </div>
-                    <div class="p-4 bg-zinc-900 border border-zinc-800 rounded text-[10px] mono text-gray-500">
-                        INFO: Auditor mode bypasses UI filters to query the raw Unichain L2 State using Bech32 decoding.
-                    </div>
-                </div>
-
-                <button onclick="executeTransaction()" class="w-full bg-white text-black font-bold py-4 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
-                    COMMIT TO LEDGER
-                </button>
-            </section>
-
-            <section class="space-y-6">
-                <div class="bg-black border border-gray-800 rounded-2xl p-6">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 pb-2 border-b border-gray-800">Keys & Datum</h3>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-[10px] font-bold text-blue-500">PUBLIC ADDRESS</span>
-                                <button onclick="copyText('public-key-val')" class="text-[10px] text-gray-600 hover:text-white">COPY</button>
-                            </div>
-                            <div id="public-key-val" class="mono text-[10px] bg-zinc-900 p-3 rounded break-all border border-zinc-800">----------------</div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-[10px] font-bold text-red-500">PRIVATE SPEND KEY</span>
-                                <div class="flex gap-2">
-                                    <button onclick="toggleVisibility('private-key-val')" id="toggle-btn" class="text-[10px] text-gray-600 hover:text-white">SHOW</button>
-                                    <button onclick="copyText('private-key-val')" class="text-[10px] text-gray-600 hover:text-white">COPY</button>
+                    <!-- Enhanced Image Upload Boxes -->
+                    <div class="grid md:grid-cols-2 gap-6 pt-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-700">Facial Scan (Selfie)</label>
+                            <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:bg-slate-50 transition-colors">
+                                <input type="file" id="face-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onchange="handleImageUpload(this, 'face-preview')">
+                                <div id="face-preview" class="space-y-2">
+                                    <i data-lucide="camera" class="w-8 h-8 mx-auto text-slate-300"></i>
+                                    <p class="text-xs text-slate-400">Click to upload face photo</p>
                                 </div>
                             </div>
-                            <div id="private-key-val" class="mono text-[10px] bg-zinc-900 p-3 rounded break-all border border-zinc-800 blur-text">----------------</div>
+                            <div id="face-delay-msg" class="hidden text-[11px] font-medium text-amber-600 delay-notice bg-amber-50 p-2 rounded-lg border border-amber-100">
+                                <i data-lucide="clock" class="w-3 h-3 inline mr-1"></i> Verification will delay 4-5 working days for manual biometric improvement.
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-slate-700">Document Scan (Primary)</label>
+                            <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:bg-slate-50 transition-colors">
+                                <input type="file" id="doc-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onchange="handleImageUpload(this, 'doc-preview')">
+                                <div id="doc-preview" class="space-y-2">
+                                    <i data-lucide="file-text" class="w-8 h-8 mx-auto text-slate-300"></i>
+                                    <p class="text-xs text-slate-400">Upload Front/Back scan</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-100">
+                        <button type="submit" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Generate Security Keys</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- PHASE 3: REVIEW -->
+        <div id="view-review" class="view-content hidden">
+            <div class="glass-card rounded-3xl p-8 max-w-2xl mx-auto shadow-xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"><i data-lucide="search"></i></div>
+                    <h2 class="text-2xl font-bold">Final Review</h2>
+                </div>
+                <div id="review-content" class="space-y-3 bg-slate-50 p-6 rounded-2xl text-sm border border-slate-100"></div>
+                <div class="flex gap-4 mt-8">
+                    <button onclick="showView('form')" class="flex-1 py-4 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all">Edit Details</button>
+                    <button onclick="finalizeProcess()" class="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-black transition-all">Confirm & Hash</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHASE 4: SUCCESS / OUTPUT -->
+        <div id="view-success" class="view-content hidden">
+            <div class="max-w-2xl mx-auto space-y-6">
+                <div class="text-center py-6">
+                    <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="check" class="w-8 h-8"></i></div>
+                    <h2 class="text-3xl font-bold">Node Anchoring Complete</h2>
+                    <p class="text-slate-500">Your information is staged for the 5-day manual audit.</p>
+                </div>
+                
+                <div class="bg-slate-900 text-white rounded-3xl p-8 space-y-6 shadow-2xl">
+                    <div>
+                        <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest block mb-2">Unichain Simulated Address (ADA Standard)</label>
+                        <div class="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                            <input type="password" id="out-addr" readonly class="bg-transparent text-sm mono flex-grow outline-none">
+                            <button onclick="toggleMask('out-addr')" class="hover:text-blue-400"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                            <button onclick="copyEl('out-addr')" class="hover:text-blue-400"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest block mb-2">Public Discovery Key (Shared)</label>
+                        <div class="flex items-center justify-between bg-blue-600/20 p-4 rounded-xl border border-blue-500/30">
+                            <span id="out-key" class="mono font-bold text-blue-400 text-lg"></span>
+                            <button onclick="copyText('out-key')" class="hover:text-white"><i data-lucide="copy" class="w-5 h-5"></i></button>
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-6 h-64 overflow-hidden flex flex-col">
-                    <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4">Live Ledger History</h3>
-                    <div id="ledger-log" class="flex-1 overflow-y-auto space-y-2 mono text-[10px] text-gray-400">
-                        </div>
-                </div>
-            </section>
+                <button onclick="location.reload()" class="w-full py-4 text-blue-600 font-bold hover:bg-blue-50 rounded-xl transition-all">Finish & Clear Session</button>
+            </div>
         </div>
     </main>
-</div>
 
-<script>
-    let currentRole = 'Borrower';
+    <!-- Custom Professional Modals -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div id="modal-box" class="bg-white rounded-3xl p-8 max-w-sm w-full transform scale-95 transition-all">
+            <div id="modal-icon-container" class="mb-4"></div>
+            <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+            <p id="modal-text" class="text-slate-500 text-sm mb-6"></p>
+            <button onclick="closeModal()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold">Got it</button>
+        </div>
+    </div>
 
-    function switchTab(role) {
-        currentRole = role;
-        // Update Nav UI
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        event.target.classList.add('active');
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unichain-id-auth';
         
-        // Update Content Headers
-        document.getElementById('view-title').innerText = role + " Portal";
-        
-        // Toggle Inputs
-        if(role === 'Auditor') {
-            document.getElementById('finance-inputs').classList.add('hidden-section');
-            document.getElementById('common-inputs').classList.add('hidden-section');
-            document.getElementById('auditor-inputs').classList.remove('hidden-section');
-        } else {
-            document.getElementById('finance-inputs').classList.remove('hidden-section');
-            document.getElementById('common-inputs').classList.remove('hidden-section');
-            document.getElementById('auditor-inputs').classList.add('hidden-section');
-        }
-        clearError();
-    }
+        let app, db, auth, user;
+        let currentType = '';
+        let formDataStore = {};
 
-    function updateCollateral() {
-        const amount = document.getElementById('loan-amount').value || 0;
-        const lever = document.getElementById('leverage-ratio').value;
-        const total = (amount * lever).toFixed(2);
-        document.getElementById('collateral-display').innerText = total + " ADA";
-    }
-
-    function executeTransaction() {
-        clearError();
-        const name = document.getElementById('legal-name').value;
-        const agree = document.getElementById('agreement-check').checked;
-        const query = document.getElementById('search-query').value;
-
-        // Validation Logic (Real-world scenario)
-        if(currentRole !== 'Auditor') {
-            if(!name) return showError("IDENTITY FAILURE: Legal Name must be provided for KYC attestation.");
-            if(!agree) return showError("POLICY FAILURE: You must confirm the collateral agreement.");
-            const amt = document.getElementById('loan-amount').value;
-            if(!amt || amt <= 0) return showError("TRANSACTION FAILURE: Loan principal must be greater than 0.");
-        } else {
-            if(!query) return showError("AUDIT FAILURE: Search string (addr1/skey) is required.");
+        async function init() {
+            if (!firebaseConfig.apiKey) return;
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            await signInAnonymously(auth);
+            onAuthStateChanged(auth, u => { user = u; console.log("Secured Connection:", user?.uid); });
+            lucide.createIcons();
         }
 
-        // Generate Mock ADA Keys
-        const genHex = (len) => [...Array(len)].map(() => Math.floor(Math.random()*16).toString(16)).join('');
-        const pubKey = "addr1q" + genHex(50);
-        const pvtKey = "skey1" + genHex(64);
+        window.showView = (id) => {
+            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${id}`).classList.remove('hidden');
+            window.scrollTo(0,0);
+        };
 
-        document.getElementById('public-key-val').innerText = pubKey;
-        document.getElementById('private-key-val').innerText = pvtKey;
+        window.initForm = (type) => {
+            currentType = type;
+            const container = document.getElementById('form-fields');
+            container.innerHTML = '';
+            
+            const fields = type === 'citizen' ? [
+                { id: 'full_name', label: 'Full Legal Name', type: 'text', placeholder: 'Enter as per ID', req: true },
+                { id: 'id_num', label: 'Identity Number', type: 'text', placeholder: 'N-XXXXXXXX', req: true },
+                { id: 'dob', label: 'Date of Birth', type: 'date', req: true },
+                { id: 'nationality', label: 'Nationality', type: 'text', placeholder: 'Country of issue', req: true },
+                { id: 'address', label: 'Residential Address', type: 'text', placeholder: 'Street, City, ZIP', req: true },
+                { id: 'phone', label: 'Mobile Number', type: 'tel', placeholder: '+1...', req: true }
+            ] : [
+                { id: 'full_name', label: 'Student Full Name', type: 'text', placeholder: 'Official Name', req: true },
+                { id: 'uni_name', label: 'Institution Name', type: 'text', placeholder: 'University/College', req: true },
+                { id: 'student_id', label: 'Matriculation Number', type: 'text', placeholder: 'STU-XXXXX', req: true },
+                { id: 'major', label: 'Course of Study', type: 'text', placeholder: 'B.Sc Computer Science', req: true },
+                { id: 'grad_year', label: 'Expected Graduation', type: 'number', placeholder: '2026', req: true },
+                { id: 'edu_email', label: 'Institutional Email', type: 'email', placeholder: 'name@uni.edu', req: true }
+            ];
 
-        // Log to Ledger
-        const log = document.getElementById('ledger-log');
-        const entry = document.createElement('div');
-        entry.className = "border-l border-blue-500 pl-2 py-1 mb-1 bg-blue-500/5";
-        entry.innerHTML = `<span class="text-blue-400">[${new Date().toLocaleTimeString()}]</span> ${currentRole} Operation Hash: ${genHex(12)}...`;
-        log.prepend(entry);
-    }
+            fields.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'space-y-2';
+                div.innerHTML = `
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">${f.label}</label>
+                    <input type="${f.type}" name="${f.id}" required="${f.req}" placeholder="${f.placeholder}" 
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none transition-all focus:border-blue-600 focus:ring-4 focus:ring-blue-50/50">
+                `;
+                container.appendChild(div);
+            });
 
-    function showError(msg) {
-        const err = document.getElementById('error-display');
-        err.innerText = msg;
-        err.style.display = 'block';
-    }
+            document.getElementById('form-title').innerText = type === 'citizen' ? 'Citizen KYC Node' : 'Student Credential Node';
+            showView('form');
+        };
 
-    function clearError() {
-        document.getElementById('error-display').style.display = 'none';
-    }
+        window.handleImageUpload = (input, previewId) => {
+            const preview = document.getElementById(previewId);
+            const delayMsg = document.getElementById('face-delay-msg');
+            
+            if (input.files && input.files[0]) {
+                preview.innerHTML = `
+                    <div class="flex items-center justify-center gap-2 text-green-600 font-bold text-xs">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Image Buffered
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">${input.files[0].name}</p>
+                `;
+                if(previewId === 'face-preview') delayMsg.classList.remove('hidden');
+                lucide.createIcons();
+            }
+        };
 
-    function toggleVisibility(id) {
-        const el = document.getElementById(id);
-        const btn = document.getElementById('toggle-btn');
-        if(el.classList.contains('blur-text')) {
-            el.classList.remove('blur-text');
-            btn.innerText = "HIDE";
-        } else {
-            el.classList.add('blur-text');
-            btn.innerText = "SHOW";
-        }
-    }
+        document.getElementById('main-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            formDataStore = Object.fromEntries(formData.entries());
+            
+            // Validation
+            if (Object.values(formDataStore).some(v => v === '')) {
+                return showModal('Security Alert', 'All fields are mandatory for high-security anchoring.', 'error');
+            }
 
-    function copyText(id) {
-        const text = document.getElementById(id).innerText;
-        if(text.includes('---')) return;
-        navigator.clipboard.writeText(text);
-        // Visual indicator
-        const original = event.target.innerText;
-        event.target.innerText = "COPIED!";
-        setTimeout(() => event.target.innerText = original, 1000);
-    }
-</script>
+            const reviewBox = document.getElementById('review-content');
+            reviewBox.innerHTML = Object.entries(formDataStore).map(([k, v]) => `
+                <div class="flex justify-between border-b border-slate-200 pb-2">
+                    <span class="text-slate-400 capitalize">${k.replace('_',' ')}</span>
+                    <span class="font-bold text-slate-900">${v}</span>
+                </div>
+            `).join('');
 
+            showView('review');
+        });
+
+        window.finalizeProcess = async () => {
+            if (!user) return showModal('Error', 'Ledger connection lost.', 'error');
+
+            const salt = Date.now().toString();
+            const addr = "addr1" + sha256(user.uid + salt).substring(0, 50);
+            const key = `UNI-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+            try {
+                // Store private data (encrypted simulation)
+                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'verification_queue', 'latest'), {
+                    ...formDataStore,
+                    type: currentType,
+                    status: 'pending_manual_audit',
+                    delay_days: 5,
+                    on_chain_address: addr,
+                    shared_key: key,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Store in Public Carbon Index for searching
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'carbon_index', key), {
+                    address: addr,
+                    type: currentType,
+                    issuer: "Unichain Manual Audit Node",
+                    status: "Awaiting Manual Improvement",
+                    audit_required: true
+                });
+
+                document.getElementById('out-addr').value = addr;
+                document.getElementById('out-key').innerText = key;
+                showView('success');
+            } catch (err) {
+                showModal('Ledger Write Failed', 'Could not anchor data. Check connection.', 'error');
+            }
+        };
+
+        // Utility: Custom Modals
+        window.showModal = (title, text, type) => {
+            const overlay = document.getElementById('modal-overlay');
+            const icon = document.getElementById('modal-icon-container');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+            
+            icon.innerHTML = type === 'error' ? '<div class="w-12 h-12 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center"><i data-lucide="alert-triangle"></i></div>' : 
+                                               '<div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center"><i data-lucide="info"></i></div>';
+            
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.closeModal = () => document.getElementById('modal-overlay').classList.add('hidden');
+        window.toggleMask = (id) => { const e = document.getElementById(id); e.type = e.type === 'password' ? 'text' : 'password'; };
+        window.copyEl = (id) => { document.getElementById(id).select(); document.execCommand('copy'); };
+        window.copyText = (id) => { 
+            const t = document.getElementById(id).innerText;
+            const i = document.createElement('input'); i.value = t; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i);
+            showModal('Success', 'Key copied to clipboard.', 'info');
+        };
+
+        init();
+    </script>
 </body>
 </html>
