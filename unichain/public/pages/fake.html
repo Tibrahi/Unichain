@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniChain | Decentralized Identity & Verification</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#0f172a',
+                            blue: '#2563eb',
+                            darkblue: '#1e40af',
+                            white: '#ffffff',
+                            gray: '#f8fafc'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Chart Container Styling per Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Animation for "Mining" */
+        @keyframes pulse-blue {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(37, 99, 235, 0); }
+        }
+        .animate-mining {
+            animation: pulse-blue 2s infinite;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Hide sections by default, JS will toggle */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <!-- Placeholder Comments Required -->
+    <!-- Chosen Palette: White, Blue, Black (Clean Professional/Corporate Trust) -->
+    <!-- Application Structure Plan: The SPA is organized into four distinct views: 'Dashboard' (Network Stats), 'Citizen Verify' (Standard KYC), 'Student DApp' (Web3 Style), and 'Explorer' (Search). This separation allows distinct workflows for different user personas (Admins checking stats, Citizens, Students, and Verifiers). The layout uses a fixed top navigation and a fluid main content area. Data is stored in Firestore with simulated blockchain metadata (hashes, blocks) generated client-side to mimic the 'UniChain' protocol. -->
+    <!-- Visualization & Content Choices: 
+         1. Network Stats (Chart.js): A line chart showing 'Daily Blocks Mined' to establish trust and activity. Justification: Users trust active networks.
+         2. Verification Cards: Clean forms with preview modals. Justification: Reduces errors before 'immutable' submission.
+         3. Blockchain Simulation: Visual 'Mining' overlay. Justification: Provides immediate feedback on the complex background process of key generation.
+         4. Explorer Results: A certificate-style layout. Justification: Mimics real-world physical credentials for familiarity. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+</head>
+<body class="bg-gray-50 text-slate-900 min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigateTo('home')">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center text-white font-bold text-xl">U</div>
+                        <span class="font-bold text-xl tracking-tight text-brand-black">UniChain</span>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <button onclick="navigateTo('home')" class="nav-btn border-transparent text-gray-500 hover:border-brand-blue hover:text-brand-blue inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors" data-target="home">Dashboard</button>
+                    <button onclick="navigateTo('citizen')" class="nav-btn border-transparent text-gray-500 hover:border-brand-blue hover:text-brand-blue inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors" data-target="citizen">Citizen KYC</button>
+                    <button onclick="navigateTo('student')" class="nav-btn border-transparent text-gray-500 hover:border-brand-blue hover:text-brand-blue inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors" data-target="student">Student DApp</button>
+                    <button onclick="navigateTo('search')" class="nav-btn border-transparent text-gray-500 hover:border-brand-blue hover:text-brand-blue inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors" data-target="search">Explorer</button>
+                </div>
+                <!-- Mobile menu button wrapper would go here -->
+                <div class="flex items-center sm:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-brand-blue p-2">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden sm:hidden bg-white border-b border-gray-200">
+            <div class="pt-2 pb-4 space-y-1">
+                <button onclick="navigateTo('home'); toggleMobileMenu()" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-brand-blue hover:text-brand-blue w-full text-left">Dashboard</button>
+                <button onclick="navigateTo('citizen'); toggleMobileMenu()" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-brand-blue hover:text-brand-blue w-full text-left">Citizen KYC</button>
+                <button onclick="navigateTo('student'); toggleMobileMenu()" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-brand-blue hover:text-brand-blue w-full text-left">Student DApp</button>
+                <button onclick="navigateTo('search'); toggleMobileMenu()" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-brand-blue hover:text-brand-blue w-full text-left">Explorer</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- SECTION: HOME / DASHBOARD -->
+        <section id="home" class="page-section active">
+            <div class="mb-8 text-center sm:text-left">
+                <h1 class="text-3xl font-bold text-gray-900">Network Status</h1>
+                <p class="mt-2 text-gray-600 max-w-2xl">
+                    Welcome to the UniChain Protocol Dashboard. Monitor live verification nodes, recent blocks, and overall system health. 
+                    This system provides immutable proof of identity and academic standing using simulated cryptographic consensus.
+                </p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
+                <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-brand-blue">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">Total Verified Users</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-gray-900" id="stat-total-users">Loading...</dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-indigo-500">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">Blocks Mined</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-gray-900" id="stat-blocks">#89,402</dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-gray-800">
+                    <div class="px-4 py-5 sm:p-6">
+                        <dt class="text-sm font-medium text-gray-500 truncate">Network Status</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-green-600 flex items-center gap-2">
+                            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span> Active
+                        </dd>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Verification Throughput (24h)</h3>
+                <div class="chart-container">
+                    <canvas id="networkChart"></canvas>
+                </div>
+                <p class="mt-4 text-sm text-gray-500 text-center">
+                    Real-time visual analysis of document verification requests processed by the UniChain consensus layer.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION: CITIZEN VERIFICATION -->
+        <section id="citizen" class="page-section">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">Citizen Identity Verification</h2>
+                <p class="mt-2 text-gray-600">
+                    Securely link your physical identity to the blockchain. This process requires standard government-issued identification. 
+                    Your data will be hashed and a unique key will be generated for third-party verification.
+                </p>
+            </div>
+
+            <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+                <div class="p-6 sm:p-10">
+                    <form id="citizen-form" class="space-y-6">
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">Full Legal Name</label>
+                                <div class="mt-1">
+                                    <input type="text" id="cit-name" required class="shadow-sm focus:ring-brand-blue focus:border-brand-blue block w-full sm:text-sm border-gray-300 rounded-md p-2 border" placeholder="John Doe">
+                                </div>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="block text-sm font-medium text-gray-700">National ID Number</label>
+                                <div class="mt-1">
+                                    <input type="text" id="cit-id" required class="shadow-sm focus:ring-brand-blue focus:border-brand-blue block w-full sm:text-sm border-gray-300 rounded-md p-2 border" placeholder="XXX-XXXX-XXXX">
+                                </div>
+                            </div>
+                            
+                            <div class="sm:col-span-6 border-t border-gray-100 pt-4">
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Biometric & Document Proof</h3>
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Face Verification (Photo)</label>
+                                <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-brand-blue transition-colors bg-gray-50">
+                                    <div class="space-y-1 text-center">
+                                        <div class="text-4xl">👤</div>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label class="relative cursor-pointer bg-white rounded-md font-medium text-brand-blue hover:text-brand-darkblue">
+                                                <span>Upload a file</span>
+                                                <input id="cit-face" type="file" class="sr-only" accept="image/*">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">ID Front</label>
+                                <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-brand-blue transition-colors bg-gray-50">
+                                    <div class="space-y-1 text-center">
+                                        <div class="text-4xl">🪪</div>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label class="relative cursor-pointer bg-white rounded-md font-medium text-brand-blue hover:text-brand-darkblue">
+                                                <span>Upload Front</span>
+                                                <input id="cit-front" type="file" class="sr-only" accept="image/*">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">ID Back</label>
+                                <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-brand-blue transition-colors bg-gray-50">
+                                    <div class="space-y-1 text-center">
+                                        <div class="text-4xl">🔙</div>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label class="relative cursor-pointer bg-white rounded-md font-medium text-brand-blue hover:text-brand-darkblue">
+                                                <span>Upload Back</span>
+                                                <input id="cit-back" type="file" class="sr-only" accept="image/*">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-5">
+                            <div class="flex justify-end">
+                                <button type="button" onclick="handlePreview('citizen')" class="ml-3 inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-black">
+                                    Review Application
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: STUDENT DAPP -->
+        <section id="student" class="page-section">
+            <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900">Student Governance & Docs</h2>
+                    <p class="mt-2 text-gray-600">
+                        Web3 Portal. Issue academic credentials to the chain and participate in student governance voting.
+                        Simulates interaction with the Cardano (ADA) ecosystem.
+                    </p>
+                </div>
+                <div class="mt-4 sm:mt-0">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <span class="w-2 h-2 mr-2 bg-green-500 rounded-full"></span> Node Connected
+                    </span>
+                </div>
+            </div>
+
+            <!-- DApp Card -->
+            <div class="bg-gray-900 text-white shadow-xl rounded-xl overflow-hidden border border-gray-700">
+                <div class="bg-gray-800 px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+                    <h3 class="text-lg font-medium">Smart Contract Interface</h3>
+                    <div class="text-xs font-mono text-gray-400">v.2.4.1-alpha</div>
+                </div>
+                
+                <div class="p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    
+                    <!-- Form Side -->
+                    <div>
+                        <form id="student-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Student Name</label>
+                                <input type="text" id="stu-name" class="mt-1 block w-full bg-gray-800 border-gray-600 rounded-md text-white shadow-sm focus:ring-brand-blue focus:border-brand-blue sm:text-sm p-2" placeholder="Jane Smith">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Institution</label>
+                                <input type="text" id="stu-inst" class="mt-1 block w-full bg-gray-800 border-gray-600 rounded-md text-white shadow-sm focus:ring-brand-blue focus:border-brand-blue sm:text-sm p-2" placeholder="University of Rwanda">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Degree / Document Type</label>
+                                <select id="stu-type" class="mt-1 block w-full bg-gray-800 border-gray-600 rounded-md text-white shadow-sm focus:ring-brand-blue focus:border-brand-blue sm:text-sm p-2">
+                                    <option>Bachelor of Science</option>
+                                    <option>Master of Arts</option>
+                                    <option>PhD</option>
+                                    <option>Student ID Card</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Document Hash (Pre-calc) or Upload</label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md hover:border-brand-blue transition-colors bg-gray-800">
+                                    <div class="space-y-1 text-center">
+                                        <div class="text-2xl">📄</div>
+                                        <p class="text-xs text-gray-400">Drag PDF/Image here or click to select</p>
+                                        <input id="stu-doc" type="file" class="sr-only">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Visual Side -->
+                    <div class="flex flex-col justify-between">
+                        <div class="bg-gray-800 rounded-lg p-4 font-mono text-xs text-green-400 mb-6 h-48 overflow-y-auto" id="console-output">
+                            <p>> Initializing DApp connection...</p>
+                            <p>> Connected to Mainnet.</p>
+                            <p>> Waiting for input...</p>
+                        </div>
+
+                        <div class="bg-indigo-900 bg-opacity-40 rounded-lg p-4 border border-indigo-700 mb-6">
+                            <h4 class="text-sm font-bold text-indigo-300 mb-2">Voting Rights Token (VRT)</h4>
+                            <p class="text-xs text-indigo-200">Verification mints a VRT to your address, enabling participation in campus governance.</p>
+                        </div>
+
+                        <button onclick="handlePreview('student')" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Mint Credential & Generate Key
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: SEARCH / EXPLORER -->
+        <section id="search" class="page-section">
+            <div class="max-w-3xl mx-auto text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900">Block Explorer & Verification</h2>
+                <p class="mt-2 text-gray-600">
+                    Verify the authenticity of any UniChain credential. Enter the public key shared by the user.
+                </p>
+            </div>
+
+            <div class="max-w-xl mx-auto mb-12">
+                <div class="relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">🔑</span>
+                    </div>
+                    <input type="text" id="search-input" class="focus:ring-brand-blue focus:border-brand-blue block w-full pl-10 sm:text-sm border-gray-300 rounded-md p-4 border" placeholder="Paste Verification Key (e.g., UNI-8A2F...)">
+                    <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+                        <button onclick="performSearch()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded text-white bg-brand-blue hover:bg-brand-darkblue focus:outline-none">
+                            Verify
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Result Container -->
+            <div id="search-result" class="hidden max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+                <div class="bg-gray-50 px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Credential Found</h3>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        ✓ Valid on Chain
+                    </span>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Issued To</dt>
+                            <dd class="mt-1 text-sm text-gray-900 font-bold" id="res-name">John Doe</dd>
+                        </div>
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Type</dt>
+                            <dd class="mt-1 text-sm text-gray-900 capitalize" id="res-type">Citizen Identity</dd>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500">Verification Key</dt>
+                            <dd class="mt-1 text-xs font-mono text-gray-600 bg-gray-100 p-2 rounded block break-all" id="res-key">UNI-...</dd>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500">Block Hash</dt>
+                            <dd class="mt-1 text-xs font-mono text-gray-600 block break-all" id="res-hash">0x...</dd>
+                        </div>
+                        <div class="sm:col-span-2 hidden" id="res-wallet-row">
+                            <dt class="text-sm font-medium text-gray-500">Associated Wallet (ADA)</dt>
+                            <dd class="mt-1 text-xs font-mono text-blue-600 block break-all" id="res-wallet">addr1...</dd>
+                        </div>
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Timestamp</dt>
+                            <dd class="mt-1 text-sm text-gray-900" id="res-time">...</dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="bg-gray-50 px-4 py-4 sm:px-6 border-t border-gray-200 text-center">
+                    <button class="text-sm text-brand-blue hover:text-brand-darkblue font-medium">Download Proof Certificate</button>
+                </div>
+            </div>
+            
+            <div id="search-error" class="hidden max-w-2xl mx-auto text-center py-10">
+                <div class="text-4xl mb-2">🚫</div>
+                <h3 class="text-lg font-medium text-gray-900">Credential Not Found</h3>
+                <p class="text-gray-500">The key provided does not match any record on the UniChain ledger.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+                        <span class="text-blue-600 text-xl">📝</span>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-5">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Review Information</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Please review your data before writing to the block. This action cannot be undone.
+                            </p>
+                            <div class="mt-4 text-left bg-gray-50 p-4 rounded-md text-sm text-gray-700 space-y-2" id="review-content">
+                                <!-- Content injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="button" onclick="confirmSubmission()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-blue text-base font-medium text-white hover:bg-brand-darkblue focus:outline-none sm:col-start-2 sm:text-sm">
+                        Confirm & Mint
+                    </button>
+                    <button type="button" onclick="closeModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:col-start-1 sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing/Mining Modal -->
+    <div id="mining-modal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-90 transition-opacity"></div>
+            <div class="bg-white rounded-lg p-8 max-w-sm w-full z-10 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gray-200">
+                    <div class="h-full bg-brand-blue animate-pulse w-2/3"></div>
+                </div>
+                <div class="mb-4 flex justify-center">
+                    <div class="loader"></div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Mining Block...</h3>
+                <p class="text-sm text-gray-500 mt-2">Generating Keys & Proofs</p>
+                <div class="mt-4 font-mono text-xs text-gray-400" id="mining-hash">0x8f...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div class="bg-white rounded-lg p-6 max-w-md w-full z-10 relative">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                        <span class="text-green-600 text-xl">✓</span>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900">Verification Successful</h3>
+                    <p class="text-sm text-gray-500 mt-2">Your data has been stored on the UniChain.</p>
+                    
+                    <div class="mt-6 bg-gray-50 p-4 rounded border border-gray-200">
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide">Your Verification Key</label>
+                        <div class="mt-1 flex rounded-md shadow-sm">
+                            <input type="text" id="final-key" readonly class="focus:ring-brand-blue focus:border-brand-blue flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 p-2 bg-white text-center font-bold font-mono">
+                            <button onclick="copyKey()" class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none">
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Share this key with anyone who needs to verify your documents.</p>
+                    </div>
+
+                    <div id="ada-info" class="hidden mt-4 text-left">
+                        <p class="text-xs font-mono text-gray-500 break-all">Wallet: <span id="final-wallet" class="text-brand-blue"></span></p>
+                    </div>
+
+                    <div class="mt-6">
+                        <button onclick="closeSuccess()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-blue text-base font-medium text-white hover:bg-brand-darkblue focus:outline-none sm:text-sm">
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">&copy; 2025 UniChain Decentralized Systems. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // --- CONFIGURATION ---
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // --- STATE ---
+        let currentUser = null;
+        let tempFormData = {};
+        
+        // --- AUTH & INIT ---
+        const initAuth = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await auth.signInWithCustomToken(__initial_auth_token);
+            } else {
+                await auth.signInAnonymously();
+            }
+        };
+
+        initAuth();
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            if (user) {
+                console.log("Connected to UniChain Node (Auth Success)");
+                updateStats(); // Load stats once connected
+            }
+        });
+
+        // --- NAVIGATION LOGIC ---
+        function navigateTo(targetId) {
+            // Hide all sections
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            // Show target
+            document.getElementById(targetId).classList.add('active');
+            
+            // Update Nav State
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === targetId) {
+                    btn.classList.add('border-brand-blue', 'text-brand-blue');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    btn.classList.remove('border-brand-blue', 'text-brand-blue');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- CHART JS ---
+        const ctx = document.getElementById('networkChart').getContext('2d');
+        const networkChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'Now'],
+                datasets: [{
+                    label: 'Blocks Mined',
+                    data: [12, 19, 35, 25, 52, 40, 65],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        async function updateStats() {
+            if (!currentUser) return;
+            // Fetch real count from Firestore logic (simulated by querying collection size not efficient, using random + real check if needed)
+            // Rule 2 compliant: Simple query
+            try {
+                const q = firebase.firestore().collection('artifacts', appId, 'public', 'data', 'verifications');
+                q.onSnapshot((snapshot) => {
+                    document.getElementById('stat-total-users').innerText = snapshot.size + 1240; // Base + real
+                }, (error) => {
+                    console.error("Error fetching stats", error);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        // --- FORM HANDLING & PREVIEW ---
+        function handlePreview(type) {
+            tempFormData = { type: type, timestamp: new Date().toISOString() };
+            let contentHtml = '';
+
+            if (type === 'citizen') {
+                const name = document.getElementById('cit-name').value;
+                const id = document.getElementById('cit-id').value;
+                if(!name || !id) return alertCustom('Please fill in all fields.');
+
+                tempFormData.name = name;
+                tempFormData.idNumber = id;
+                
+                contentHtml = `
+                    <p><strong>Type:</strong> Citizen Verification</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>ID Number:</strong> ${id}</p>
+                    <p><strong>Documents:</strong> 3 Files Selected (Face, Front, Back)</p>
+                `;
+            } else {
+                const name = document.getElementById('stu-name').value;
+                const inst = document.getElementById('stu-inst').value;
+                const docType = document.getElementById('stu-type').value;
+                if(!name || !inst) return alertCustom('Please fill in all fields.');
+
+                tempFormData.name = name;
+                tempFormData.institution = inst;
+                tempFormData.docType = docType;
+                
+                // DApp Console Effect
+                const consoleEl = document.getElementById('console-output');
+                consoleEl.innerHTML += `<p>> Compiling metadata for ${name}...</p>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+
+                contentHtml = `
+                    <p><strong>Type:</strong> Student Credential</p>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Institution:</strong> ${inst}</p>
+                    <p><strong>Document:</strong> ${docType}</p>
+                    <p class="text-xs text-gray-500 mt-2">Connecting to Cardano Node...</p>
+                `;
+            }
+
+            document.getElementById('review-content').innerHTML = contentHtml;
+            document.getElementById('review-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('review-modal').classList.add('hidden');
+        }
+
+        function alertCustom(msg) {
+            // Using a simple tailored alert for validation interaction
+            const modalTitle = document.getElementById('modal-title');
+            const originalTitle = modalTitle.innerText;
+            modalTitle.innerText = "Validation Error";
+            document.getElementById('review-content').innerHTML = `<p class="text-red-600">${msg}</p>`;
+            document.getElementById('review-modal').classList.remove('hidden');
+            setTimeout(() => {
+                closeModal();
+                modalTitle.innerText = originalTitle;
+            }, 2000);
+        }
+
+        // --- CORE BLOCKCHAIN LOGIC & FIRESTORE SAVE ---
+        async function confirmSubmission() {
+            closeModal();
+            const miningModal = document.getElementById('mining-modal');
+            const miningHash = document.getElementById('mining-hash');
+            miningModal.classList.remove('hidden');
+
+            // Simulate Mining Loop
+            let counter = 0;
+            const miningInterval = setInterval(() => {
+                miningHash.innerText = "Hashing: " + generateRandomHash();
+                counter++;
+                if(counter > 15) { // Stop after ~1.5s
+                    clearInterval(miningInterval);
+                    finalizeTransaction();
+                }
+            }, 100);
+        }
+
+        async function finalizeTransaction() {
+            if (!currentUser) return;
+
+            // Generate Artifacts
+            const key = generateKey();
+            const blockHash = generateRandomHash();
+            const walletAddr = tempFormData.type === 'student' ? generateADAAddress() : null;
+
+            // Prepare Data
+            const docData = {
+                ...tempFormData,
+                key: key,
+                blockHash: blockHash,
+                walletAddress: walletAddr,
+                status: 'Verified',
+                verifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Save to Firestore (Rule 1 & 3 Compliant)
+            try {
+                // Using the Key as the Document ID for easy search O(1)
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('verifications').doc(key).set(docData);
+                
+                // Show Success
+                document.getElementById('mining-modal').classList.add('hidden');
+                document.getElementById('final-key').value = key;
+                
+                if(walletAddr) {
+                    document.getElementById('ada-info').classList.remove('hidden');
+                    document.getElementById('final-wallet').innerText = walletAddr;
+                } else {
+                    document.getElementById('ada-info').classList.add('hidden');
+                }
+
+                document.getElementById('success-modal').classList.remove('hidden');
+
+                // Reset Forms
+                if(tempFormData.type === 'citizen') document.getElementById('citizen-form').reset();
+                else document.getElementById('student-form').reset();
+
+            } catch (error) {
+                console.error("Transaction Failed", error);
+                document.getElementById('mining-modal').classList.add('hidden');
+                alertCustom("Transaction Failed. Check Console.");
+            }
+        }
+
+        function closeSuccess() {
+            document.getElementById('success-modal').classList.add('hidden');
+            navigateTo('home');
+        }
+
+        // --- SEARCH LOGIC ---
+        async function performSearch() {
+            const inputKey = document.getElementById('search-input').value.trim();
+            if(!inputKey) return;
+
+            const resultContainer = document.getElementById('search-result');
+            const errorContainer = document.getElementById('search-error');
+            
+            // Hide previous
+            resultContainer.classList.add('hidden');
+            errorContainer.classList.add('hidden');
+
+            if (!currentUser) return;
+
+            try {
+                // Direct Key Lookup
+                const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('verifications').doc(inputKey);
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('res-name').innerText = data.name;
+                    document.getElementById('res-type').innerText = data.type === 'student' ? `Student: ${data.docType}` : 'Citizen Identity';
+                    document.getElementById('res-key').innerText = data.key;
+                    document.getElementById('res-hash').innerText = data.blockHash;
+                    document.getElementById('res-time').innerText = data.verifiedAt ? new Date(data.verifiedAt.seconds * 1000).toLocaleString() : 'Just now';
+
+                    if(data.walletAddress) {
+                        document.getElementById('res-wallet-row').classList.remove('hidden');
+                        document.getElementById('res-wallet').innerText = data.walletAddress;
+                    } else {
+                        document.getElementById('res-wallet-row').classList.add('hidden');
+                    }
+
+                    resultContainer.classList.remove('hidden');
+                } else {
+                    errorContainer.classList.remove('hidden');
+                }
+            } catch (e) {
+                console.error("Search Error", e);
+                errorContainer.classList.remove('hidden');
+            }
+        }
+
+        // --- UTILS ---
+        function generateKey() {
+            // Format: UNI-XXXX-YYYY
+            const part1 = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const part2 = Math.random().toString(36).substring(2, 6).toUpperCase();
+            return `UNI-${part1}-${part2}`;
+        }
+
+        function generateRandomHash() {
+            return '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        function generateADAAddress() {
+            // Fake Cardano Address structure
+            return 'addr1' + Array.from({length: 58}, () => Math.floor(Math.random() * 36).toString(36)).join('');
+        }
+
+        function copyKey() {
+            const copyText = document.getElementById("final-key");
+            copyText.select();
+            document.execCommand("copy"); // Fallback for iframe environment
+            
+            const btn = event.currentTarget;
+            const span = btn.querySelector('span');
+            const originalText = span.innerText;
+            span.innerText = "Copied!";
+            setTimeout(() => span.innerText = originalText, 1500);
+        }
+
+    </script>
+</body>
+</html>
