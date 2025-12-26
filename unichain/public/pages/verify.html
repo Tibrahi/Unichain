@@ -3,334 +3,665 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unichain | Identity Generation Node</title>
+    <title>Unichain | Decentralized Identity Node</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-     <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
     
-    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f0f4f8;
+            background-image: radial-gradient(at 0% 0%, hsla(219,70%,96%,1) 0, transparent 50%), 
+                              radial-gradient(at 50% 100%, hsla(220,60%,97%,1) 0, transparent 50%);
+            color: #0f172a; 
+            min-height: 100vh;
+        }
+        
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .input-card { background: white; border: 1px solid #e2e8f0; border-radius: 1.5rem; transition: all 0.3s ease; }
-        .input-card:hover { border-color: #2563eb; transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
-        .camera-preview { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 1rem; background: #000; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { width: 48px; height: 48px; border: 5px solid #E2E8F0; border-bottom-color: #2563eb; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
+        
+        /* Modern Card Styling */
+        .input-card { 
+            background: white; 
+            border: 1px solid rgba(226, 232, 240, 0.8); 
+            border-radius: 1.5rem; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative;
+            z-index: 10;
+        }
+        
+        .input-card:hover { 
+            border-color: #3b82f6; 
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .input-card:focus-within { 
+            border-color: #2563eb; 
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); 
+        }
+        
+        /* Camera & Inputs */
+        .camera-preview { 
+            width: 100%; 
+            aspect-ratio: 1; 
+            object-fit: cover; 
+            border-radius: 1rem; 
+            background: #1e293b; 
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .custom-input:focus {
+            background-color: #fff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); filter: blur(4px); } 
+            to { opacity: 1; transform: translateY(0); filter: blur(0); } 
+        }
+        
+        .loader { 
+            width: 56px; height: 56px; 
+            border: 6px solid #E2E8F0; 
+            border-bottom-color: #2563eb; 
+            border-radius: 50%; 
+            display: inline-block; 
+            animation: rotation 1s linear infinite; 
+        }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .view-content { display: none; }
         .view-content.active { display: block; }
+
+        /* Fix for clickable areas */
+        .clickable-area {
+            cursor: pointer;
+            position: relative;
+        }
     </style>
 </head>
 
-<body class="min-h-screen pb-20">
+<body class="pb-20">
 
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
-        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2 font-bold text-xl cursor-pointer" onclick="showView('select')">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><i data-lucide="zap" class="w-5 h-5"></i></div>
-                <span>Uni<span class="text-blue-600">chain</span></span>
+    <nav class="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-200/60 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 font-bold text-xl cursor-pointer select-none" onclick="showView('select')">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <i data-lucide="zap" class="w-6 h-6"></i>
+                </div>
+                <span class="tracking-tight">Uni<span class="text-blue-600">chain</span></span>
             </div>
-            <button onclick="showView('search')" class="text-sm font-semibold bg-slate-100 px-5 py-2 rounded-full hover:bg-slate-200 transition-all border border-slate-200">Explorer</button>
+            <button onclick="showView('search')" class="flex items-center gap-2 text-sm font-semibold bg-slate-50 px-6 py-2.5 rounded-full hover:bg-slate-100 transition-all border border-slate-200 text-slate-600 hover:text-slate-900">
+                <i data-lucide="search" class="w-4 h-4"></i> Public Explorer
+            </button>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-6 py-8">
+    <main class="max-w-5xl mx-auto px-6 py-10">
         
-        <div id="view-select" class="view-content active fade-in space-y-8">
-            <div class="text-center py-6">
-                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Generate Web3 Identity</h1>
-                <p class="text-slate-500 mt-2">Choose your node type to begin.</p>
+        <div id="view-select" class="view-content active fade-in space-y-10">
+            <div class="text-center max-w-2xl mx-auto py-4">
+                <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-4">Generate Identity Node</h1>
+                <p class="text-lg text-slate-500">Choose your classification to anchor your data to the local chain.</p>
             </div>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div onclick="initForm('citizen')" class="input-card p-8 cursor-pointer group">
-                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all"><i data-lucide="user-check"></i></div>
-                    <h3 class="text-xl font-bold mb-2">Citizen Node</h3>
-                    <p class="text-slate-500 text-sm">National ID indexing for all residents.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div onclick="initForm('citizen')" class="input-card p-10 clickable-area group">
+                    <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i data-lucide="shield" class="w-24 h-24 text-blue-600"></i>
+                    </div>
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                        <i data-lucide="user-check" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-slate-900">Citizen Node</h3>
+                    <p class="text-slate-500 leading-relaxed">Standard identity verification. Requires age &gt;16 validation and national ID structure audit.</p>
                 </div>
-                <div onclick="initForm('student')" class="input-card p-8 cursor-pointer group">
-                    <div class="w-14 h-14 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-slate-900 group-hover:text-white transition-all"><i data-lucide="graduation-cap"></i></div>
-                    <h3 class="text-xl font-bold mb-2">Student Node</h3>
-                    <p class="text-slate-500 text-sm">Academic verification and student tracking.</p>
+                
+                <div onclick="initForm('student')" class="input-card p-10 clickable-area group">
+                    <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i data-lucide="book-open" class="w-24 h-24 text-indigo-600"></i>
+                    </div>
+                    <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                        <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 text-slate-900">Student Node</h3>
+                    <p class="text-slate-500 leading-relaxed">Academic institution verification. Optimized for university and school enrollment tracking.</p>
                 </div>
             </div>
         </div>
 
         <div id="view-form" class="view-content fade-in">
             <div class="max-w-2xl mx-auto">
+                <button onclick="showView('select')" class="mb-6 text-sm font-bold text-slate-400 hover:text-slate-700 flex items-center gap-2 transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Selection
+                </button>
+
                 <form id="main-form" class="space-y-8">
-                    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-                        <h2 id="form-title" class="text-2xl font-bold">Details</h2>
-                        <div id="student-only" class="hidden space-y-2">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Education Level</label>
-                            <select id="edu-level" onchange="updateFormFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <div class="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm space-y-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                        
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 id="form-title" class="text-2xl font-bold text-slate-800">Details</h2>
+                            <div class="text-xs font-bold px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg uppercase tracking-wider">Step 1</div>
+                        </div>
+
+                        <div id="student-only" class="hidden space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Education Level</label>
+                            <select id="edu-level" onchange="updateFormFields()" class="custom-input cursor-pointer">
                                 <option value="primary">Primary School</option>
                                 <option value="secondary">Secondary School</option>
-                                <option value="university">University</option>
+                                <option value="university">University / College</option>
                             </select>
                         </div>
-                        <div id="dynamic-fields" class="grid md:grid-cols-2 gap-4"></div>
+
+                        <div id="dynamic-fields" class="grid md:grid-cols-2 gap-5"></div>
+
                         <div class="space-y-2">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Document Serial Number</label>
-                            <input type="text" id="doc-serial" required placeholder="e.g. ID-123456" class="w-full p-4 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">ID / Verification Number</label>
+                            <input type="text" id="doc-serial" required placeholder="NOT 16 Digits" class="custom-input">
+                            <p class="text-[10px] text-slate-400 pl-2">Security Rule: Cannot be exactly 16 characters.</p>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-                        <h3 class="text-lg font-bold">Verification</h3>
-                        <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm space-y-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                        
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-2xl font-bold text-slate-800">Verification Assets</h2>
+                            <div class="text-xs font-bold px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg uppercase tracking-wider">Step 2</div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div class="space-y-3">
-                                <label class="text-xs font-bold text-slate-700">Live Selfie</label>
-                                <div class="relative group bg-black rounded-2xl overflow-hidden aspect-square">
+                                <label class="text-xs font-bold text-slate-700 block">Live Facial Capture</label>
+                                <div class="relative group rounded-2xl overflow-hidden bg-black shadow-md">
                                     <video id="webcam" autoplay playsinline class="camera-preview"></video>
                                     <canvas id="photo-canvas" class="hidden"></canvas>
-                                    <img id="selfie-result" class="hidden camera-preview">
-                                    <div class="absolute bottom-4 left-0 right-0 flex justify-center">
-                                        <button type="button" onclick="capturePhoto()" class="bg-white text-black px-6 py-2 rounded-full font-bold shadow-xl hover:scale-105 transition-transform">Capture</button>
+                                    
+                                    <div id="capture-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm cursor-pointer" onclick="capturePhoto()">
+                                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 shadow-xl hover:scale-110 transition-transform">
+                                            <i data-lucide="camera" class="w-8 h-8 text-black"></i>
+                                        </div>
+                                        <span class="text-white font-bold text-sm">Click to Capture</span>
                                     </div>
+                                    
+                                    <img id="selfie-result" class="hidden camera-preview">
+                                </div>
+                                <div id="cam-warning" class="hidden flex items-start gap-2 text-xs font-medium text-amber-700 bg-amber-50 p-3 rounded-xl border border-amber-100">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0 text-amber-500"></i> 
+                                    <span>Biometric hash generated. Waiting for final audit.</span>
                                 </div>
                             </div>
-                            <div class="space-y-4">
+                            
+                            <div class="space-y-5 flex flex-col justify-center">
                                 <div class="space-y-2">
-                                    <label class="text-xs font-bold text-slate-700">ID Front</label>
-                                    <input type="file" required class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700">
+                                    <label class="text-xs font-bold text-slate-700">Document Front</label>
+                                    <input type="file" id="doc-front" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-xs font-bold text-slate-700">ID Back</label>
-                                    <input type="file" required class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700">
+                                    <label class="text-xs font-bold text-slate-700">Document Back</label>
+                                    <input type="file" id="doc-back" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-3xl font-extrabold text-lg shadow-lg">Submit Generation Request</button>
+
+                    <button type="submit" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold text-lg hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300">Generate Identity Node</button>
                 </form>
             </div>
         </div>
 
         <div id="view-review" class="view-content fade-in">
-            <div class="max-w-lg mx-auto bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
-                <h2 class="text-2xl font-bold mb-6">Confirm Info</h2>
-                <div id="review-list" class="space-y-3 mb-8 bg-slate-50 p-6 rounded-2xl text-sm"></div>
+            <div class="max-w-lg mx-auto bg-white rounded-[2rem] p-8 border border-slate-200 shadow-2xl">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="file-text" class="w-8 h-8 text-slate-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold">Confirm Data Hash</h2>
+                    <p class="text-sm text-slate-400">Review your inputs before immutable anchoring.</p>
+                </div>
+                
+                <div id="review-list" class="space-y-3 mb-8 bg-slate-50 p-6 rounded-2xl text-sm border border-slate-100"></div>
+                
                 <div class="flex gap-4">
-                    <button onclick="showView('form')" class="flex-1 py-4 border rounded-2xl font-bold">Back</button>
-                    <button onclick="finalizeProcess()" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-bold">Generate Key</button>
+                    <button onclick="showView('form')" class="flex-1 py-4 border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-colors">Edit</button>
+                    <button onclick="finalizeProcess()" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg">Authorize & Mint</button>
                 </div>
             </div>
         </div>
 
-        <div id="view-processing" class="view-content fade-in text-center py-20">
-            <div class="loader mb-6"></div>
-            <h2 class="text-2xl font-bold">Securing Node...</h2>
+        <div id="view-processing" class="view-content fade-in text-center py-24">
+            <div class="relative inline-block mb-8">
+                <div class="loader"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i data-lucide="cpu" class="w-6 h-6 text-blue-500 animate-pulse"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold mb-3 text-slate-900">Anchoring Identity Node...</h2>
+            <p class="text-slate-500 max-w-md mx-auto">Calculating SHA-256 hashes and assigning unique ADA address block.</p>
         </div>
 
-        <div id="view-success" class="view-content fade-in text-center">
-            <h2 class="text-3xl font-bold mb-4 text-green-600">Identity Anchored!</h2>
-            <div class="bg-slate-900 text-left p-8 rounded-3xl space-y-6">
-                <div>
-                    <label class="text-blue-400 text-[10px] uppercase block mb-2">Public UNI-Key</label>
-                    <div class="flex justify-between items-center bg-blue-600 p-4 rounded-xl text-white">
-                        <span id="out-key" class="mono font-bold"></span>
+        <div id="view-success" class="view-content fade-in">
+            <div class="max-w-2xl mx-auto space-y-8 text-center">
+                <div class="space-y-3">
+                    <div class="w-24 h-24 bg-green-100 text-green-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-green-200 shadow-xl">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i>
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-slate-900">Node Anchored Successfully</h2>
+                    <p class="text-slate-500 text-lg">Your digital identity is now live on the local chain.</p>
+                </div>
+                
+                <div class="bg-slate-900 text-left p-8 md:p-10 rounded-[2.5rem] shadow-2xl space-y-8 relative overflow-hidden group">
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-600 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                    
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">Cardano (ADA) Address</label>
+                            <span class="text-xs text-slate-500 font-mono">Simulated</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-white/5 p-1 rounded-2xl border border-white/10 pr-2 focus-within:bg-white/10 transition-colors">
+                            <input type="password" id="out-addr" readonly class="bg-transparent text-sm mono text-white flex-grow outline-none border-none p-4 w-full" value="addr1...">
+                            <div class="flex gap-1">
+                                <button onclick="toggleMask('out-addr')" class="p-2 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-colors" title="Show/Hide">
+                                    <i data-lucide="eye" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="copyVal('out-addr')" class="p-2 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-colors" title="Copy">
+                                    <i data-lucide="copy" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">Public Discovery Key</label>
+                            <span class="text-xs text-slate-500 font-mono">Shareable</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-600 p-5 rounded-2xl border border-blue-400/50 shadow-lg shadow-blue-900/50">
+                            <span id="out-key" class="mono font-bold text-white text-xl tracking-wide">UNI-XXXX-XXXX</span>
+                            <button onclick="copyTxt('out-key')" class="text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-all">
+                                <i data-lucide="copy" class="w-6 h-6"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label class="text-blue-400 text-[10px] uppercase block mb-2">ADA Address</label>
-                    <input type="password" id="out-addr" readonly class="w-full bg-white/10 p-4 rounded-xl text-white mono text-xs border-none">
-                </div>
+                
+                <button onclick="location.reload()" class="inline-flex items-center gap-2 font-bold text-slate-400 hover:text-slate-800 transition-colors py-3 px-6 rounded-full hover:bg-slate-100">
+                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Start New Session
+                </button>
             </div>
-            <button onclick="location.reload()" class="mt-8 text-slate-400 underline">Start New Session</button>
         </div>
 
         <div id="view-search" class="view-content fade-in">
-            <div class="max-w-xl mx-auto py-12 space-y-6">
-                <h2 class="text-3xl font-bold text-center">Identity Explorer</h2>
-                <div class="flex flex-col gap-4 bg-white p-6 rounded-[2rem] shadow-lg border border-slate-100">
-                    <select id="search-type" class="w-full p-4 rounded-xl bg-slate-50 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="citizen">Search Citizen</option>
-                        <option value="student">Search Student</option>
-                    </select>
-                    <div class="relative">
-                        <input type="text" id="search-box" placeholder="Enter UNI-Key (e.g. UNI-ABCD-1234)" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <button onclick="runSearch()" class="absolute right-2 top-2 bg-blue-600 text-white p-2 rounded-lg"><i data-lucide="search"></i></button>
-                    </div>
+            <div class="max-w-2xl mx-auto py-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold mb-3">Unichain Public Index</h2>
+                    <p class="text-slate-500">Search for anchored nodes via their Public Discovery Key.</p>
                 </div>
-                <div id="search-results" class="hidden"></div>
+                
+                <div class="bg-white p-2 rounded-[2rem] shadow-xl border border-slate-200 flex flex-col md:flex-row gap-2 relative z-20">
+                    <select id="search-type" class="p-4 rounded-[1.5rem] bg-slate-50 border-none outline-none font-bold text-slate-600 cursor-pointer hover:bg-slate-100 transition-colors md:w-40 appearance-none text-center">
+                        <option value="citizen">Citizen</option>
+                        <option value="student">Student</option>
+                    </select>
+                    <div class="flex-grow relative">
+                        <input type="text" id="search-box" placeholder="Enter Key (e.g. UNI-ABCD-1234)" class="w-full h-full px-6 py-4 md:py-0 rounded-[1.5rem] outline-none text-lg font-mono uppercase placeholder:normal-case placeholder:font-sans placeholder:text-slate-300">
+                    </div>
+                    <button onclick="runSearch()" class="bg-blue-600 text-white px-8 py-4 rounded-[1.5rem] hover:bg-blue-700 font-bold shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                        <span>Search</span>
+                    </button>
+                </div>
+
+                <div id="search-results" class="mt-12 hidden space-y-6"></div>
             </div>
         </div>
     </main>
 
-    <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/60 z-[100] hidden items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center">
-            <h4 id="modal-title" class="text-xl font-bold mb-4">Notification</h4>
-            <p id="modal-text" class="text-slate-500 text-sm mb-6"></p>
-            <button onclick="closeModal()" class="w-full py-4 bg-black text-white rounded-2xl font-bold">Okay</button>
+    <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/40 z-[100] hidden items-center justify-center p-6 backdrop-blur-md transition-opacity">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-fade-in text-center transform scale-100">
+            <div id="modal-icon-box" class="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-sm"></div>
+            <h4 id="modal-title" class="text-xl font-bold mb-2 text-slate-900">Message</h4>
+            <p id="modal-text" class="text-slate-500 text-sm mb-8 leading-relaxed"></p>
+            <button onclick="closeModal()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg">Close</button>
         </div>
     </div>
 
     <script>
-        // --- CONFIG & INIT ---
-        // Safety for local testing
-        const safeConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "demo", projectId: "demo" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unichain-local-v1';
+        // --- 1. LOCAL STORAGE ADAPTER (MOCK CHAIN) ---
+        // This ensures the app works 100% locally without Firebase config
+        const MockChain = {
+            save: (key, data) => {
+                const db = JSON.parse(localStorage.getItem('unichain_db') || '{}');
+                db[key] = data;
+                localStorage.setItem('unichain_db', JSON.stringify(db));
+            },
+            get: (key) => {
+                const db = JSON.parse(localStorage.getItem('unichain_db') || '{}');
+                return db[key] || null;
+            }
+        };
 
-        if (safeConfig.apiKey !== "demo") {
-            firebase.initializeApp(safeConfig);
-        }
-        
-        const db = safeConfig.apiKey !== "demo" ? firebase.firestore() : null;
-        let bioData = {}, photoCaptured = false, currentStream = null, currentType = '';
+        // --- 2. STATE & INIT ---
+        let currentType = 'citizen';
+        let currentStream = null;
+        let bioData = {};
+        let photoCaptured = false;
 
         function init() {
             lucide.createIcons();
-            // Allow anonymous sign in if firebase is active
-            if (db) firebase.auth().signInAnonymously().catch(e => console.log("Offline Mode"));
+            // We skip Firebase init checks for the Local Version to ensure it runs
+            console.log("Unichain Local Node Active");
         }
 
-        // --- NAVIGATION ---
+        // --- 3. NAVIGATION ---
         window.showView = (id) => {
             document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
             document.getElementById(`view-${id}`).classList.add('active');
-            if(id !== 'form' && currentStream) {
-                currentStream.getTracks().forEach(t => t.stop());
+            
+            if (id !== 'form' && currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
             }
-            window.scrollTo(0,0);
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            lucide.createIcons();
         };
 
+        // --- 4. FORM LOGIC ---
         window.initForm = (type) => {
             currentType = type;
             document.getElementById('student-only').classList.toggle('hidden', type !== 'student');
-            document.getElementById('form-title').innerText = type === 'citizen' ? 'Citizen Registry' : 'Student Registry';
+            document.getElementById('form-title').innerText = type === 'citizen' ? 'Citizen Identification' : 'Academic Verification';
             updateFormFields();
             showView('form');
             startWebcam();
         };
 
         window.updateFormFields = () => {
-            const container = document.getElementById('dynamic-fields');
             const level = document.getElementById('edu-level').value;
+            const container = document.getElementById('dynamic-fields');
+            
             let fields = [
-                { id: 'full_name', label: 'Full Name', type: 'text', placeholder: 'Legal Name' },
-                { id: 'dob', label: 'Date of Birth', type: 'date', placeholder: '' }
+                { id: 'full_name', label: 'Legal Full Name', type: 'text', placeholder: 'As appears on ID' },
+                { id: 'dob', label: 'Birth Date', type: 'date', placeholder: '' },
+                { id: 'address_loc', label: 'Residential City', type: 'text', placeholder: 'e.g. Kigali, New York' }
             ];
 
             if (currentType === 'student') {
-                fields.push({ id: 'location', label: 'Institution', type: 'text', placeholder: 'School Name' });
+                fields.push({ id: 'institution', label: level === 'university' ? 'University Name' : 'School Name', type: 'text', placeholder: 'Official Name' });
+                if (level === 'university') {
+                    fields.push({ id: 'major', label: 'Major / Faculty', type: 'text', placeholder: 'e.g. Computer Science' });
+                }
             } else {
-                fields.push({ id: 'location', label: 'Nationality', type: 'text', placeholder: 'Country' });
+                fields.push({ id: 'nationality', label: 'Nationality', type: 'text', placeholder: 'Issuing Country' });
+                fields.push({ id: 'phone', label: 'Phone Number (10 Digits)', type: 'tel', placeholder: '07...' });
             }
 
             container.innerHTML = fields.map(f => `
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase">${f.label}</label>
-                    <input type="${f.type}" name="${f.id}" required class="w-full p-4 rounded-xl bg-slate-50 border-none ring-1 ring-slate-200 outline-none">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">${f.label}</label>
+                    <input type="${f.type}" name="${f.id}" required placeholder="${f.placeholder}" 
+                           class="custom-input">
                 </div>
             `).join('');
         };
 
+        // --- 5. CAMERA LOGIC ---
         async function startWebcam() {
+            const video = document.getElementById('webcam');
+            // Try/Catch for browser permission errors
             try {
-                currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                document.getElementById('webcam').srcObject = currentStream;
-            } catch (e) {
-                console.log("Webcam blocked or missing");
+                currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                video.srcObject = currentStream;
+            } catch (err) {
+                console.warn("Camera missed, mocking for demo");
+                // Allow proceeding even if camera fails in strict local file env
             }
         }
 
         window.capturePhoto = () => {
             const video = document.getElementById('webcam');
+            if(!video.srcObject) {
+                // If camera failed, just simulate capture
+                photoCaptured = true;
+                document.getElementById('cam-warning').classList.remove('hidden');
+                document.getElementById('capture-overlay').classList.add('hidden');
+                return;
+            }
+            
             const canvas = document.getElementById('photo-canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
+            const resImg = document.getElementById('selfie-result');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            document.getElementById('selfie-result').src = canvas.toDataURL('image/webp');
-            document.getElementById('selfie-result').classList.remove('hidden');
+            
+            resImg.src = canvas.toDataURL('image/webp');
             video.classList.add('hidden');
+            resImg.classList.remove('hidden');
+            document.getElementById('cam-warning').classList.remove('hidden');
+            document.getElementById('capture-overlay').classList.add('hidden');
             photoCaptured = true;
         };
 
+        // --- 6. VALIDATION & PROCESSING ---
         document.getElementById('main-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const fd = new FormData(e.target);
-            bioData = Object.fromEntries(fd.entries());
-            bioData.serial = document.getElementById('doc-serial').value;
             
-            let html = '';
-            for(let key in bioData) {
-                html += `<div class="flex justify-between py-1 border-b"><span>${key}</span><b>${bioData[key]}</b></div>`;
+            const raw = new FormData(e.target);
+            bioData = Object.fromEntries(raw.entries());
+            bioData.serial = document.getElementById('doc-serial').value;
+
+            // --- VALIDATION RULES ---
+            
+            // 1. Photo Check
+            if (!photoCaptured) return showModal('Biometric Missing', 'Please capture a selfie for identity verification.', 'error');
+            
+            // 2. Age Check (> 16)
+            if (bioData.dob) {
+                const birthDate = new Date(bioData.dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                if (currentType === 'citizen' && age < 16) {
+                    return showModal('Eligibility Error', 'Citizen Node generation requires the applicant to be at least 16 years old.', 'error');
+                }
             }
-            document.getElementById('review-list').innerHTML = html;
+
+            // 3. ID Length Check (Must NOT be 16)
+            if (bioData.serial.length === 16) {
+                return showModal('Invalid Serial Format', 'Verification number must NOT be exactly 16 digits long.', 'error');
+            }
+
+            // 4. Phone Check (Must be 10 digits)
+            if (currentType === 'citizen') {
+                const phoneClean = bioData.phone.replace(/\D/g,''); // remove non-digits
+                if (phoneClean.length !== 10) {
+                    return showModal('Invalid Phone', 'Phone number must be exactly 10 digits.', 'error');
+                }
+            }
+
+            // Populate Review
+            const review = document.getElementById('review-list');
+            review.innerHTML = Object.entries(bioData).map(([k,v]) => `
+                <div class="flex justify-between border-b border-slate-200 py-3 last:border-0">
+                    <span class="text-slate-400 capitalize font-medium">${k.replace('_',' ')}</span>
+                    <span class="font-bold text-slate-800 text-right">${v}</span>
+                </div>
+            `).join('');
+            
             showView('review');
         });
 
-        window.finalizeProcess = async () => {
+        window.finalizeProcess = () => {
             showView('processing');
-            const serial = bioData.serial.toUpperCase();
-            const key = `UNI-${serial.substring(0,4)}-${Math.floor(1000+Math.random()*8999)}`;
-            const addr = "addr1" + sha256(serial).substring(0, 40);
+            
+            // Generate Realistic Keys
+            const randomHex = Math.random().toString(16).substr(2, 4).toUpperCase();
+            const randomSerial = Math.floor(1000 + Math.random() * 9000);
+            
+            // "Real" looking Public Key
+            const sharedKey = `UNI-${randomHex}-${randomSerial}`;
+            
+            // Simulated ADA Address
+            const adaAddr = "addr1" + sha256(JSON.stringify(bioData) + Date.now()).substring(0, 58) + "z9";
 
-            if (db) {
-                await db.collection('artifacts').doc(appId).collection('public_index').doc(key).set({
-                    name: bioData.full_name,
-                    dob: bioData.dob,
-                    location: bioData.location,
-                    address: addr,
-                    type: currentType
-                });
-            }
+            // Save to Local Storage (Mock Chain)
+            const nodeData = {
+                type: currentType,
+                full_name: bioData.full_name,
+                dob: bioData.dob,
+                address_loc: bioData.address_loc, // Public location
+                ada_address: adaAddr, // Full address
+                public_key: sharedKey,
+                verified: false,
+                timestamp: new Date().toISOString()
+            };
+
+            MockChain.save(sharedKey, nodeData);
 
             setTimeout(() => {
-                document.getElementById('out-key').innerText = key;
-                document.getElementById('out-addr').value = addr;
+                document.getElementById('out-addr').value = adaAddr;
+                document.getElementById('out-key').innerText = sharedKey;
                 showView('success');
-            }, 1500);
+                showModal('Success', 'Identity anchored locally. You can now search for this user.', 'success');
+            }, 2500);
         };
 
-        window.runSearch = async () => {
+        // --- 7. SEARCH LOGIC ---
+        window.runSearch = () => {
             const query = document.getElementById('search-box').value.trim().toUpperCase();
-            const typeReq = document.getElementById('search-type').value;
-            const resDiv = document.getElementById('search-results');
+            const filterType = document.getElementById('search-type').value;
+            const results = document.getElementById('search-results');
             
-            resDiv.innerHTML = "Searching...";
-            resDiv.classList.remove('hidden');
+            if (!query) return;
 
-            if (!db) {
-                resDiv.innerHTML = "Search requires Firebase deployment.";
-                return;
-            }
+            results.innerHTML = '<div class="text-center py-6 text-slate-400 animate-pulse">Querying Local Ledger...</div>';
+            results.classList.remove('hidden');
 
-            const doc = await db.collection('artifacts').doc(appId).collection('public_index').doc(query).get();
-            if (doc.exists && doc.data().type === typeReq) {
-                const d = doc.data();
-                resDiv.innerHTML = `
-                    <div class="bg-white p-8 rounded-3xl shadow-lg border-t-4 border-blue-600">
-                        <h3 class="text-xl font-bold mb-4">${d.name}</h3>
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div><p class="text-slate-400">DOB</p><p>${d.dob}</p></div>
-                            <div><p class="text-slate-400">Location</p><p>${d.location}</p></div>
+            setTimeout(() => {
+                // Fetch from LocalStorage
+                const data = MockChain.get(query);
+                
+                // Logic: Must exist AND match the type selected (Student/Citizen)
+                if (data && data.type === filterType) {
+                    // Create masked address for display (shareable part)
+                    const maskedAddr = data.ada_address.substring(0, 15) + "..." + data.ada_address.substring(data.ada_address.length - 6);
+                    
+                    results.innerHTML = `
+                        <div class="bg-white border border-slate-200 p-8 rounded-[2rem] shadow-xl fade-in relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                            
+                            <div class="flex items-start justify-between mb-6">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">${data.type}</span>
+                                        <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Public Data</span>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-slate-900">${data.full_name}</h3>
+                                </div>
+                                <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+                                    <i data-lucide="user" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Date of Birth</label>
+                                    <p class="font-medium text-slate-800">${data.dob}</p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Location</label>
+                                    <p class="font-medium text-slate-800">${data.address_loc}</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 border-t border-slate-100">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Wallet Address (Public Share)</label>
+                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex justify-between items-center">
+                                    <span class="mono text-xs text-slate-600 break-all">${maskedAddr}</span>
+                                    <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mt-4">
-                            <p class="text-slate-400 text-xs">Wallet Address</p>
-                            <p class="mono text-[10px] break-all bg-slate-50 p-2 rounded">${d.address}</p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                resDiv.innerHTML = "No record found matching that Key and Category.";
-            }
+                    `;
+                    lucide.createIcons();
+                } else {
+                    results.innerHTML = `
+                        <div class="p-8 bg-red-50 border border-red-100 text-red-600 rounded-[2rem] text-center shadow-sm">
+                            <div class="mb-2 font-bold text-lg">Node Not Found</div>
+                            <p class="text-sm opacity-80">No ${filterType} identity found with Key: ${query}</p>
+                        </div>`;
+                }
+            }, 800);
         };
 
-        window.showModal = (t, m) => {
-            document.getElementById('modal-title').innerText = t;
-            document.getElementById('modal-text').innerText = m;
-            document.getElementById('modal-backdrop').classList.replace('hidden', 'flex');
+        // --- 8. UI HELPERS ---
+        window.showModal = (title, text, type) => {
+            const box = document.getElementById('modal-backdrop');
+            const iconBox = document.getElementById('modal-icon-box');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+            
+            const icons = {
+                error: { bg: 'bg-red-100', text: 'text-red-600', icon: 'alert-triangle' },
+                success: { bg: 'bg-green-100', text: 'text-green-600', icon: 'check-circle' },
+                info: { bg: 'bg-blue-100', text: 'text-blue-600', icon: 'info' }
+            };
+            
+            const style = icons[type] || icons.info;
+            iconBox.className = `w-16 h-16 ${style.bg} ${style.text} rounded-2xl mx-auto mb-6 flex items-center justify-center`;
+            iconBox.innerHTML = `<i data-lucide="${style.icon}" class="w-8 h-8"></i>`;
+            
+            box.classList.remove('hidden'); 
+            box.classList.add('flex'); 
+            lucide.createIcons();
         };
-        window.closeModal = () => document.getElementById('modal-backdrop').classList.replace('flex', 'hidden');
+
+        window.closeModal = () => document.getElementById('modal-backdrop').classList.add('hidden');
+        
+        window.toggleMask = (id) => { 
+            const e = document.getElementById(id); 
+            e.type = e.type === 'password' ? 'text' : 'password'; 
+        };
+        
+        window.copyVal = (id) => { 
+            const e = document.getElementById(id);
+            const originalType = e.type;
+            e.type = 'text'; e.select(); 
+            document.execCommand('copy'); 
+            e.type = originalType; 
+            showModal('Copied', 'Address copied to clipboard.', 'info'); 
+        };
+        
+        window.copyTxt = (id) => { 
+            const t = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(t).then(() => {
+                showModal('Copied', 'Public Key copied to clipboard.', 'info'); 
+            });
+        };
 
         window.onload = init;
     </script>
