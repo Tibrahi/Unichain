@@ -12,29 +12,71 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
         
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc;
+            color: #0f172a; 
+        }
+        
         .display-font { font-family: 'Space Grotesk', sans-serif; }
         
-        /* Toast & Animations */
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { min-width: 300px; padding: 16px; border-radius: 12px; background: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 6px solid; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out forwards; }
-        .toast.success { border-left-color: #10b981; } .toast.error { border-left-color: #ef4444; } .toast.info { border-left-color: #3b82f6; }
+        /* Custom Toast Notification */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            min-width: 300px; padding: 16px; border-radius: 12px;
+            background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-left: 6px solid; display: flex; align-items: center; gap: 12px;
+            animation: slideIn 0.3s ease-out forwards; opacity: 0; transform: translateX(100%);
+        }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.info { border-left-color: #3b82f6; }
+
         @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
 
-        /* Inputs & Uploads */
-        .modern-input { width: 100%; padding: 0.8rem 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; transition: all 0.2s; font-size: 0.9rem; }
-        .modern-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); outline: none; }
-        .upload-area { border: 2px dashed #cbd5e1; border-radius: 1rem; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+        /* Modern Input */
+        .modern-input {
+            width: 100%; padding: 0.8rem 1rem; background: #ffffff;
+            border: 1px solid #e2e8f0; border-radius: 0.75rem; transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .modern-input:focus {
+            border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); outline: none;
+        }
+
+        /* File Upload Area */
+        .upload-area {
+            border: 2px dashed #cbd5e1; border-radius: 1rem; padding: 1.5rem;
+            text-align: center; cursor: pointer; transition: all 0.2s;
+        }
         .upload-area:hover { border-color: #6366f1; background: #eef2ff; }
         .upload-area.active { border-color: #10b981; background: #ecfdf5; border-style: solid; }
 
-        /* View Management */
+        /* Security Features */
+        .blur-secret {
+            filter: blur(8px); user-select: none; cursor: not-allowed; transition: filter 0.5s ease;
+        }
+        .reveal-secret {
+            filter: blur(0); cursor: text;
+        }
+        
+        /* Protected Data View (No Copy/Screenshot Protection CSS tricks) */
+        .protected-view {
+            user-select: none; /* Standard */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+        }
+        @media print {
+            .no-print { display: none; }
+        }
+
+        /* Navigation Views */
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .blur-secret { filter: blur(8px); user-select: none; transition: filter 0.3s ease; }
-        .reveal-secret { filter: blur(0); }
     </style>
 </head>
 
@@ -49,17 +91,18 @@
                 <span class="font-bold text-lg display-font">UniChain <span class="text-indigo-600">ID</span></span>
             </div>
             <div class="flex gap-4">
-                <button onclick="showView('home')" class="text-sm font-medium hover:text-indigo-600">Register</button>
-                <button onclick="showView('search')" class="text-sm font-medium hover:text-indigo-600">Verify / Search</button>
+                <button onclick="showView('search')" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
+                    <i data-lucide="search" class="w-4 h-4"></i> Search DB
+                </button>
             </div>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto px-6 py-8">
 
-        <div id="view-home" class="view-section active">
-            <h1 class="text-3xl font-bold text-center mb-2 display-font">Registration Portal</h1>
-            <p class="text-gray-500 text-center mb-10">Choose the identity category to begin registration.</p>
+        <div id="view-select" class="view-section active">
+            <h1 class="text-3xl font-bold text-center mb-2 display-font">Identity Classification</h1>
+            <p class="text-gray-500 text-center mb-10">Select the entity type to configure data requirements.</p>
 
             <div class="grid md:grid-cols-2 gap-6">
                 <div onclick="initForm('citizen')" class="bg-white p-8 rounded-2xl border border-gray-200 hover:border-indigo-500 hover:shadow-lg cursor-pointer transition-all group">
@@ -75,272 +118,390 @@
                         <i data-lucide="graduation-cap" class="w-6 h-6"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2">Student</h3>
-                    <p class="text-sm text-gray-500">Includes logic for minors (<16) vs adults (>16). Requires Reg No.</p>
+                    <p class="text-sm text-gray-500">Academic identity. Logic adapts based on Age (16+) and Education Level.</p>
                 </div>
-            </div>
-            
-            <div class="mt-8 text-center">
-                <button onclick="showView('search')" class="text-indigo-600 text-sm font-bold hover:underline">Already have an ID? Go to Search</button>
             </div>
         </div>
 
         <div id="view-form" class="view-section">
-            <button onclick="showView('home')" class="mb-6 flex items-center gap-2 text-sm text-gray-500 hover:text-black">
+            <button onclick="showView('select')" class="mb-6 flex items-center gap-2 text-sm text-gray-500 hover:text-black">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Selection
             </button>
 
             <form id="main-form" class="space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-indigo-500"></i> Basic Information</h3>
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Full Name</label><input type="text" id="inp-name" name="full_name" required class="modern-input"></div>
-                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Date of Birth</label><input type="date" id="inp-dob" name="dob" onchange="checkStudentAge()" required class="modern-input"></div>
-                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Gender</label>
-                            <select name="gender" class="modern-input"><option>Male</option><option>Female</option></select>
-                        </div>
-                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Province</label><input type="text" name="province" required class="modern-input"></div>
+                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> Classification</h3>
+                    
+                    <div id="student-level-wrapper" class="hidden">
+                        <label class="text-xs font-bold text-gray-500 uppercase block mb-1">Education Level</label>
+                        <select id="edu-level" name="edu_level" onchange="updateFormFields()" class="modern-input bg-gray-50">
+                            <option value="primary">Primary School</option>
+                            <option value="secondary">Secondary School</option>
+                            <option value="university">University</option>
+                        </select>
+                    </div>
+                    <div id="citizen-badge" class="hidden">
+                        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">CITIZEN ENTRY</span>
                     </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> Classification Details</h3>
-                    
-                    <div id="student-section" class="hidden space-y-4">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Level</label>
-                                <select id="edu-level" name="edu_level" class="modern-input">
-                                    <option value="secondary">Secondary School</option>
-                                    <option value="university">University</option>
-                                </select>
-                            </div>
-                            <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Reg Number</label><input type="text" name="reg_no" class="modern-input font-mono"></div>
+                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="user-check" class="w-4 h-4 text-indigo-500"></i> Basic Information</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Full Name</label><input type="text" name="full_name" required class="modern-input"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Date of Birth</label><input type="date" id="dob-input" name="dob" required class="modern-input" onchange="checkAgeLogic()"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Gender</label>
+                            <select name="gender" class="modern-input">
+                                <option>Male</option><option>Female</option>
+                            </select>
                         </div>
-                        
-                        <div id="age-badge" class="hidden p-3 rounded-lg text-xs font-bold flex items-center gap-2"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Province</label><input type="text" name="province" required class="modern-input"></div>
                     </div>
+                    <div id="age-display" class="mt-3 text-xs font-mono text-gray-400"></div>
+                </div>
 
-                    <div id="id-upload-section" class="hidden mt-4 space-y-4 border-t border-gray-100 pt-4">
-                        <p class="text-sm font-bold text-gray-900">Identification Documents Required</p>
+                <div id="id-upload-section" class="hidden bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="credit-card" class="w-4 h-4 text-indigo-500"></i> National Identification</h3>
+                    <div class="space-y-4">
                         <div>
                             <label class="text-xs font-bold text-gray-500 uppercase block mb-1">National ID Number</label>
-                            <input type="text" name="id_card_num" id="inp-id-num" placeholder="16-Digit ID Number" class="modern-input font-mono">
+                            <input type="text" name="id_card_num" placeholder="16-Digit ID Number" class="modern-input font-mono">
                         </div>
                         <div class="grid md:grid-cols-2 gap-4">
                             <div class="upload-area" id="box-front" onclick="document.getElementById('file-front').click()">
-                                <input type="file" id="file-front" name="doc_front" class="hidden" onchange="previewFile(this, 'front-prev', 'box-front')">
-                                <span class="text-xs font-bold text-gray-400">UPLOAD ID FRONT</span>
-                                <img id="front-prev" class="hidden h-20 mx-auto mt-2 object-contain">
+                                <input type="file" id="file-front" class="hidden" onchange="previewFile(this, 'front-prev', 'box-front')">
+                                <span class="text-xs font-bold text-gray-400">UPLOAD FRONT</span>
+                                <img id="front-prev" class="hidden h-24 mx-auto mt-2 object-contain rounded">
                             </div>
                             <div class="upload-area" id="box-back" onclick="document.getElementById('file-back').click()">
-                                <input type="file" id="file-back" name="doc_back" class="hidden" onchange="previewFile(this, 'back-prev', 'box-back')">
-                                <span class="text-xs font-bold text-gray-400">UPLOAD ID BACK</span>
-                                <img id="back-prev" class="hidden h-20 mx-auto mt-2 object-contain">
+                                <input type="file" id="file-back" class="hidden" onchange="previewFile(this, 'back-prev', 'box-back')">
+                                <span class="text-xs font-bold text-gray-400">UPLOAD BACK</span>
+                                <img id="back-prev" class="hidden h-24 mx-auto mt-2 object-contain rounded">
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div id="parent-inputs" class="hidden bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-indigo-500"></i> Guardian Info</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Guardian Name</label><input type="text" name="parent_name" class="modern-input"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Guardian Phone</label><input type="tel" name="parent_phone" class="modern-input"></div>
+                    </div>
+                </div>
+
+                <div id="uni-inputs" class="hidden bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="school" class="w-4 h-4 text-indigo-500"></i> University Details</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Reg Number</label><input type="text" name="uni_reg_no" class="modern-input font-mono"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Student Phone</label><input type="tel" name="student_phone" class="modern-input"></div>
                     </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
                         <h3 class="font-bold text-gray-900">Biometric Seal</h3>
-                        <p class="text-sm text-gray-500">Face scan required.</p>
+                        <p class="text-sm text-gray-500">Face scan required to generate wallet keys.</p>
                     </div>
                     <button type="button" onclick="openCameraModal('registration')" class="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-black">
-                        <i data-lucide="camera" class="w-4 h-4"></i> Scan
+                        <i data-lucide="camera" class="w-4 h-4"></i> Scan Face
                     </button>
                 </div>
                 <input type="hidden" id="selfie-data" name="selfie_data">
-                
-                <button type="button" onclick="openReviewModal()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all">Review & Generate Wallet</button>
+                <div id="selfie-status" class="hidden text-center text-emerald-600 font-bold text-sm bg-emerald-50 py-2 rounded-lg border border-emerald-100">
+                    <i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i> Biometrics Captured
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all">Review Application</button>
             </form>
+        </div>
+
+        <div id="view-review" class="view-section">
+            <h1 class="text-2xl font-bold text-center mb-6 display-font">Review Information</h1>
+            <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-xl max-w-2xl mx-auto">
+                <div class="bg-yellow-50 border border-yellow-100 p-4 rounded-lg mb-6 flex gap-3">
+                    <i data-lucide="alert-circle" class="text-yellow-600 w-6 h-6 shrink-0"></i>
+                    <p class="text-sm text-yellow-700">Please review the data below carefully. Once minted to the blockchain, the base identity layer is immutable.</p>
+                </div>
+
+                <div id="review-content" class="space-y-4 text-sm">
+                    </div>
+
+                <div class="flex gap-4 mt-8">
+                    <button onclick="showView('form')" class="flex-1 py-3 border border-red-200 text-red-600 hover:bg-red-50 font-bold rounded-xl">Reject / Edit</button>
+                    <button onclick="confirmGeneration()" class="flex-1 py-3 bg-indigo-600 text-white hover:bg-indigo-700 font-bold rounded-xl shadow-lg">Continue & Mint</button>
+                </div>
+            </div>
         </div>
 
         <div id="view-wallet" class="view-section">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
-                <div class="bg-emerald-600 p-8 text-white text-center">
-                    <div class="mx-auto bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mb-4"><i data-lucide="check" class="w-8 h-8"></i></div>
-                    <h2 class="text-2xl font-bold display-font">Identity Created</h2>
-                    <p class="text-emerald-100 text-sm mt-1">Your ID is now live on Unichain.</p>
+                <div class="bg-indigo-900 p-8 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10"><i data-lucide="network" class="w-48 h-48"></i></div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-mono backdrop-blur-sm">CARDANO MAINNET</span>
+                        <span class="bg-green-400/20 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm text-green-100">MINTED</span>
+                    </div>
+                    <h2 class="text-3xl font-bold display-font">Identity Anchored</h2>
+                    <p class="text-indigo-200 text-sm mt-1">Your decentralized keys and Public Search ID are ready.</p>
                 </div>
+
                 <div class="p-8 space-y-6">
+                    <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
+                        <label class="text-xs font-bold text-indigo-600 uppercase tracking-widest block mb-1">Public Search Key (Share this)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="search-key-display" readonly class="w-full bg-white border border-indigo-200 text-indigo-900 font-bold text-lg font-mono p-3 rounded-lg">
+                            <button onclick="copyToClip('search-key-display')" class="p-3 bg-indigo-100 hover:bg-indigo-200 rounded-lg text-indigo-700"><i data-lucide="copy" class="w-5 h-5"></i></button>
+                        </div>
+                        <p class="text-xs text-indigo-400 mt-2">Use this key to lookup your identity info on the network.</p>
+                    </div>
+                    
+                    <hr class="border-gray-100">
+
                     <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Public Key (Search ID)</label>
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Cardano Wallet Address</label>
                         <div class="flex gap-2">
-                            <input type="text" id="gen-pub-key" readonly class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-xs font-mono p-3 rounded-lg">
-                            <button onclick="copyToClip('gen-pub-key')" class="p-3 bg-gray-100 rounded-lg"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            <input type="text" id="wallet-addr" readonly class="w-full bg-gray-50 border border-gray-200 text-gray-600 text-xs font-mono p-3 rounded-lg">
+                            <button onclick="copyToClip('wallet-addr')" class="p-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-600"><i data-lucide="copy" class="w-4 h-4"></i></button>
                         </div>
                     </div>
+
                     <div class="bg-red-50 p-4 rounded-xl border border-red-100">
-                        <label class="text-xs font-bold text-red-500 uppercase tracking-widest block mb-1">Private Key (Secret)</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="gen-priv-key" readonly class="w-full bg-white border border-red-200 text-red-600 text-xs font-mono p-3 rounded-lg filter blur-sm hover:blur-none transition-all">
-                            <button onclick="copyToClip('gen-priv-key')" class="p-3 bg-white border border-red-100 rounded-lg"><i data-lucide="copy" class="w-4 h-4 text-red-400"></i></button>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-red-500 uppercase tracking-widest flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i> Private Key</label>
+                            <span class="text-[10px] text-red-400 font-bold">TOP SECRET</span>
+                        </div>
+                        
+                        <div class="relative">
+                            <div id="key-mask" class="absolute inset-0 bg-red-50/90 backdrop-blur-md z-10 flex items-center justify-center rounded-lg border border-red-100">
+                                <button onclick="openCameraModal('unlock')" class="bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg hover:bg-red-700 transition-all flex items-center gap-2">
+                                    <i data-lucide="eye" class="w-3 h-3"></i> Face Verify to Decrypt
+                                </button>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <input type="text" id="priv-key" readonly class="w-full bg-white border border-red-200 text-red-600 text-xs font-mono p-3 rounded-lg blur-secret">
+                                <button id="btn-copy-priv" onclick="copyToClip('priv-key')" disabled class="p-3 bg-white border border-red-100 text-red-300 rounded-lg cursor-not-allowed"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            </div>
                         </div>
                     </div>
-                    <button onclick="showView('home')" class="w-full py-3 bg-gray-900 text-white rounded-xl font-bold">Return Home</button>
+
+                    <div class="flex gap-3 pt-4">
+                        <button onclick="showView('search')" class="flex-1 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-black">Go to Search</button>
+                    </div>
+
                 </div>
             </div>
         </div>
 
         <div id="view-search" class="view-section">
-            <h1 class="text-3xl font-bold text-center mb-2 display-font">Verify Identity</h1>
-            <p class="text-gray-500 text-center mb-8">Enter the Public Key to retrieve user data.</p>
+            <div class="max-w-md mx-auto mt-10">
+                <h2 class="text-2xl font-bold text-center mb-6 display-font">Identity Lookup</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Enter Search Key</label>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="search-input" placeholder="UNI-202X-XXXX..." class="modern-input font-mono uppercase">
+                        <button onclick="performSearch()" class="bg-indigo-600 text-white px-6 rounded-lg font-bold hover:bg-indigo-700">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center">Enter the generated key to retrieve decentralized identity data.</p>
+                </div>
+            </div>
+        </div>
 
-            <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-xl mx-auto">
-                <div class="flex gap-2 mb-6">
-                    <input type="text" id="search-key" placeholder="Paste Public Key (pub_...)" class="modern-input font-mono">
-                    <button onclick="performSearch()" class="bg-indigo-600 text-white px-6 rounded-lg font-bold hover:bg-indigo-700">Search</button>
+        <div id="view-result" class="view-section protected-view">
+             <button onclick="showView('search')" class="mb-6 flex items-center gap-2 text-sm text-gray-500 hover:text-black no-print">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Search
+            </button>
+
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200 max-w-2xl mx-auto">
+                <div class="bg-slate-900 p-6 flex justify-between items-start">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white display-font">Digital Identity Record</h2>
+                        <p class="text-slate-400 text-sm">Verifiable Credential • Unichain</p>
+                    </div>
+                    <div id="result-qr" class="bg-white p-2 rounded-lg"></div>
                 </div>
 
-                <div id="search-result" class="hidden">
-                    <div class="border-t border-gray-100 pt-6">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400"><i data-lucide="user" class="w-8 h-8"></i></div>
-                            <div>
-                                <h3 class="text-xl font-bold" id="res-name">User Name</h3>
-                                <p class="text-sm text-gray-500" id="res-role">Role</p>
-                            </div>
-                            <span class="ml-auto bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">VERIFIED</span>
+                <div class="p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                        
+                        <div class="col-span-full pb-4 border-b border-gray-100">
+                             <span class="text-xs font-bold text-gray-400 uppercase">01. Search Identity Key</span>
+                             <p class="text-lg font-mono font-bold text-indigo-600" id="res-key">---</p>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 text-sm mb-6">
-                            <div class="p-3 bg-gray-50 rounded-lg">
-                                <span class="block text-xs text-gray-400 uppercase">DOB</span>
-                                <span class="font-medium" id="res-dob">--</span>
-                            </div>
-                            <div class="p-3 bg-gray-50 rounded-lg">
-                                <span class="block text-xs text-gray-400 uppercase">Province</span>
-                                <span class="font-medium" id="res-province">--</span>
-                            </div>
-                            <div class="p-3 bg-gray-50 rounded-lg">
-                                <span class="block text-xs text-gray-400 uppercase">ID Number</span>
-                                <span class="font-mono" id="res-id">--</span>
-                            </div>
-                            <div class="p-3 bg-gray-50 rounded-lg">
-                                <span class="block text-xs text-gray-400 uppercase">Reg No</span>
-                                <span class="font-mono" id="res-reg">--</span>
-                            </div>
+                        <div>
+                            <span class="text-xs font-bold text-gray-400 uppercase">02. Full Name</span>
+                            <p class="font-medium text-gray-900 text-lg" id="res-name">---</p>
+                        </div>
+                        
+                        <div>
+                            <span class="text-xs font-bold text-gray-400 uppercase">03. Status / Role</span>
+                            <p class="font-medium text-gray-900 text-lg capitalize" id="res-role">---</p>
                         </div>
 
-                        <div class="flex gap-3">
-                            <button onclick="handleVerification('reject')" class="flex-1 py-3 border border-red-200 text-red-600 rounded-xl font-bold hover:bg-red-50">Reject</button>
-                            <button onclick="handleVerification('approve')" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700">Continue</button>
+                        <div>
+                            <span class="text-xs font-bold text-gray-400 uppercase">04. Date of Birth</span>
+                            <p class="font-medium text-gray-900" id="res-dob">---</p>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-bold text-gray-400 uppercase">05. Age</span>
+                            <p class="font-medium text-gray-900" id="res-age">---</p>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-bold text-gray-400 uppercase">06. Gender</span>
+                            <p class="font-medium text-gray-900" id="res-gender">---</p>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-bold text-gray-400 uppercase">07. Province</span>
+                            <p class="font-medium text-gray-900" id="res-province">---</p>
+                        </div>
+
+                        <div id="res-edu-box">
+                            <span class="text-xs font-bold text-gray-400 uppercase">08. Education Level</span>
+                            <p class="font-medium text-gray-900 capitalize" id="res-edu">---</p>
+                        </div>
+
+                         <div id="res-id-box">
+                            <span class="text-xs font-bold text-gray-400 uppercase">09. National ID No.</span>
+                            <p class="font-medium text-gray-900 font-mono" id="res-id-num">---</p>
+                        </div>
+
+                        <div id="res-contact-box" class="col-span-full bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <span class="text-xs font-bold text-gray-400 uppercase">10. Contact Information</span>
+                            <p class="font-medium text-gray-900" id="res-contact">---</p>
+                            <p class="text-xs text-gray-500 mt-1" id="res-contact-type">Personal</p>
+                        </div>
+
+                        <div class="col-span-full">
+                            <span class="text-xs font-bold text-gray-400 uppercase">11. Wallet Address</span>
+                            <p class="text-xs font-mono text-gray-500 break-all" id="res-wallet">---</p>
+                        </div>
+                         
+                        <div class="col-span-full pt-4 border-t border-gray-100 flex gap-4">
+                            <div class="w-1/2">
+                                <span class="text-xs font-bold text-gray-400 uppercase block mb-2">ID Front</span>
+                                <img id="res-img-front" class="w-full h-32 object-contain bg-gray-100 rounded border">
+                            </div>
+                            <div class="w-1/2">
+                                <span class="text-xs font-bold text-gray-400 uppercase block mb-2">ID Back</span>
+                                <img id="res-img-back" class="w-full h-32 object-contain bg-gray-100 rounded border">
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div id="search-error" class="hidden text-center text-red-500 font-bold py-4">
-                    User not found. Check the key.
                 </div>
             </div>
         </div>
 
     </main>
 
-    <div id="review-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-            <div class="p-6 border-b border-gray-100">
-                <h3 class="text-xl font-bold text-gray-900">Review Data</h3>
-                <p class="text-sm text-gray-500">Blockchain records are immutable. Verify accuracy.</p>
-            </div>
-            <div class="p-6 space-y-3 text-sm" id="review-content">
-                </div>
-            <div class="p-6 bg-gray-50 flex gap-3">
-                <button onclick="document.getElementById('review-modal').classList.add('hidden')" class="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-white">Edit</button>
-                <button onclick="finalSubmit()" class="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700">Confirm & Mint</button>
-            </div>
-        </div>
-    </div>
-
     <div id="camera-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden relative">
             <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-gray-800">Biometric Scan</h3>
+                <h3 class="font-bold text-gray-800" id="modal-title">Biometric Scan</h3>
                 <button onclick="closeCameraModal()" class="text-gray-400 hover:text-black"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <div class="relative bg-black aspect-square">
                 <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
+                <div class="absolute inset-0 border-[40px] border-black/50 rounded-full m-8"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-full h-1 bg-green-500/50 absolute animate-pulse" style="top:50%"></div>
+                </div>
             </div>
             <div class="p-6">
-                <button onclick="capture()" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700">Capture</button>
+                <button onclick="capture()" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700">Capture & Verify</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- MOCK DATABASE (To make Search work in this demo) ---
-        // In production, this would be your blockchain ledger or API
-        const MOCK_DB = [];
-
-        // --- GLOBAL STATE ---
-        let currentType = 'citizen';
+        // --- DATA STORE ---
+        let currentType = 'student'; 
         let stream = null;
+        let mode = 'registration';
+        let tempFormData = null; // Stores data during review
+        let simulatedDB = {}; // Simulates the blockchain ledger
 
-        // --- INIT ---
-        lucide.createIcons();
+        // --- UTILS ---
+        function calculateAge(dobString) {
+            if(!dobString) return 0;
+            const dob = new Date(dobString);
+            const diff_ms = Date.now() - dob.getTime();
+            const age_dt = new Date(diff_ms); 
+            return Math.abs(age_dt.getUTCFullYear() - 1970);
+        }
 
+        // --- VIEW MANAGEMENT ---
         function showView(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${id}`).classList.add('active');
             window.scrollTo(0,0);
         }
 
-        function showToast(msg, type='info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<span class="text-sm font-bold">${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
         // --- FORM LOGIC ---
         function initForm(type) {
             currentType = type;
             document.getElementById('main-form').reset();
-            document.getElementById('student-section').classList.add('hidden');
-            document.getElementById('id-upload-section').classList.add('hidden');
-            document.getElementById('age-badge').classList.add('hidden');
-
+            
+            // Toggle Visuals
+            const eduWrapper = document.getElementById('student-level-wrapper');
+            const citizenBadge = document.getElementById('citizen-badge');
+            
             if (type === 'student') {
-                document.getElementById('student-section').classList.remove('hidden');
+                eduWrapper.classList.remove('hidden');
+                citizenBadge.classList.add('hidden');
             } else {
-                // Citizens always need ID upload
-                document.getElementById('id-upload-section').classList.remove('hidden');
+                eduWrapper.classList.add('hidden');
+                citizenBadge.classList.remove('hidden');
             }
+            
+            updateFormFields();
             showView('form');
         }
 
-        // --- NEW LOGIC: AGE CHECK FOR STUDENTS ---
-        function checkStudentAge() {
-            if(currentType !== 'student') return;
+        function checkAgeLogic() {
+            const dob = document.getElementById('dob-input').value;
+            const age = calculateAge(dob);
+            document.getElementById('age-display').innerText = dob ? `Calculated Age: ${age} years` : '';
+            updateFormFields(); // Re-evaluate inputs based on new age
+        }
 
-            const dobVal = document.getElementById('inp-dob').value;
-            if(!dobVal) return;
-
-            const dobDate = new Date(dobVal);
-            const diff_ms = Date.now() - dobDate.getTime();
-            const age_dt = new Date(diff_ms); 
-            const age = Math.abs(age_dt.getUTCFullYear() - 1970);
+        function updateFormFields() {
+            // Logic:
+            // 1. If Citizen -> Show ID Upload.
+            // 2. If Student AND Age > 16 -> Show ID Upload.
+            // 3. If Student AND University -> Show Uni Inputs.
+            // 4. If Student AND < 18 -> Show Parent Inputs.
             
-            const badge = document.getElementById('age-badge');
-            const uploadSec = document.getElementById('id-upload-section');
-            const idInput = document.getElementById('inp-id-num');
+            const age = calculateAge(document.getElementById('dob-input').value);
+            const level = document.getElementById('edu-level').value;
 
-            badge.classList.remove('hidden');
-            
-            if(age >= 16) {
-                badge.className = "p-3 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200";
-                badge.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 inline mr-2"></i> Student is ${age} (Above 16). National ID Required.`;
-                uploadSec.classList.remove('hidden');
-                idInput.setAttribute('required', 'true');
-            } else {
-                badge.className = "p-3 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200";
-                badge.innerHTML = `<i data-lucide="info" class="w-4 h-4 inline mr-2"></i> Student is ${age} (Minor). Parent info used (Simulated).`;
-                uploadSec.classList.add('hidden');
-                idInput.removeAttribute('required');
+            // Reset
+            document.getElementById('id-upload-section').classList.add('hidden');
+            document.getElementById('parent-inputs').classList.add('hidden');
+            document.getElementById('uni-inputs').classList.add('hidden');
+
+            // ID Logic
+            if (currentType === 'citizen' || (currentType === 'student' && age >= 16)) {
+                document.getElementById('id-upload-section').classList.remove('hidden');
             }
-            lucide.createIcons();
+
+            // Student Specifics
+            if (currentType === 'student') {
+                if (level === 'university') {
+                    document.getElementById('uni-inputs').classList.remove('hidden');
+                }
+                
+                // Minor Logic (Guardian) - usually for Primary/Secondary or <18
+                if (age < 18 && level !== 'university') {
+                    document.getElementById('parent-inputs').classList.remove('hidden');
+                }
+            }
         }
 
         function previewFile(input, imgId, boxId) {
@@ -356,115 +517,19 @@
             }
         }
 
-        // --- REVIEW MODAL LOGIC ---
-        function openReviewModal() {
-            const formData = new FormData(document.getElementById('main-form'));
-            const data = Object.fromEntries(formData);
-            
-            // Validate required fields
-            if(!data.full_name || !data.dob) return showToast('Please fill basic info', 'error');
-            if(!data.selfie_data) return showToast('Biometric Scan Required', 'error');
-
-            let html = `
-                <div class="grid grid-cols-2 gap-4">
-                    <div><span class="text-xs text-gray-400">FULL NAME</span><div class="font-bold">${data.full_name}</div></div>
-                    <div><span class="text-xs text-gray-400">TYPE</span><div class="font-bold uppercase">${currentType}</div></div>
-                    <div><span class="text-xs text-gray-400">DOB</span><div class="font-mono">${data.dob}</div></div>
-                    <div><span class="text-xs text-gray-400">PROVINCE</span><div>${data.province}</div></div>
-            `;
-
-            if(data.id_card_num) {
-                html += `
-                    <div class="col-span-2 border-t pt-2 mt-2">
-                        <span class="text-xs text-gray-400">NATIONAL ID</span>
-                        <div class="font-mono text-indigo-600 font-bold">${data.id_card_num}</div>
-                    </div>
-                `;
-            }
-
-            html += `</div>`;
-            document.getElementById('review-content').innerHTML = html;
-            document.getElementById('review-modal').classList.remove('hidden');
-        }
-
-        // --- SUBMISSION & MOCK STORAGE ---
-        function finalSubmit() {
-            document.getElementById('review-modal').classList.add('hidden');
-            
-            // Generate Keys
-            const randHex = (l) => [...Array(l)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-            const pubKey = `pub_${randHex(16)}`;
-            const privKey = `prv_${randHex(32)}`;
-
-            // Collect Data
-            const formData = new FormData(document.getElementById('main-form'));
-            const userData = Object.fromEntries(formData);
-            
-            // Save to Mock DB
-            MOCK_DB.push({
-                key: pubKey,
-                name: userData.full_name,
-                dob: userData.dob,
-                province: userData.province,
-                role: currentType,
-                id_num: userData.id_card_num || 'N/A',
-                reg_no: userData.reg_no || 'N/A'
-            });
-
-            // Show Wallet View
-            document.getElementById('gen-pub-key').value = pubKey;
-            document.getElementById('gen-priv-key').value = privKey;
-            
-            showToast('Generating Identity...', 'info');
-            setTimeout(() => {
-                showView('wallet');
-                showToast('Success!', 'success');
-            }, 1000);
-        }
-
-        // --- SEARCH LOGIC ---
-        function performSearch() {
-            const query = document.getElementById('search-key').value.trim();
-            const resultBox = document.getElementById('search-result');
-            const errorBox = document.getElementById('search-error');
-            
-            // Find user in Mock DB
-            const user = MOCK_DB.find(u => u.key === query);
-
-            if(user) {
-                document.getElementById('res-name').innerText = user.name;
-                document.getElementById('res-role').innerText = user.role.toUpperCase();
-                document.getElementById('res-dob').innerText = user.dob;
-                document.getElementById('res-province').innerText = user.province;
-                document.getElementById('res-id').innerText = user.id_num;
-                document.getElementById('res-reg').innerText = user.reg_no;
-
-                resultBox.classList.remove('hidden');
-                errorBox.classList.add('hidden');
-            } else {
-                resultBox.classList.add('hidden');
-                errorBox.classList.remove('hidden');
-            }
-        }
-
-        function handleVerification(action) {
-            if(action === 'approve') {
-                showToast('User Verified & Accepted', 'success');
-                // Logic to proceed...
-            } else {
-                showToast('User Rejected', 'error');
-                // Logic to reject...
-            }
-        }
-
-        // --- CAMERA UTILS ---
-        async function openCameraModal() {
+        // --- BIOMETRICS ---
+        async function openCameraModal(actionMode) {
+            mode = actionMode;
             document.getElementById('camera-modal').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = mode === 'registration' ? 'Register Face' : 'Verify Identity';
             try {
                 const video = document.getElementById('webcam');
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
                 video.srcObject = stream;
-            } catch(e) { showToast('Camera Error', 'error'); closeCameraModal(); }
+            } catch(e) {
+                showToast('Camera Access Denied', 'error');
+                closeCameraModal();
+            }
         }
 
         function closeCameraModal() {
@@ -473,16 +538,182 @@
         }
 
         function capture() {
-            document.getElementById('selfie-data').value = "captured";
             closeCameraModal();
-            showToast('Biometrics Captured', 'success');
+            if (mode === 'registration') {
+                document.getElementById('selfie-data').value = "captured";
+                document.getElementById('selfie-status').classList.remove('hidden');
+                showToast('Biometrics mapped successfully', 'success');
+            } else if (mode === 'unlock') {
+                revealPrivateKey();
+            }
+        }
+
+        // --- SUBMISSION & REVIEW ---
+        document.getElementById('main-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const hasBio = document.getElementById('selfie-data').value;
+            if(!hasBio) return showToast('Biometric Scan Required', 'error');
+
+            const formData = new FormData(e.target);
+            tempFormData = Object.fromEntries(formData);
+            
+            // Generate Preview HTML
+            let html = `<ul class="space-y-3">`;
+            for (const [key, value] of Object.entries(tempFormData)) {
+                if(value && key !== 'selfie_data' && typeof value === 'string') {
+                    html += `<li class="flex justify-between border-b border-gray-100 pb-1">
+                        <span class="font-bold text-gray-500 capitalize">${key.replace(/_/g, ' ')}</span>
+                        <span class="font-medium text-right">${value}</span>
+                    </li>`;
+                }
+            }
+            html += `</ul>`;
+            
+            document.getElementById('review-content').innerHTML = html;
+            showView('review');
+        });
+
+        function confirmGeneration() {
+            showToast('Minting Identity...', 'info');
+            setTimeout(() => {
+                generateIdentity();
+                showView('wallet');
+                showToast('Identity Minted on Chain', 'success');
+            }, 1500);
+        }
+
+        function generateIdentity() {
+            // Cardano-like & Search Key Generation
+            const randHex = (len) => [...Array(len)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+            
+            const walletAddress = `addr_test1q${randHex(6)}...${randHex(6)}`;
+            const privateKey = `xprv_${randHex(64)}`;
+            // Dynamic Search Key based on inputs
+            const searchKey = `UNI-${new Date().getFullYear()}-${Math.floor(Math.random() * 100000)}`;
+
+            // Display Keys
+            document.getElementById('wallet-addr').value = walletAddress;
+            document.getElementById('priv-key').value = privateKey;
+            document.getElementById('search-key-display').value = searchKey;
+
+            // Save to Simulated DB
+            const age = calculateAge(tempFormData.dob);
+            
+            // Handle Images (Mocking file objects to URLs for demo)
+            const frontFile = document.getElementById('file-front').files[0];
+            const backFile = document.getElementById('file-back').files[0];
+            const frontUrl = frontFile ? URL.createObjectURL(frontFile) : null;
+            const backUrl = backFile ? URL.createObjectURL(backFile) : null;
+
+            simulatedDB[searchKey] = {
+                ...tempFormData,
+                age: age,
+                role: currentType,
+                wallet: walletAddress,
+                searchKey: searchKey,
+                frontId: frontUrl,
+                backId: backUrl
+            };
+        }
+
+        // --- SECURITY ---
+        function revealPrivateKey() {
+            document.getElementById('key-mask').style.display = 'none';
+            const input = document.getElementById('priv-key');
+            input.classList.remove('blur-secret');
+            input.classList.add('reveal-secret');
+            
+            const btn = document.getElementById('btn-copy-priv');
+            btn.disabled = false;
+            btn.classList.remove('text-red-300', 'cursor-not-allowed');
+            btn.classList.add('text-red-600');
+            
+            showToast('Decryption Successful', 'success');
+        }
+
+        // --- SEARCH LOGIC ---
+        function performSearch() {
+            const inputKey = document.getElementById('search-input').value.trim();
+            const data = simulatedDB[inputKey];
+
+            if (!data) {
+                showToast('Identity Not Found', 'error');
+                return;
+            }
+
+            // Populate Result View
+            document.getElementById('res-key').innerText = data.searchKey;
+            document.getElementById('res-name').innerText = data.full_name;
+            document.getElementById('res-role').innerText = data.role;
+            document.getElementById('res-dob').innerText = data.dob;
+            document.getElementById('res-age').innerText = data.age + " Years";
+            document.getElementById('res-gender').innerText = data.gender;
+            document.getElementById('res-province').innerText = data.province;
+            document.getElementById('res-wallet').innerText = data.wallet;
+
+            // Conditional Logic for Result
+            if(data.role === 'student') {
+                document.getElementById('res-edu-box').style.display = 'block';
+                document.getElementById('res-edu').innerText = data.edu_level;
+            } else {
+                document.getElementById('res-edu-box').style.display = 'none';
+            }
+
+            if(data.id_card_num) {
+                document.getElementById('res-id-num').innerText = data.id_card_num;
+                document.getElementById('res-id-box').style.display = 'block';
+            } else {
+                document.getElementById('res-id-box').style.display = 'none';
+            }
+
+            // Contact Logic
+            let contact = data.parent_phone || data.student_phone || "N/A";
+            let contactType = data.parent_phone ? "Guardian Contact" : "Personal Contact";
+            document.getElementById('res-contact').innerText = contact;
+            document.getElementById('res-contact-type').innerText = contactType;
+
+            // Images
+            const imgFront = document.getElementById('res-img-front');
+            const imgBack = document.getElementById('res-img-back');
+            
+            if(data.frontId) { 
+                imgFront.src = data.frontId; imgFront.parentElement.style.display = 'block'; 
+            } else { imgFront.parentElement.style.display = 'none'; }
+            
+            if(data.backId) { 
+                imgBack.src = data.backId; imgBack.parentElement.style.display = 'block'; 
+            } else { imgBack.parentElement.style.display = 'none'; }
+
+            // Generate QR
+            document.getElementById('result-qr').innerHTML = "";
+            new QRCode(document.getElementById("result-qr"), {
+                text: inputKey,
+                width: 64,
+                height: 64
+            });
+
+            showView('result');
+            showToast('Identity Record Retrieved', 'success');
         }
 
         function copyToClip(id) {
             const el = document.getElementById(id);
             el.select();
             navigator.clipboard.writeText(el.value);
-            showToast('Copied!', 'info');
+            showToast('Copied to clipboard', 'info');
+        }
+
+        // Init
+        lucide.createIcons();
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = 'info'; if(type === 'success') icon = 'check-circle'; if(type === 'error') icon = 'alert-triangle';
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i> <span class="text-sm font-medium text-gray-800">${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
     </script>
 </body>
