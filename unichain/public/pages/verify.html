@@ -3,174 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unichain | Secure Verification Node</title>
+    <title>Unichain | Identity Generation Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        :root { --unichain-blue: #0052FF; --unichain-black: #0A0B0D; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfd; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(0, 0, 0, 0.05); }
-        .input-focus:focus { border-color: var(--unichain-blue); ring: 2px solid rgba(0, 82, 255, 0.1); }
-        .delay-notice { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .input-card { background: white; border: 1px solid #e2e8f0; border-radius: 1.5rem; transition: all 0.3s ease; }
+        .input-card:focus-within { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .camera-preview { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 1rem; background: #000; }
+        .hidden-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="text-slate-900 min-h-screen">
+<body class="min-h-screen pb-20">
 
     <!-- Navbar -->
-    <nav class="border-b bg-white border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
         <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2 font-bold text-xl tracking-tight cursor-pointer" onclick="showView('select')">
-                <div class="w-7 h-7 bg-blue-600 rounded flex items-center justify-center text-white text-sm">U</div>
-                <span>Unichain<span class="text-blue-600">Portal</span></span>
+            <div class="flex items-center gap-2 font-bold text-xl cursor-pointer" onclick="showView('select')">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><i data-lucide="zap"></i></div>
+                <span>Uni<span class="text-blue-600">chain</span></span>
             </div>
-            <div class="flex gap-4">
-                <button onclick="showView('search')" class="text-sm font-semibold text-slate-500 hover:text-blue-600">Search Ledger</button>
-            </div>
+            <button onclick="showView('search')" class="text-sm font-semibold bg-slate-100 px-4 py-2 rounded-full hover:bg-slate-200 transition-all">Search Key</button>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-6 py-10">
+    <main class="max-w-4xl mx-auto px-6 py-8">
         
-        <!-- PHASE 1: SELECTION -->
-        <div id="view-select" class="view-content space-y-8">
-            <div class="text-center mb-10">
-                <h1 class="text-3xl font-extrabold text-slate-900">Verification Gateway</h1>
-                <p class="text-slate-500">Select your credential class to begin on-chain anchoring.</p>
+        <!-- SELECTION PHASE -->
+        <div id="view-select" class="view-content fade-in space-y-8">
+            <div class="text-center py-6">
+                <h1 class="text-3xl font-extrabold tracking-tight">Generate Web3 Identity</h1>
+                <p class="text-slate-500 mt-2">Select your classification to begin manual-audit anchoring.</p>
             </div>
             <div class="grid md:grid-cols-2 gap-6">
-                <div onclick="initForm('citizen')" class="glass-card p-8 rounded-3xl cursor-pointer hover:shadow-xl hover:border-blue-500 transition-all border-2 border-transparent">
-                    <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-6"><i data-lucide="user"></i></div>
-                    <h3 class="text-xl font-bold mb-2 text-slate-900">Citizen Identity</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed">National ID verification, biometric cross-check, and residential proofing.</p>
+                <div onclick="initForm('citizen')" class="input-card p-8 cursor-pointer hover:shadow-2xl hover:-translate-y-1 group">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all"><i data-lucide="user-check"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Citizen Node</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">High-security KYC involving live facial capture and national ID indexing.</p>
                 </div>
-                <div onclick="initForm('student')" class="glass-card p-8 rounded-3xl cursor-pointer hover:shadow-xl hover:border-blue-500 transition-all border-2 border-transparent">
-                    <div class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-6"><i data-lucide="graduation-cap"></i></div>
-                    <h3 class="text-xl font-bold mb-2 text-slate-900">Academic Credential</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed">University enrollment, diploma verification, and student DApp access.</p>
+                <div onclick="initForm('student')" class="input-card p-8 cursor-pointer hover:shadow-2xl hover:-translate-y-1 group">
+                    <div class="w-14 h-14 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-slate-900 group-hover:text-white transition-all"><i data-lucide="graduation-cap"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Student Node</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Tiered educational verification for Primary, Secondary, and Higher Ed.</p>
                 </div>
             </div>
         </div>
 
-        <!-- PHASE 2: COMPREHENSIVE INPUT -->
-        <div id="view-form" class="view-content hidden">
-            <button onclick="showView('select')" class="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Selection
-            </button>
-            
-            <div class="glass-card rounded-3xl p-8 shadow-sm">
-                <h2 id="form-title" class="text-2xl font-bold mb-2"></h2>
-                <p class="text-slate-500 text-sm mb-8">Please provide accurate information for manual auditing.</p>
-                
-                <form id="main-form" class="space-y-6">
-                    <!-- Dynamic Inputs via JS -->
-                    <div id="form-fields" class="grid md:grid-cols-2 gap-6"></div>
+        <!-- FORM PHASE -->
+        <div id="view-form" class="view-content hidden fade-in">
+            <div class="max-w-2xl mx-auto">
+                <form id="main-form" class="space-y-8">
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h2 id="form-title" class="text-2xl font-bold">Details</h2>
+                            <div id="step-indicator" class="text-[10px] font-bold px-3 py-1 bg-blue-50 text-blue-600 rounded-full uppercase">Step 1: Bio-Data</div>
+                        </div>
 
-                    <!-- Enhanced Image Upload Boxes -->
-                    <div class="grid md:grid-cols-2 gap-6 pt-4">
+                        <!-- Classification -->
+                        <div id="student-only" class="hidden animate-fade-in space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Education Level</label>
+                            <select id="edu-level" onchange="updateFormFields()" class="w-full p-4 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="primary">Primary School</option>
+                                <option value="secondary">Secondary School</option>
+                                <option value="university">University / College</option>
+                            </select>
+                        </div>
+
+                        <div id="dynamic-fields" class="grid md:grid-cols-2 gap-4"></div>
+
+                        <!-- Doc Serial Number (Crucial for Key Generation) -->
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-slate-700">Facial Scan (Selfie)</label>
-                            <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:bg-slate-50 transition-colors">
-                                <input type="file" id="face-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onchange="handleImageUpload(this, 'face-preview')">
-                                <div id="face-preview" class="space-y-2">
-                                    <i data-lucide="camera" class="w-8 h-8 mx-auto text-slate-300"></i>
-                                    <p class="text-xs text-slate-400">Click to upload face photo</p>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Document Serial Number</label>
+                            <input type="text" id="doc-serial" required placeholder="e.g. ID-9900-X12" class="w-full p-4 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- CAMERA & DOCUMENTS -->
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                        <h3 class="text-lg font-bold">Verification Assets</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Selfie Section -->
+                            <div class="space-y-3">
+                                <label class="text-xs font-bold text-slate-700">Live Selfie Capture</label>
+                                <div class="relative group">
+                                    <video id="webcam" autoplay playsinline class="camera-preview"></video>
+                                    <canvas id="photo-canvas" class="hidden"></canvas>
+                                    <div id="capture-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
+                                        <button type="button" onclick="capturePhoto()" class="bg-white text-black px-6 py-2 rounded-full font-bold shadow-xl">Capture Frame</button>
+                                    </div>
+                                    <img id="selfie-result" class="hidden camera-preview">
+                                </div>
+                                <div id="cam-warning" class="hidden text-[10px] font-medium text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-100 leading-tight">
+                                    <i data-lucide="clock" class="w-3 h-3 inline mr-1"></i> Manual biometric audit required. Expect 4-5 working days delay for improvement.
                                 </div>
                             </div>
-                            <div id="face-delay-msg" class="hidden text-[11px] font-medium text-amber-600 delay-notice bg-amber-50 p-2 rounded-lg border border-amber-100">
-                                <i data-lucide="clock" class="w-3 h-3 inline mr-1"></i> Verification will delay 4-5 working days for manual biometric improvement.
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-bold text-slate-700">Document Scan (Primary)</label>
-                            <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:bg-slate-50 transition-colors">
-                                <input type="file" id="doc-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onchange="handleImageUpload(this, 'doc-preview')">
-                                <div id="doc-preview" class="space-y-2">
-                                    <i data-lucide="file-text" class="w-8 h-8 mx-auto text-slate-300"></i>
-                                    <p class="text-xs text-slate-400">Upload Front/Back scan</p>
+
+                            <!-- Dual Doc Uploads -->
+                            <div class="space-y-4">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-700">Document Front Scan</label>
+                                    <input type="file" id="doc-front" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-700">Document Back Scan</label>
+                                    <input type="file" id="doc-back" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-6 border-t border-slate-100">
-                        <button type="submit" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">Generate Security Keys</button>
-                    </div>
+                    <button type="submit" class="w-full py-5 bg-blue-600 text-white rounded-3xl font-extrabold text-lg hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-200 transition-all">Review Generation Request</button>
                 </form>
             </div>
         </div>
 
-        <!-- PHASE 3: REVIEW -->
-        <div id="view-review" class="view-content hidden">
-            <div class="glass-card rounded-3xl p-8 max-w-2xl mx-auto shadow-xl">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"><i data-lucide="search"></i></div>
-                    <h2 class="text-2xl font-bold">Final Review</h2>
-                </div>
-                <div id="review-content" class="space-y-3 bg-slate-50 p-6 rounded-2xl text-sm border border-slate-100"></div>
-                <div class="flex gap-4 mt-8">
-                    <button onclick="showView('form')" class="flex-1 py-4 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all">Edit Details</button>
-                    <button onclick="finalizeProcess()" class="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-black transition-all">Confirm & Hash</button>
+        <!-- REVIEW PHASE -->
+        <div id="view-review" class="view-content hidden fade-in">
+            <div class="max-w-lg mx-auto bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
+                <h2 class="text-2xl font-bold mb-6">Confirm Data Hash</h2>
+                <div id="review-list" class="space-y-3 mb-8 bg-slate-50 p-6 rounded-2xl text-sm border border-slate-100"></div>
+                <div class="flex gap-4">
+                    <button onclick="showView('form')" class="flex-1 py-4 border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all">Edit Info</button>
+                    <button onclick="finalizeProcess()" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-black transition-all">Authorize Key Gen</button>
                 </div>
             </div>
         </div>
 
-        <!-- PHASE 4: SUCCESS / OUTPUT -->
-        <div id="view-success" class="view-content hidden">
-            <div class="max-w-2xl mx-auto space-y-6">
-                <div class="text-center py-6">
-                    <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="check" class="w-8 h-8"></i></div>
-                    <h2 class="text-3xl font-bold">Node Anchoring Complete</h2>
-                    <p class="text-slate-500">Your information is staged for the 5-day manual audit.</p>
+        <!-- SUCCESS PHASE -->
+        <div id="view-success" class="view-content hidden fade-in">
+            <div class="max-w-2xl mx-auto space-y-8 text-center">
+                <div class="space-y-2">
+                    <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="shield-check" class="w-10 h-10"></i></div>
+                    <h2 class="text-3xl font-bold">Identity Node Anchored</h2>
+                    <p class="text-slate-500">Your key and address have been successfully generated.</p>
                 </div>
-                
-                <div class="bg-slate-900 text-white rounded-3xl p-8 space-y-6 shadow-2xl">
-                    <div>
-                        <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest block mb-2">Unichain Simulated Address (ADA Standard)</label>
-                        <div class="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
-                            <input type="password" id="out-addr" readonly class="bg-transparent text-sm mono flex-grow outline-none">
-                            <button onclick="toggleMask('out-addr')" class="hover:text-blue-400"><i data-lucide="eye" class="w-4 h-4"></i></button>
-                            <button onclick="copyEl('out-addr')" class="hover:text-blue-400"><i data-lucide="copy" class="w-4 h-4"></i></button>
+
+                <div class="bg-slate-900 text-left p-10 rounded-[2.5rem] shadow-2xl space-y-8 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10"><i data-lucide="database" class="w-32 h-32"></i></div>
+                    <div class="relative z-10">
+                        <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest block mb-3">On-Chain Cardano (ADA) Address</label>
+                        <div class="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10 group">
+                            <input type="password" id="out-addr" readonly class="bg-transparent text-sm mono text-white flex-grow outline-none border-none">
+                            <button onclick="toggleMask('out-addr')" class="text-slate-500 hover:text-white transition-colors"><i data-lucide="eye" class="w-5 h-5"></i></button>
+                            <button onclick="copyVal('out-addr')" class="text-slate-500 hover:text-white transition-colors"><i data-lucide="copy" class="w-5 h-5"></i></button>
                         </div>
                     </div>
-                    <div>
-                        <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest block mb-2">Public Discovery Key (Shared)</label>
-                        <div class="flex items-center justify-between bg-blue-600/20 p-4 rounded-xl border border-blue-500/30">
-                            <span id="out-key" class="mono font-bold text-blue-400 text-lg"></span>
-                            <button onclick="copyText('out-key')" class="hover:text-white"><i data-lucide="copy" class="w-5 h-5"></i></button>
+                    <div class="relative z-10">
+                        <label class="text-blue-400 text-[10px] font-bold uppercase tracking-widest block mb-3">Public Discovery Key (UNI-NODE)</label>
+                        <div class="flex items-center justify-between bg-blue-600 p-5 rounded-2xl shadow-lg border border-blue-400">
+                            <span id="out-key" class="mono font-bold text-white text-xl"></span>
+                            <button onclick="copyTxt('out-key')" class="text-white hover:opacity-70"><i data-lucide="copy" class="w-6 h-6"></i></button>
                         </div>
                     </div>
                 </div>
-                <button onclick="location.reload()" class="w-full py-4 text-blue-600 font-bold hover:bg-blue-50 rounded-xl transition-all">Finish & Clear Session</button>
+                <button onclick="location.reload()" class="font-bold text-slate-400 hover:text-blue-600 transition-colors">Terminate Session & Return</button>
+            </div>
+        </div>
+
+        <!-- SEARCH VIEW -->
+        <div id="view-search" class="view-content hidden fade-in">
+            <div class="max-w-xl mx-auto py-12">
+                <h2 class="text-3xl font-bold text-center mb-8">Unichain Public Index</h2>
+                <div class="relative group">
+                    <input type="text" id="search-box" placeholder="Search Shared Key (UNI-XXXX)" class="w-full px-8 py-6 rounded-[2rem] bg-white border-2 border-slate-100 focus:border-blue-600 outline-none text-xl font-medium transition-all shadow-lg group-hover:shadow-xl">
+                    <button onclick="runSearch()" class="absolute right-4 top-4 bg-blue-600 text-white p-4 rounded-2xl hover:bg-blue-700 transition-colors">
+                        <i data-lucide="search"></i>
+                    </button>
+                </div>
+                <div id="search-results" class="mt-8 hidden space-y-4"></div>
             </div>
         </div>
     </main>
 
     <!-- Custom Professional Modals -->
-    <div id="modal-overlay" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
-        <div id="modal-box" class="bg-white rounded-3xl p-8 max-w-sm w-full transform scale-95 transition-all">
-            <div id="modal-icon-container" class="mb-4"></div>
-            <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
-            <p id="modal-text" class="text-slate-500 text-sm mb-6"></p>
-            <button onclick="closeModal()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold">Got it</button>
+    <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/60 z-[100] hidden items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-fade-in text-center">
+            <div id="modal-icon-box" class="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center"></div>
+            <h4 id="modal-title" class="text-xl font-bold mb-2">Message</h4>
+            <p id="modal-text" class="text-slate-500 text-sm mb-8"></p>
+            <button onclick="closeModal()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-black transition-all">Close</button>
         </div>
     </div>
 
-    <!-- Firebase -->
+    <!-- 
+        FIRESTORE CONNECTION GUIDE & RULES:
+        1. Ensure Firebase Auth is enabled (Anonymous).
+        2. Set Firestore Rules:
+        
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            match /artifacts/unichain-id-auth/users/{userId}/verification_queue/{docId} {
+              allow read, write: if request.auth != null && request.auth.uid == userId;
+            }
+            match /artifacts/unichain-id-auth/public/data/carbon_index/{key} {
+              allow read: if true;
+              allow write: if request.auth != null;
+            }
+          }
+        }
+    -->
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'unichain-id-auth';
+        const appId = 'unichain-id-auth';
         
-        let app, db, auth, user;
-        let currentType = '';
-        let formDataStore = {};
+        let app, db, auth, user, currentType, currentStream;
+        let bioData = {};
+        let photoCaptured = false;
 
         async function init() {
             if (!firebaseConfig.apiKey) return;
@@ -179,147 +228,206 @@
             auth = getAuth(app);
             
             await signInAnonymously(auth);
-            onAuthStateChanged(auth, u => { user = u; console.log("Secured Connection:", user?.uid); });
+            onAuthStateChanged(auth, u => { user = u; console.log("Node Secured:", user?.uid); });
             lucide.createIcons();
         }
 
         window.showView = (id) => {
             document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
             document.getElementById(`view-${id}`).classList.remove('hidden');
+            if (id !== 'form' && currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
             window.scrollTo(0,0);
         };
 
-        window.initForm = (type) => {
+        window.initForm = async (type) => {
             currentType = type;
-            const container = document.getElementById('form-fields');
-            container.innerHTML = '';
-            
-            const fields = type === 'citizen' ? [
-                { id: 'full_name', label: 'Full Legal Name', type: 'text', placeholder: 'Enter as per ID', req: true },
-                { id: 'id_num', label: 'Identity Number', type: 'text', placeholder: 'N-XXXXXXXX', req: true },
-                { id: 'dob', label: 'Date of Birth', type: 'date', req: true },
-                { id: 'nationality', label: 'Nationality', type: 'text', placeholder: 'Country of issue', req: true },
-                { id: 'address', label: 'Residential Address', type: 'text', placeholder: 'Street, City, ZIP', req: true },
-                { id: 'phone', label: 'Mobile Number', type: 'tel', placeholder: '+1...', req: true }
-            ] : [
-                { id: 'full_name', label: 'Student Full Name', type: 'text', placeholder: 'Official Name', req: true },
-                { id: 'uni_name', label: 'Institution Name', type: 'text', placeholder: 'University/College', req: true },
-                { id: 'student_id', label: 'Matriculation Number', type: 'text', placeholder: 'STU-XXXXX', req: true },
-                { id: 'major', label: 'Course of Study', type: 'text', placeholder: 'B.Sc Computer Science', req: true },
-                { id: 'grad_year', label: 'Expected Graduation', type: 'number', placeholder: '2026', req: true },
-                { id: 'edu_email', label: 'Institutional Email', type: 'email', placeholder: 'name@uni.edu', req: true }
-            ];
-
-            fields.forEach(f => {
-                const div = document.createElement('div');
-                div.className = 'space-y-2';
-                div.innerHTML = `
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">${f.label}</label>
-                    <input type="${f.type}" name="${f.id}" required="${f.req}" placeholder="${f.placeholder}" 
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none transition-all focus:border-blue-600 focus:ring-4 focus:ring-blue-50/50">
-                `;
-                container.appendChild(div);
-            });
-
-            document.getElementById('form-title').innerText = type === 'citizen' ? 'Citizen KYC Node' : 'Student Credential Node';
+            document.getElementById('student-only').classList.toggle('hidden', type !== 'student');
+            document.getElementById('form-title').innerText = type === 'citizen' ? 'Citizen Identification' : 'Academic Verification';
+            updateFormFields();
             showView('form');
+            startWebcam();
         };
 
-        window.handleImageUpload = (input, previewId) => {
-            const preview = document.getElementById(previewId);
-            const delayMsg = document.getElementById('face-delay-msg');
-            
-            if (input.files && input.files[0]) {
-                preview.innerHTML = `
-                    <div class="flex items-center justify-center gap-2 text-green-600 font-bold text-xs">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i> Image Buffered
-                    </div>
-                    <p class="text-[10px] text-slate-400 mt-1">${input.files[0].name}</p>
-                `;
-                if(previewId === 'face-preview') delayMsg.classList.remove('hidden');
-                lucide.createIcons();
+        window.updateFormFields = () => {
+            const level = document.getElementById('edu-level').value;
+            const container = document.getElementById('dynamic-fields');
+            let fields = [
+                { id: 'full_name', label: 'Legal Full Name', type: 'text', placeholder: 'As on ID' },
+                { id: 'dob', label: 'Birth Date', type: 'date', placeholder: '' }
+            ];
+
+            if (currentType === 'student') {
+                fields.push({ id: 'institution', label: level === 'university' ? 'University Name' : 'School Name', type: 'text', placeholder: 'Official Name' });
+                fields.push({ id: 'id_internal', label: 'Enrollment ID', type: 'text', placeholder: 'Reg Number' });
+                if (level === 'university') fields.push({ id: 'major', label: 'Major/Field', type: 'text', placeholder: 'BSc Computer Science' });
+            } else {
+                fields.push({ id: 'nationality', label: 'Country', type: 'text', placeholder: 'Issue Country' });
+                fields.push({ id: 'phone', label: 'Mobile Number', type: 'tel', placeholder: '+1...' });
             }
+
+            container.innerHTML = fields.map(f => `
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${f.label}</label>
+                    <input type="${f.type}" name="${f.id}" required placeholder="${f.placeholder}" class="w-full p-4 rounded-2xl bg-slate-50 border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            `).join('');
+        };
+
+        async function startWebcam() {
+            const video = document.getElementById('webcam');
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                video.srcObject = currentStream;
+            } catch (err) {
+                showModal('Camera Access Required', 'Please enable camera permissions to proceed with high-security KYC.', 'error');
+            }
+        }
+
+        window.capturePhoto = () => {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('photo-canvas');
+            const result = document.getElementById('selfie-result');
+            const warning = document.getElementById('cam-warning');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            result.src = canvas.toDataURL('image/webp');
+            video.classList.add('hidden');
+            result.classList.remove('hidden');
+            warning.classList.remove('hidden');
+            photoCaptured = true;
+            lucide.createIcons();
         };
 
         document.getElementById('main-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            formDataStore = Object.fromEntries(formData.entries());
+            if (!photoCaptured) return showModal('Biometric Missing', 'You must capture a live selfie to proceed.', 'error');
             
-            // Validation
-            if (Object.values(formDataStore).some(v => v === '')) {
-                return showModal('Security Alert', 'All fields are mandatory for high-security anchoring.', 'error');
-            }
+            const raw = new FormData(e.target);
+            bioData = Object.fromEntries(raw.entries());
+            bioData.serial = document.getElementById('doc-serial').value;
 
-            const reviewBox = document.getElementById('review-content');
-            reviewBox.innerHTML = Object.entries(formDataStore).map(([k, v]) => `
-                <div class="flex justify-between border-b border-slate-200 pb-2">
+            const review = document.getElementById('review-list');
+            review.innerHTML = Object.entries(bioData).map(([k,v]) => `
+                <div class="flex justify-between border-b border-slate-200 py-2">
                     <span class="text-slate-400 capitalize">${k.replace('_',' ')}</span>
                     <span class="font-bold text-slate-900">${v}</span>
                 </div>
             `).join('');
-
+            
             showView('review');
         });
 
         window.finalizeProcess = async () => {
-            if (!user) return showModal('Error', 'Ledger connection lost.', 'error');
+            if (!user) return;
 
-            const salt = Date.now().toString();
-            const addr = "addr1" + sha256(user.uid + salt).substring(0, 50);
-            const key = `UNI-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
+            // REAL-WORLD SCENARIO GENERATION
+            // Generate Key based on Document Serial + Entropy
+            const serial = bioData.serial.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const sharedKey = `UNI-${serial.substring(0,4)}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const adaAddr = "addr1" + sha256(serial + user.uid).substring(0, 58);
 
             try {
-                // Store private data (encrypted simulation)
+                // Save Private Record
                 await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'verification_queue', 'latest'), {
-                    ...formDataStore,
+                    ...bioData,
                     type: currentType,
-                    status: 'pending_manual_audit',
-                    delay_days: 5,
-                    on_chain_address: addr,
-                    shared_key: key,
+                    status: 'awaiting_manual_audit',
+                    address: adaAddr,
+                    key: sharedKey,
                     timestamp: new Date().toISOString()
                 });
 
-                // Store in Public Carbon Index for searching
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'carbon_index', key), {
-                    address: addr,
+                // Save Public Discovery Key (Carbon Index)
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'carbon_index', sharedKey), {
+                    address: adaAddr,
                     type: currentType,
-                    issuer: "Unichain Manual Audit Node",
-                    status: "Awaiting Manual Improvement",
-                    audit_required: true
+                    institution: bioData.institution || "National Registry",
+                    verified: false,
+                    audit_note: "Manual Audit Pending (4-5 Days)"
                 });
 
-                document.getElementById('out-addr').value = addr;
-                document.getElementById('out-key').innerText = key;
+                document.getElementById('out-addr').value = adaAddr;
+                document.getElementById('out-key').innerText = sharedKey;
                 showView('success');
             } catch (err) {
-                showModal('Ledger Write Failed', 'Could not anchor data. Check connection.', 'error');
+                showModal('Database Connection Failed', 'Ensure security rules are set correctly in your Firestore dashboard.', 'error');
             }
         };
 
-        // Utility: Custom Modals
+        window.runSearch = async () => {
+            const query = document.getElementById('search-box').value.trim().toUpperCase();
+            const results = document.getElementById('search-results');
+            if (!query) return;
+
+            results.innerHTML = '<div class="text-center py-10 animate-pulse text-slate-400">Syncing with Unichain Ledger...</div>';
+            results.classList.remove('hidden');
+
+            try {
+                const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'carbon_index', query));
+                if (snap.exists()) {
+                    const d = snap.data();
+                    results.innerHTML = `
+                        <div class="bg-white border border-slate-200 p-8 rounded-[2rem] shadow-xl fade-in border-l-8 border-l-blue-600">
+                            <div class="flex items-center gap-3 mb-6">
+                                <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">${d.type}</span>
+                                <span class="bg-amber-100 text-amber-600 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Awaiting Audit</span>
+                            </div>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Authenticated Address</label>
+                                    <p class="mono text-xs break-all bg-slate-50 p-4 rounded-xl border border-slate-100">${d.address}</p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Registered Entity</label>
+                                    <p class="font-bold text-slate-900">${d.institution}</p>
+                                </div>
+                                <div class="pt-4 border-t border-slate-100">
+                                    <p class="text-[10px] text-slate-400 italic font-medium"><i data-lucide="info" class="w-3 h-3 inline"></i> ${d.audit_note}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                } else {
+                    results.innerHTML = `<div class="p-8 bg-red-50 text-red-600 rounded-3xl text-center font-bold">Key not found in public registry.</div>`;
+                }
+            } catch (e) {
+                showModal('Search Error', 'Could not query the blockchain node.', 'error');
+            }
+        };
+
         window.showModal = (title, text, type) => {
-            const overlay = document.getElementById('modal-overlay');
-            const icon = document.getElementById('modal-icon-container');
+            const box = document.getElementById('modal-backdrop');
+            const iconBox = document.getElementById('modal-icon-box');
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-text').innerText = text;
             
-            icon.innerHTML = type === 'error' ? '<div class="w-12 h-12 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center"><i data-lucide="alert-triangle"></i></div>' : 
-                                               '<div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center"><i data-lucide="info"></i></div>';
+            if (type === 'error') {
+                iconBox.className = "w-16 h-16 bg-red-100 text-red-600 rounded-2xl mx-auto mb-6 flex items-center justify-center";
+                iconBox.innerHTML = '<i data-lucide="alert-circle" class="w-8 h-8"></i>';
+            } else {
+                iconBox.className = "w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl mx-auto mb-6 flex items-center justify-center";
+                iconBox.innerHTML = '<i data-lucide="info" class="w-8 h-8"></i>';
+            }
             
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex');
+            box.classList.remove('hidden');
+            box.classList.add('flex');
             lucide.createIcons();
         };
 
-        window.closeModal = () => document.getElementById('modal-overlay').classList.add('hidden');
+        window.closeModal = () => document.getElementById('modal-backdrop').classList.add('hidden');
         window.toggleMask = (id) => { const e = document.getElementById(id); e.type = e.type === 'password' ? 'text' : 'password'; };
-        window.copyEl = (id) => { document.getElementById(id).select(); document.execCommand('copy'); };
-        window.copyText = (id) => { 
+        window.copyVal = (id) => { document.getElementById(id).select(); document.execCommand('copy'); showModal('Copied', 'Address saved to clipboard.', 'info'); };
+        window.copyTxt = (id) => { 
             const t = document.getElementById(id).innerText;
             const i = document.createElement('input'); i.value = t; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i);
-            showModal('Success', 'Key copied to clipboard.', 'info');
+            showModal('Copied', 'Shared Key saved to clipboard.', 'info');
         };
 
         init();
