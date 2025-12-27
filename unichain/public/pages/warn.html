@@ -56,6 +56,17 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        /* Loading Spinner for Email Form */
+        .loader {
+            border: 2px solid #1e293b;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen relative flex flex-col items-center justify-center p-6">
@@ -133,11 +144,20 @@
 
         <div class="text-center max-w-sm mx-auto border-t border-white/10 pt-8">
             <p class="text-sm text-slate-400 mb-4">Get notified when we go live</p>
-            <div class="flex gap-2">
-                <input type="email" placeholder="Enter your email" class="bg-black border border-white/20 rounded-lg px-4 py-2 text-sm w-full focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-600">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Notify
+            
+            <form id="notifyForm" class="flex gap-2 relative">
+                <input type="email" name="email" required placeholder="Enter your email" 
+                    class="bg-black border border-white/20 rounded-lg px-4 py-2 text-sm w-full focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-600">
+                
+                <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center min-w-[80px]">
+                    <span>Notify</span>
                 </button>
+            </form>
+            
+            <div id="successMessage" class="hidden mt-2 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg animate-fade-in">
+                <p class="text-blue-300 text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Added to the priority list.
+                </p>
             </div>
         </div>
 
@@ -154,18 +174,16 @@
         // Initialize Icons
         lucide.createIcons();
 
-        // Animation Logic
+        // Animation Logic for Progress Bar
         document.addEventListener('DOMContentLoaded', () => {
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
             
-            // Simulate loading
             setTimeout(() => {
-                progressBar.style.width = '52%';
+                progressBar.style.width = '42%'; // Updated to match previous example
                 
-                // Count up number animation
                 let start = 0;
-                const end = 52;
+                const end = 42;
                 const duration = 2000;
                 const incrementTime = duration / end;
                 
@@ -176,6 +194,51 @@
                 }, incrementTime);
                 
             }, 300);
+        });
+
+        // EMAIL HANDLING LOGIC
+        const form = document.getElementById('notifyForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent page reload
+            
+            const emailInput = form.querySelector('input[type="email"]');
+            const email = emailInput.value;
+
+            // 1. Show Loading State
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="loader"></div>';
+            submitBtn.disabled = true;
+
+            // 2. Send Data to FormSubmit (AJAX)
+            fetch("https://formsubmit.co/ajax/landcrafts210@gmail.com", {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    _subject: "New UniChain Subscriber", 
+                    email: email,
+                    message: `ALERT: A new user (${email}) has requested to be notified about the UniChain launch.` 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 3. Success State
+                form.style.display = 'none'; // Hide form
+                successMessage.classList.remove('hidden'); // Show success msg
+            })
+            .catch(error => {
+                console.log(error);
+                submitBtn.innerHTML = "Error"; 
+                setTimeout(() => {
+                     submitBtn.innerHTML = originalBtnText;
+                     submitBtn.disabled = false;
+                }, 2000);
+            });
         });
     </script>
 </body>
