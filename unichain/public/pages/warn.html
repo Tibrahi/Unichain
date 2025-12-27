@@ -3,118 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniChain | Under Construction</title>
-    <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+    <title>UniChain | System Upgrade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-        }
-        .display-font { font-family: 'Space Grotesk', sans-serif; }
-        
-        /* Animated Construction Sticker */
-        .sticker-bounce {
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(-3deg); }
-            50% { transform: translateY(-15px) rotate(3deg); }
+        /* Custom Configuration */
+        :root {
+            --brand-blue: #2563eb;
+            --brand-glow: #3b82f6;
         }
 
-        .gradient-text {
-            background: linear-gradient(to right, #818cf8, #c084fc);
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .display-font { font-family: 'Space Grotesk', sans-serif; }
+
+        /* Background Grid Animation */
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image: linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+        }
+
+        /* Pulse Animation for the Core */
+        .core-pulse {
+            animation: pulse-blue 3s infinite;
+        }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        /* Float Animation */
+        .float-icon { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #ffffff, #60a5fa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 text-white overflow-hidden">
+<body class="min-h-screen relative flex flex-col items-center justify-center p-6">
 
-    <div class="absolute top-0 left-0 w-full h-full -z-10 opacity-20">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600 rounded-full blur-[120px]"></div>
-    </div>
+    <div class="fixed inset-0 bg-grid z-0 pointer-events-none"></div>
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[120px] -z-10"></div>
 
-    <div class="max-w-2xl w-full text-center">
-        <div class="flex justify-center mb-8">
-            <div class="sticker-bounce relative">
-                <div class="bg-yellow-400 p-6 rounded-3xl shadow-[0_20px_50px_rgba(234,179,8,0.3)] rotate-[-3deg]">
-                    <i data-lucide="hard-hat" class="w-20 h-20 text-black"></i>
+    <div class="relative z-10 max-w-4xl w-full">
+        
+        <div class="flex flex-col items-center mb-12">
+            <div class="mb-6 float-icon relative">
+                <div class="absolute inset-0 bg-blue-500 blur-2xl opacity-20 rounded-full"></div>
+                <div class="core-pulse bg-black border border-blue-900/50 p-6 rounded-2xl relative shadow-[0_0_30px_rgba(37,99,235,0.3)]">
+                    <i data-lucide="shield-check" class="w-16 h-16 text-blue-500"></i>
                 </div>
-                <div class="absolute -bottom-2 -right-2 bg-indigo-600 p-3 rounded-full border-4 border-[#0f172a]">
-                    <i data-lucide="cpu" class="w-6 h-6 text-white"></i>
+                <div class="absolute -top-2 -right-2 bg-white p-1.5 rounded-full animate-ping opacity-75"></div>
+                <div class="absolute -top-2 -right-2 bg-blue-400 p-1.5 rounded-full"></div>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/30 border border-blue-800 mb-4 backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                <span class="text-xs font-mono text-blue-200 tracking-wider uppercase">System Update In Progress</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-bold display-font text-center tracking-tight mb-4">
+                <span class="text-gradient">UniChain</span> 2.0
+            </h1>
+            <p class="text-slate-400 text-lg text-center max-w-2xl font-light">
+                We are currently architecting the <strong class="text-white">Next-Gen Document Verification</strong> module. 
+                Redefining trust through mathematical certainty.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md hover:border-blue-500/50 transition-colors group">
+                <div class="bg-black w-10 h-10 rounded-lg flex items-center justify-center mb-4 border border-white/10 group-hover:border-blue-500/50">
+                    <i data-lucide="blocks" class="w-5 h-5 text-blue-400"></i>
                 </div>
+                <h3 class="text-lg font-bold mb-2 display-font text-white">Blockchain Integration</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                    Deploying advanced ledger technology to ensure your data remains immutable and transparent across all nodes.
+                </p>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md hover:border-blue-500/50 transition-colors group">
+                <div class="bg-black w-10 h-10 rounded-lg flex items-center justify-center mb-4 border border-white/10 group-hover:border-blue-500/50">
+                    <i data-lucide="zap" class="w-5 h-5 text-blue-400"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2 display-font text-white">Real-Time Validation</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                    Upgrading our verification protocol to process document authenticity in milliseconds, not minutes.
+                </p>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-md hover:border-blue-500/50 transition-colors group">
+                <div class="bg-black w-10 h-10 rounded-lg flex items-center justify-center mb-4 border border-white/10 group-hover:border-blue-500/50">
+                    <i data-lucide="lock" class="w-5 h-5 text-blue-400"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2 display-font text-white">Zero-Knowledge Security</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                    Enhancing privacy layers so verification happens without exposing sensitive underlying data.
+                </p>
             </div>
         </div>
 
-        <div id="status-content" class="space-y-6">
-            <div class="animate-pulse flex flex-col items-center">
-                <div class="h-8 bg-slate-700 w-3/4 rounded-md mb-4"></div>
-                <div class="h-4 bg-slate-700 w-1/2 rounded-md"></div>
+        <div class="max-w-md mx-auto mb-16">
+            <div class="flex justify-between text-xs font-mono text-blue-300 mb-2">
+                <span>DEPLOYMENT STATUS</span>
+                <span id="progress-text">Initializing...</span>
+            </div>
+            <div class="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-blue-500 shadow-[0_0_10px_#3b82f6] w-0 transition-all duration-[2000ms] ease-out"></div>
             </div>
         </div>
 
-        <div class="mt-12 max-w-sm mx-auto">
-            <div class="flex justify-between text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">
-                <span>System Integrity</span>
-                <span id="progress-percent">0%</span>
-            </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div id="progress-bar" class="bg-indigo-500 h-full w-0 transition-all duration-1000 ease-out"></div>
+        <div class="text-center max-w-sm mx-auto border-t border-white/10 pt-8">
+            <p class="text-sm text-slate-400 mb-4">Get notified when we go live</p>
+            <div class="flex gap-2">
+                <input type="email" placeholder="Enter your email" class="bg-black border border-white/20 rounded-lg px-4 py-2 text-sm w-full focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-600">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Notify
+                </button>
             </div>
         </div>
 
-        <div class="mt-12">
-            <a href="../index.html" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium border-b border-transparent hover:border-white pb-1">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Return to Identity Hub
+        <div class="mt-12 text-center">
+            <a href="../index.html" class="group inline-flex items-center gap-2 text-slate-500 hover:text-white transition-colors text-sm">
+                <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+                Return to Identity Hub
             </a>
         </div>
+
     </div>
 
     <script>
         // Initialize Icons
         lucide.createIcons();
 
-        // Content Update Logic
+        // Animation Logic
         document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('status-content');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
             
-            // The logic mentioned in your request
-            const updateInfo = {
-                title: "Building the Future of Trust",
-                mainMessage: "Our engineers are currently refining the <strong>Next-Gen Document Verification</strong> module.",
-                techNotice: "We are actively integrating advanced <strong>Blockchain Technology</strong> and real-time <strong>Validation Protocol</strong> to ensure your data remains immutable and secure.",
-                status: "In Development"
-            };
-
-            // Injecting HTML via innerHTML
-            container.innerHTML = `
-                <h1 class="text-4xl md:text-5xl font-bold display-font mb-4 tracking-tight">
-                    ${updateInfo.title}
-                </h1>
-                <p class="text-slate-400 text-lg md:text-xl leading-relaxed">
-                    ${updateInfo.mainMessage}
-                </p>
-                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 rounded-2xl mt-8 inline-block">
-                    <p class="text-sm text-indigo-300 font-mono flex items-center justify-center gap-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                        </span>
-                        ${updateInfo.techNotice}
-                    </p>
-                </div>
-            `;
-
-            // Progress Bar Animation
+            // Simulate loading
             setTimeout(() => {
-                document.getElementById('progress-bar').style.width = '65%';
-                document.getElementById('progress-percent').innerText = '65%';
-            }, 500);
+                progressBar.style.width = '72%';
+                
+                // Count up number animation
+                let start = 0;
+                const end = 72;
+                const duration = 2000;
+                const incrementTime = duration / end;
+                
+                const timer = setInterval(() => {
+                    start += 1;
+                    progressText.innerText = start + '% COMPLETED';
+                    if (start === end) clearInterval(timer);
+                }, incrementTime);
+                
+            }, 300);
         });
     </script>
 </body>
