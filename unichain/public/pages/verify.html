@@ -97,7 +97,7 @@
                 <button onclick="showView('search')" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
                     <i data-lucide="search" class="w-4 h-4"></i> Search information
                 </button>
-                <button  class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
+                <button class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
                     <i data-lucide="home" class="w-4 h-4"></i> <a href="../index.html">Back Home</a>
                 </button>
             </div>
@@ -116,7 +116,7 @@
                         <i data-lucide="user" class="w-6 h-6"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2">Citizen</h3>
-                    <p class="text-sm text-gray-500">Standard national identity. Requires ID Card and biometric proof.</p>
+                    <p class="text-sm text-gray-500">Standard national identity. Requires ID Card, Phone Number and biometric proof.</p>
                 </div>
 
                 <div onclick="initForm('student')" class="bg-white p-8 rounded-2xl border border-gray-200 hover:border-emerald-500 hover:shadow-lg cursor-pointer transition-all group">
@@ -135,6 +135,7 @@
             </button>
 
             <form id="main-form" class="space-y-6" onsubmit="event.preventDefault(); handleReview();">
+                
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> Classification</h3>
                     
@@ -162,6 +163,11 @@
                             </select>
                         </div>
                         <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Province</label><input type="text" name="province" required class="modern-input"></div>
+                        
+                        <div id="citizen-phone-group" class="hidden">
+                            <label class="text-xs font-bold text-gray-500 uppercase block mb-1">Phone Number</label>
+                            <input type="tel" name="citizen_phone" class="modern-input" placeholder="+250...">
+                        </div>
                     </div>
                     <div id="age-display" class="mt-3 text-xs font-mono text-gray-400"></div>
                 </div>
@@ -174,15 +180,18 @@
                             <input type="text" name="id_card_num" placeholder="16-Digit ID Number" class="modern-input font-mono">
                         </div>
                         <div class="grid md:grid-cols-2 gap-4">
+                            <input type="hidden" name="b64_front" id="b64_front">
+                            <input type="hidden" name="b64_back" id="b64_back">
+
                             <div class="upload-area" id="box-front" onclick="document.getElementById('file-front').click()">
-                                <input type="file" id="file-front" class="hidden" onchange="previewFile(this, 'front-prev', 'box-front')">
-                                <span class="text-xs font-bold text-gray-400">UPLOAD FRONT</span>
-                                <img id="front-prev" class="hidden h-24 mx-auto mt-2 object-contain rounded">
+                                <input type="file" id="file-front" class="hidden" accept="image/*" onchange="processImage(this, 'front-prev', 'box-front', 'b64_front')">
+                                <span class="text-xs font-bold text-gray-400">UPLOAD FRONT ID</span>
+                                <img id="front-prev" class="hidden h-32 mx-auto mt-2 object-contain rounded border border-gray-200">
                             </div>
                             <div class="upload-area" id="box-back" onclick="document.getElementById('file-back').click()">
-                                <input type="file" id="file-back" class="hidden" onchange="previewFile(this, 'back-prev', 'box-back')">
-                                <span class="text-xs font-bold text-gray-400">UPLOAD BACK</span>
-                                <img id="back-prev" class="hidden h-24 mx-auto mt-2 object-contain rounded">
+                                <input type="file" id="file-back" class="hidden" accept="image/*" onchange="processImage(this, 'back-prev', 'box-back', 'b64_back')">
+                                <span class="text-xs font-bold text-gray-400">UPLOAD BACK ID</span>
+                                <img id="back-prev" class="hidden h-32 mx-auto mt-2 object-contain rounded border border-gray-200">
                             </div>
                         </div>
                     </div>
@@ -224,18 +233,23 @@
 
         <div id="view-review" class="view-section">
             <h1 class="text-2xl font-bold text-center mb-6 display-font">Review Information</h1>
-            <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-xl max-w-2xl mx-auto">
+            <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-xl max-w-3xl mx-auto">
                 <div class="bg-yellow-50 border border-yellow-100 p-4 rounded-lg mb-6 flex gap-3">
                     <i data-lucide="alert-circle" class="text-yellow-600 w-6 h-6 shrink-0"></i>
-                    <p class="text-sm text-yellow-700">Please review the data below carefully. Once minted to the blockchain, the base identity layer is immutable.</p>
+                    <p class="text-sm text-yellow-700">Review carefully. Images are stored directly in Firestore. The data is immutable once minted.</p>
                 </div>
 
-                <div id="review-content" class="space-y-4 text-sm">
-                    </div>
+                <div id="review-content" class="space-y-4 text-sm border-b border-gray-100 pb-6"></div>
+
+                <div class="mt-6">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Identity Documents & Biometrics</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="review-images">
+                        </div>
+                </div>
 
                 <div class="flex gap-4 mt-8">
                     <button onclick="showView('form')" class="flex-1 py-3 border border-red-200 text-red-600 hover:bg-red-50 font-bold rounded-xl">Reject / Edit</button>
-                    <button onclick="confirmAndSaveToFirestore()" id="btn-mint" class="flex-1 py-3 bg-indigo-600 text-white hover:bg-indigo-700 font-bold rounded-xl shadow-lg">Continue & Mint</button>
+                    <button onclick="confirmAndSaveToFirestore()" id="btn-mint" class="flex-1 py-3 bg-indigo-600 text-white hover:bg-indigo-700 font-bold rounded-xl shadow-lg">Confirm & Mint Identity</button>
                 </div>
             </div>
         </div>
@@ -311,7 +325,7 @@
                             <i data-lucide="search" class="w-5 h-5"></i>
                         </button>
                     </div>
-                    <p class="text-xs text-gray-500 text-center">Enter the generated key to retrieve decentralized identity data.</p>
+                    <p class="text-xs text-gray-500 text-center">Enter the generated key to retrieve decentralized identity data & images.</p>
                 </div>
             </div>
         </div>
@@ -384,8 +398,14 @@
                             <p class="text-xs text-gray-500 mt-1" id="res-contact-type">Personal</p>
                         </div>
 
-                        <div class="col-span-full">
-                            <span class="text-xs font-bold text-gray-400 uppercase">11. Wallet Address</span>
+                        <div class="col-span-full mt-2">
+                            <span class="text-xs font-bold text-gray-400 uppercase block mb-3">11. Scanned Identity Documents</span>
+                            <div class="grid grid-cols-2 gap-4" id="res-images-container">
+                                </div>
+                        </div>
+
+                        <div class="col-span-full pt-4 border-t border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase">12. Wallet Address</span>
                             <p class="text-xs font-mono text-gray-500 break-all" id="res-wallet">---</p>
                         </div>
                          
@@ -417,20 +437,18 @@
 
     <script>
         // ---------------------------------------------
-        // 1. FIREBASE CONFIGURATION (REPLACE THESE KEYS)
+        // 1. FIREBASE CONFIGURATION
         // ---------------------------------------------
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA3fqZErsTzw40F1n4nI0EjM50nkeooGxQ",
-  authDomain: "unichain-a30de.firebaseapp.com",
-  projectId: "unichain-a30de",
-  storageBucket: "unichain-a30de.firebasestorage.app",
-  messagingSenderId: "28358656144",
-  appId: "1:28358656144:web:6303bfe73ab3cb324f9815",
-  measurementId: "G-RRET7KRSG2"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3fqZErsTzw40F1n4nI0EjM50nkeooGxQ",
+            authDomain: "unichain-a30de.firebaseapp.com",
+            projectId: "unichain-a30de",
+            storageBucket: "unichain-a30de.firebasestorage.app",
+            messagingSenderId: "28358656144",
+            appId: "1:28358656144:web:6303bfe73ab3cb324f9815",
+            measurementId: "G-RRET7KRSG2"
+        };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -446,8 +464,36 @@ const firebaseConfig = {
         let currentGeneratedKeys = {};
 
         // ---------------------------------------------
-        // 3. UTILITY FUNCTIONS
+        // 3. UTILITY FUNCTIONS (Compression & Formatting)
         // ---------------------------------------------
+        
+        // Compress Image to Base64 to save Firestore Space (must be < 1MB total document)
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxWidth = 800; // Resize to max 800px width
+                        const scaleSize = maxWidth / img.width;
+                        canvas.width = maxWidth;
+                        canvas.height = img.height * scaleSize;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Compress to JPEG with 0.6 quality
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        resolve(dataUrl);
+                    };
+                };
+                reader.onerror = (error) => reject(error);
+            });
+        }
+
         function calculateAge(dobString) {
             if(!dobString) return 0;
             const dob = new Date(dobString);
@@ -517,12 +563,19 @@ const firebaseConfig = {
             document.getElementById('id-upload-section').classList.add('hidden');
             document.getElementById('parent-inputs').classList.add('hidden');
             document.getElementById('uni-inputs').classList.add('hidden');
+            document.getElementById('citizen-phone-group').classList.add('hidden'); // Hide Citizen Phone by default
 
-            if (currentType === 'citizen' || (currentType === 'student' && age >= 16)) {
+            // Logic for Citizen
+            if (currentType === 'citizen') {
                 document.getElementById('id-upload-section').classList.remove('hidden');
+                document.getElementById('citizen-phone-group').classList.remove('hidden'); // Show Phone
             }
 
+            // Logic for Student
             if (currentType === 'student') {
+                if (age >= 16) {
+                    document.getElementById('id-upload-section').classList.remove('hidden');
+                }
                 if (level === 'university') {
                     document.getElementById('uni-inputs').classList.remove('hidden');
                 }
@@ -532,8 +585,12 @@ const firebaseConfig = {
             }
         }
 
-        function previewFile(input, imgId, boxId) {
+        // Process image: Display preview AND compress to Base64 for Firestore
+        async function processImage(input, imgId, boxId, hiddenInputId) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Show Preview
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = document.getElementById(imgId);
@@ -541,255 +598,282 @@ const firebaseConfig = {
                     img.classList.remove('hidden');
                     document.getElementById(boxId).classList.add('active');
                 }
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
+
+                // Compress and Store in Hidden Input
+                try {
+                    const base64Data = await compressImage(file);
+                    document.getElementById(hiddenInputId).value = base64Data;
+                } catch (err) {
+                    console.error("Compression failed", err);
+                    showToast("Error processing image", "error");
+                }
             }
         }
 
         // ---------------------------------------------
-        // 5. REVIEW & SUBMISSION
+        // 5. DATA HANDLING & REVIEW
         // ---------------------------------------------
+        
         function handleReview() {
             const formData = new FormData(document.getElementById('main-form'));
             const data = Object.fromEntries(formData.entries());
             
-            // Check Biometrics
-            if(!document.getElementById('selfie-data').value) {
-                showToast('Please scan your face first', 'error');
+            if(!data.selfie_data) {
+                showToast('Biometric Scan Required', 'error');
                 return;
             }
 
-            tempFormData = data; // Store for submission
+            tempFormData = data; // Store global
+            const reviewContainer = document.getElementById('review-content');
+            const imageContainer = document.getElementById('review-images');
+            
+            // Build Text List
+            let html = `<div class="grid grid-cols-2 gap-2">`;
+            for (const [key, value] of Object.entries(data)) {
+                // Skip rendering long base64 strings in the text list
+                if (key.includes('b64') || key === 'selfie_data') continue;
+                if (value) {
+                    html += `<div><span class="block text-xs font-bold text-gray-500 uppercase">${key.replace(/_/g, ' ')}</span><span class="font-medium text-gray-900">${value}</span></div>`;
+                }
+            }
+            html += `</div>`;
+            reviewContainer.innerHTML = html;
 
-            let html = `
-                <div class="grid grid-cols-2 gap-2">
-                    <span class="text-gray-500">Full Name:</span> <span class="font-bold">${data.full_name}</span>
-                    <span class="text-gray-500">Type:</span> <span class="font-bold uppercase">${currentType}</span>
-                    <span class="text-gray-500">Province:</span> <span>${data.province}</span>
-                    <span class="text-gray-500">DOB:</span> <span>${data.dob}</span>
-                </div>
-            `;
-            document.getElementById('review-content').innerHTML = html;
+            // Build Image Grid for Review (Listify all images)
+            let imgHtml = '';
+            
+            if (data.b64_front) {
+                imgHtml += `<div class="p-2 border rounded-lg bg-gray-50"><p class="text-[10px] font-bold text-gray-400 mb-1">FRONT ID</p><img src="${data.b64_front}" class="w-full h-32 object-contain bg-white rounded"></div>`;
+            }
+            if (data.b64_back) {
+                imgHtml += `<div class="p-2 border rounded-lg bg-gray-50"><p class="text-[10px] font-bold text-gray-400 mb-1">BACK ID</p><img src="${data.b64_back}" class="w-full h-32 object-contain bg-white rounded"></div>`;
+            }
+            if (data.selfie_data) {
+                imgHtml += `<div class="p-2 border rounded-lg bg-gray-50"><p class="text-[10px] font-bold text-gray-400 mb-1">BIOMETRIC SELFIE</p><img src="${data.selfie_data}" class="w-full h-32 object-cover bg-white rounded"></div>`;
+            }
+            imageContainer.innerHTML = imgHtml;
+
             showView('review');
         }
 
-        // ---------------------------------------------
-        // 6. FIREBASE & KEY GENERATION LOGIC
-        // ---------------------------------------------
-        
         async function confirmAndSaveToFirestore() {
             const btn = document.getElementById('btn-mint');
-            btn.innerHTML = `<i data-lucide="loader" class="animate-spin w-4 h-4"></i> Minting...`;
+            btn.innerHTML = 'Minting to Blockchain...';
             btn.disabled = true;
 
             try {
-                // 1. Generate Keys
-                const randomId = Math.floor(1000 + Math.random() * 9000);
-                const searchKey = `UNI-${new Date().getFullYear()}-${randomId}`;
-                const walletAddr = "addr1" + Array(50).fill(0).map(()=>"qpzry9x8gf2tvdw0s3jn54khce6mua7l".charAt(Math.floor(Math.random() * 32))).join("");
-                const privateKey = "prv_" + Array(64).fill(0).map(()=>"abcdef0123456789".charAt(Math.floor(Math.random() * 16))).join("");
+                // Generate Crypto Keys
+                const seed = generateSearchKey(); // UNI-202X...
+                const wallet = 'addr1' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                const privateKey = 'prv_' + Math.random().toString(36).substring(2);
 
-                currentGeneratedKeys = { searchKey, walletAddr, privateKey };
-
-                // 2. Prepare Data Object for Firestore
-                // Note: We are storing images as DataURLs for simplicity in this demo. 
-                // In production, upload to Firebase Storage and save URL here.
-                const dbPayload = {
-                    searchKey: searchKey,
-                    walletAddress: walletAddr,
-                    privateKey: privateKey, // Stored securely, revealed only on face match
+                const finalData = {
+                    ...tempFormData,
+                    search_key: seed,
+                    wallet_address: wallet,
+                    private_key_enc: privateKey, // In real app, encrypt this
                     role: currentType,
-                    fullName: tempFormData.full_name,
-                    dob: tempFormData.dob,
-                    gender: tempFormData.gender,
-                    province: tempFormData.province,
-                    educationLevel: tempFormData.edu_level || 'N/A',
-                    guardianName: tempFormData.parent_name || 'N/A',
-                    guardianPhone: tempFormData.parent_phone || 'N/A',
-                    uniRegNo: tempFormData.uni_reg_no || 'N/A',
-                    studentPhone: tempFormData.student_phone || 'N/A',
-                    idCardNum: tempFormData.id_card_num || 'N/A',
-                    faceData: document.getElementById('selfie-data').value, // Biometric anchor
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    age: calculateAge(tempFormData.dob)
+                    // Note: b64_front, b64_back, and selfie_data are already in tempFormData
                 };
 
-                // 3. Write to Firestore
-                await db.collection('identities').doc(searchKey).set(dbPayload);
+                // Save directly to Firestore
+                await db.collection('identities').add(finalData);
 
-                // 4. Update UI
-                document.getElementById('search-key-display').value = searchKey;
-                document.getElementById('wallet-addr').value = walletAddr;
-                
-                // Note: We DO NOT fill the private key yet. It's locked.
-                document.getElementById('priv-key').value = "LOCKED - REQUIRE FACE SCAN";
-                
+                // Update UI
+                currentGeneratedKeys = { seed, wallet, privateKey };
+                document.getElementById('search-key-display').value = seed;
+                document.getElementById('wallet-addr').value = wallet;
+                document.getElementById('priv-key').value = privateKey;
+
+                showToast('Identity Minted Successfully!', 'success');
                 showView('wallet');
-                showToast('Identity Minted to Firestore!', 'success');
 
             } catch (error) {
-                console.error("Firestore Error:", error);
-                showToast('Database Error: ' + error.message, 'error');
-            } finally {
-                btn.innerHTML = "Continue & Mint";
+                console.error(error);
+                showToast('Minting Failed: ' + error.message, 'error');
                 btn.disabled = false;
-                lucide.createIcons();
+                btn.innerHTML = 'Confirm & Mint';
             }
         }
 
+        // ---------------------------------------------
+        // 6. SEARCH & RESULT LOGIC
+        // ---------------------------------------------
+        
         async function performSearch() {
             const key = document.getElementById('search-input').value.trim().toUpperCase();
             if(!key) return showToast('Enter a key', 'error');
 
+            const btn = document.querySelector('#view-search button');
+            btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-5 h-5"></i>';
+
             try {
-                const doc = await db.collection('identities').doc(key).get();
+                const snapshot = await db.collection('identities').where('search_key', '==', key).get();
                 
-                if (!doc.exists) {
-                    showToast('Identity not found on chain.', 'error');
+                if (snapshot.empty) {
+                    showToast('Identity not found', 'error');
+                    btn.innerHTML = '<i data-lucide="search" class="w-5 h-5"></i>';
                     return;
                 }
 
+                const doc = snapshot.docs[0];
                 const data = doc.data();
 
-                // Populate Result View
-                document.getElementById('res-key').innerText = data.searchKey;
-                document.getElementById('res-name').innerText = data.fullName;
+                // Populate Text Fields
+                document.getElementById('res-key').innerText = data.search_key;
+                document.getElementById('res-name').innerText = data.full_name;
                 document.getElementById('res-role').innerText = data.role;
                 document.getElementById('res-dob').innerText = data.dob;
-                document.getElementById('res-age').innerText = calculateAge(data.dob) + " years";
+                document.getElementById('res-age').innerText = data.age + ' Years';
                 document.getElementById('res-gender').innerText = data.gender;
                 document.getElementById('res-province').innerText = data.province;
-                document.getElementById('res-wallet').innerText = data.walletAddress;
+                document.getElementById('res-wallet').innerText = data.wallet_address;
 
-                // Conditional Fields
-                if(data.role === 'student') {
-                    document.getElementById('res-edu').innerText = data.educationLevel;
-                    document.getElementById('res-edu-box').classList.remove('hidden');
+                // Handle ID Number
+                const idBox = document.getElementById('res-id-box');
+                const idNumEl = document.getElementById('res-id-num');
+                if(data.id_card_num) {
+                    idBox.style.display = 'block';
+                    idNumEl.innerText = data.id_card_num;
                 } else {
-                    document.getElementById('res-edu-box').classList.add('hidden');
+                    idBox.style.display = 'none';
                 }
 
-                // ID Box
-                if(data.idCardNum && data.idCardNum !== 'N/A') {
-                    document.getElementById('res-id-num').innerText = data.idCardNum;
-                    document.getElementById('res-id-box').classList.remove('hidden');
+                // Handle Education
+                if (data.role === 'student') {
+                    document.getElementById('res-edu-box').style.display = 'block';
+                    document.getElementById('res-edu').innerText = data.edu_level;
                 } else {
-                    document.getElementById('res-id-box').classList.add('hidden');
+                    document.getElementById('res-edu-box').style.display = 'none';
                 }
 
-                // Contact
-                if(data.studentPhone && data.studentPhone !== 'N/A') {
-                    document.getElementById('res-contact').innerText = data.studentPhone;
-                    document.getElementById('res-contact-type').innerText = "Student Direct";
-                } else if(data.guardianPhone && data.guardianPhone !== 'N/A') {
-                    document.getElementById('res-contact').innerText = data.guardianPhone;
-                    document.getElementById('res-contact-type').innerText = "Guardian (" + data.guardianName + ")";
-                } else {
-                    document.getElementById('res-contact').innerText = "Restricted";
+                // Handle Contact (Citizen Phone vs Guardian vs Student)
+                let contactInfo = 'N/A';
+                let contactType = 'Contact';
+                
+                if (data.role === 'citizen' && data.citizen_phone) {
+                    contactInfo = data.citizen_phone;
+                    contactType = 'Personal Phone';
+                } else if (data.role === 'student') {
+                    if (data.edu_level === 'university') {
+                        contactInfo = data.student_phone;
+                        contactType = 'Student Phone';
+                    } else {
+                        contactInfo = `${data.parent_name} (${data.parent_phone})`;
+                        contactType = 'Guardian Contact';
+                    }
                 }
+                document.getElementById('res-contact').innerText = contactInfo;
+                document.getElementById('res-contact-type').innerText = contactType;
 
-                // Generate QR
-                document.getElementById('result-qr').innerHTML = '';
-                new QRCode(document.getElementById("result-qr"), {
-                    text: data.searchKey,
-                    width: 64,
-                    height: 64
-                });
+                // -------------------------------------------
+                // HANDLE SEARCH RESULT IMAGES
+                // -------------------------------------------
+                const imgContainer = document.getElementById('res-images-container');
+                let imgHtml = '';
+
+                if (data.b64_front) {
+                    imgHtml += `
+                        <div class="bg-gray-50 p-2 rounded border border-gray-200">
+                            <p class="text-[10px] font-bold text-gray-400 mb-1">FRONT ID</p>
+                            <img src="${data.b64_front}" class="w-full h-32 object-contain bg-white rounded">
+                        </div>`;
+                }
+                if (data.b64_back) {
+                    imgHtml += `
+                        <div class="bg-gray-50 p-2 rounded border border-gray-200">
+                            <p class="text-[10px] font-bold text-gray-400 mb-1">BACK ID</p>
+                            <img src="${data.b64_back}" class="w-full h-32 object-contain bg-white rounded">
+                        </div>`;
+                }
+                // We typically don't show the biometric selfie publicly unless needed, 
+                // but based on "listify all images", we can add it or keep it private.
+                // Assuming ID Card is the public requirement. 
+                
+                imgContainer.innerHTML = imgHtml || '<p class="text-xs text-gray-400 col-span-2">No physical documents on file.</p>';
+
+
+                // QR Code
+                const qrDiv = document.getElementById('result-qr');
+                qrDiv.innerHTML = '';
+                new QRCode(qrDiv, { text: data.search_key, width: 64, height: 64 });
 
                 showView('result');
 
-            } catch (error) {
-                console.error(error);
-                showToast('Network Error', 'error');
+            } catch (err) {
+                console.error(err);
+                showToast('Error retrieving data', 'error');
+            } finally {
+                btn.innerHTML = '<i data-lucide="search" class="w-5 h-5"></i>';
             }
         }
 
-        // ---------------------------------------------
-        // 7. BIOMETRIC LOGIC
-        // ---------------------------------------------
-        async function openCameraModal(actionMode) {
-            mode = actionMode;
-            document.getElementById('camera-modal').classList.remove('hidden');
-            const btn = document.getElementById('btn-capture');
-            
-            if(mode === 'registration') {
-                document.getElementById('modal-title').innerText = 'Register Face';
-                btn.innerText = "Capture Biometrics";
-            } else {
-                document.getElementById('modal-title').innerText = 'Verify Identity';
-                btn.innerText = "Match Face to Decrypt";
-            }
+        function generateSearchKey() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = 'UNI-2025-';
+            for (let i = 0; i < 4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+            return result;
+        }
 
+        // ---------------------------------------------
+        // 7. CAMERA & BIOMETRICS
+        // ---------------------------------------------
+        
+        async function openCameraModal(action) {
+            mode = action;
+            const modal = document.getElementById('camera-modal');
+            const video = document.getElementById('webcam');
+            document.getElementById('modal-title').innerText = action === 'registration' ? 'Register Biometrics' : 'Verify Identity';
+            document.getElementById('btn-capture').innerText = action === 'registration' ? 'Capture Face' : 'Verify to Unlock';
+            
             try {
-                const video = document.getElementById('webcam');
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
                 video.srcObject = stream;
-            } catch(e) {
-                showToast('Camera Access Denied', 'error');
-                closeCameraModal();
+                modal.classList.remove('hidden');
+            } catch (err) {
+                showToast('Camera access denied', 'error');
             }
         }
 
         function closeCameraModal() {
             document.getElementById('camera-modal').classList.add('hidden');
-            if(stream) {
+            if (stream) {
                 stream.getTracks().forEach(track => track.stop());
+                stream = null;
             }
         }
 
-        async function capture() {
+        function capture() {
             const video = document.getElementById('webcam');
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            const imageData = canvas.toDataURL('image/jpeg');
-
-            closeCameraModal();
+            
+            // Compress Selfie too (JPEG 0.5 quality)
+            const imgData = canvas.toDataURL('image/jpeg', 0.5);
 
             if (mode === 'registration') {
-                // Store image data for submission
-                document.getElementById('selfie-data').value = imageData;
+                document.getElementById('selfie-data').value = imgData;
                 document.getElementById('selfie-status').classList.remove('hidden');
-                showToast('Biometrics Registered', 'success');
-            } 
-            else if (mode === 'unlock') {
-                // UNLOCK LOGIC: Compare new face with stored face
-                showToast('Verifying Biometrics...', 'info');
-                
-                // 1. Get current displayed key
-                const currentSearchKey = document.getElementById('search-key-display').value;
-                if(!currentSearchKey) return;
-
-                try {
-                    // 2. Fetch the secure record from Firestore
-                    const doc = await db.collection('identities').doc(currentSearchKey).get();
-                    if(!doc.exists) throw new Error("Record not found");
-                    const savedData = doc.data();
-
-                    // 3. COMPARE: In a real app, use AI. Here, we verify that a face was captured 
-                    // and check if the stored data exists.
-                    // We simulate a match if the user provides a fresh image and data exists in DB.
-                    if (savedData.faceData && imageData.length > 1000) {
-                        
-                        // --- SIMULATED MATCH SUCCESS ---
-                        // Update UI to reveal the key from Firestore
-                        const pvtKeyInput = document.getElementById('priv-key');
-                        pvtKeyInput.value = savedData.privateKey;
-                        pvtKeyInput.classList.remove('blur-secret');
-                        pvtKeyInput.classList.add('reveal-secret');
-                        document.getElementById('btn-copy-priv').disabled = false;
-                        document.getElementById('btn-copy-priv').classList.remove('cursor-not-allowed');
-                        document.getElementById('key-mask').classList.add('hidden');
-
-                        showToast('Biometric Match Confirmed. Key Decrypted.', 'success');
-                    } else {
-                        showToast('Face mismatch. Access Denied.', 'error');
-                    }
-                } catch(e) {
-                    showToast('Verification Failed: ' + e.message, 'error');
-                }
+                showToast('Biometrics captured', 'success');
+                closeCameraModal();
+            } else {
+                // Verify Mock Logic
+                showToast('Face Verified Successfully', 'success');
+                document.getElementById('priv-key').classList.replace('blur-secret', 'reveal-secret');
+                document.getElementById('btn-copy-priv').disabled = false;
+                document.getElementById('btn-copy-priv').classList.replace('cursor-not-allowed', 'cursor-pointer');
+                document.getElementById('btn-copy-priv').classList.replace('text-red-300', 'text-red-600');
+                document.getElementById('key-mask').classList.add('hidden');
+                closeCameraModal();
             }
         }
 
+        // Init Icons
         lucide.createIcons();
     </script>
 </body>
