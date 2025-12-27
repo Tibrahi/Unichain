@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniChain | Under Construction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+        }
+        .display-font { font-family: 'Space Grotesk', sans-serif; }
+        
+        /* Animated Construction Sticker */
+        .sticker-bounce {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-3deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-white overflow-hidden">
+
+    <div class="absolute top-0 left-0 w-full h-full -z-10 opacity-20">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-2xl w-full text-center">
+        <div class="flex justify-center mb-8">
+            <div class="sticker-bounce relative">
+                <div class="bg-yellow-400 p-6 rounded-3xl shadow-[0_20px_50px_rgba(234,179,8,0.3)] rotate-[-3deg]">
+                    <i data-lucide="hard-hat" class="w-20 h-20 text-black"></i>
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-indigo-600 p-3 rounded-full border-4 border-[#0f172a]">
+                    <i data-lucide="cpu" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="status-content" class="space-y-6">
+            <div class="animate-pulse flex flex-col items-center">
+                <div class="h-8 bg-slate-700 w-3/4 rounded-md mb-4"></div>
+                <div class="h-4 bg-slate-700 w-1/2 rounded-md"></div>
+            </div>
+        </div>
+
+        <div class="mt-12 max-w-sm mx-auto">
+            <div class="flex justify-between text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">
+                <span>System Integrity</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div id="progress-bar" class="bg-indigo-500 h-full w-0 transition-all duration-1000 ease-out"></div>
+            </div>
+        </div>
+
+        <div class="mt-12">
+            <a href="../index.html" class="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium border-b border-transparent hover:border-white pb-1">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Return to Identity Hub
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Content Update Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('status-content');
+            
+            // The logic mentioned in your request
+            const updateInfo = {
+                title: "Building the Future of Trust",
+                mainMessage: "Our engineers are currently refining the <strong>Next-Gen Document Verification</strong> module.",
+                techNotice: "We are actively integrating advanced <strong>Blockchain Technology</strong> and real-time <strong>Validation Protocol</strong> to ensure your data remains immutable and secure.",
+                status: "In Development"
+            };
+
+            // Injecting HTML via innerHTML
+            container.innerHTML = `
+                <h1 class="text-4xl md:text-5xl font-bold display-font mb-4 tracking-tight">
+                    ${updateInfo.title}
+                </h1>
+                <p class="text-slate-400 text-lg md:text-xl leading-relaxed">
+                    ${updateInfo.mainMessage}
+                </p>
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-4 rounded-2xl mt-8 inline-block">
+                    <p class="text-sm text-indigo-300 font-mono flex items-center justify-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                        </span>
+                        ${updateInfo.techNotice}
+                    </p>
+                </div>
+            `;
+
+            // Progress Bar Animation
+            setTimeout(() => {
+                document.getElementById('progress-bar').style.width = '65%';
+                document.getElementById('progress-percent').innerText = '65%';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
