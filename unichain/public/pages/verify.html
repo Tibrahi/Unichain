@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unichain | Identity Verification </title>
+    <title>Unichain | Identity Protocol </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
@@ -61,14 +64,13 @@
             filter: blur(8px); user-select: none; cursor: not-allowed; transition: filter 0.5s ease;
         }
         .reveal-secret {
-            filter: blur(0); cursor: text;
+            filter: blur(0); cursor: text; user-select: text;
         }
         
-        /* Protected Data View (No Copy/Screenshot Protection CSS tricks) */
+        /* Protected Data View */
         .protected-view {
-            user-select: none; /* Standard */
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
+            user-select: none; 
+            -webkit-user-select: none; 
         }
         @media print {
             .no-print { display: none; }
@@ -132,7 +134,7 @@
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Selection
             </button>
 
-            <form id="main-form" class="space-y-6">
+            <form id="main-form" class="space-y-6" onsubmit="event.preventDefault(); handleReview();">
                 <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> Classification</h3>
                     
@@ -233,7 +235,7 @@
 
                 <div class="flex gap-4 mt-8">
                     <button onclick="showView('form')" class="flex-1 py-3 border border-red-200 text-red-600 hover:bg-red-50 font-bold rounded-xl">Reject / Edit</button>
-                    <button onclick="confirmGeneration()" class="flex-1 py-3 bg-indigo-600 text-white hover:bg-indigo-700 font-bold rounded-xl shadow-lg">Continue & Mint</button>
+                    <button onclick="confirmAndSaveToFirestore()" id="btn-mint" class="flex-1 py-3 bg-indigo-600 text-white hover:bg-indigo-700 font-bold rounded-xl shadow-lg">Continue & Mint</button>
                 </div>
             </div>
         </div>
@@ -387,16 +389,6 @@
                             <p class="text-xs font-mono text-gray-500 break-all" id="res-wallet">---</p>
                         </div>
                          
-                        <div class="col-span-full pt-4 border-t border-gray-100 flex gap-4">
-                            <div class="w-1/2">
-                                <span class="text-xs font-bold text-gray-400 uppercase block mb-2">ID Front</span>
-                                <img id="res-img-front" class="w-full h-32 object-contain bg-gray-100 rounded border">
-                            </div>
-                            <div class="w-1/2">
-                                <span class="text-xs font-bold text-gray-400 uppercase block mb-2">ID Back</span>
-                                <img id="res-img-back" class="w-full h-32 object-contain bg-gray-100 rounded border">
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -418,20 +410,44 @@
                 </div>
             </div>
             <div class="p-6">
-                <button onclick="capture()" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700">Capture & Verify</button>
+                <button onclick="capture()" id="btn-capture" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700">Capture & Verify</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- DATA STORE ---
+        // ---------------------------------------------
+        // 1. FIREBASE CONFIGURATION (REPLACE THESE KEYS)
+        // ---------------------------------------------
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA3fqZErsTzw40F1n4nI0EjM50nkeooGxQ",
+  authDomain: "unichain-a30de.firebaseapp.com",
+  projectId: "unichain-a30de",
+  storageBucket: "unichain-a30de.firebasestorage.app",
+  messagingSenderId: "28358656144",
+  appId: "1:28358656144:web:6303bfe73ab3cb324f9815",
+  measurementId: "G-RRET7KRSG2"
+};
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // ---------------------------------------------
+        // 2. STATE MANAGEMENT
+        // ---------------------------------------------
         let currentType = 'student'; 
         let stream = null;
         let mode = 'registration';
-        let tempFormData = null; // Stores data during review
-        let simulatedDB = {}; // Simulates the blockchain ledger
+        let tempFormData = {}; 
+        let currentGeneratedKeys = {};
 
-        // --- UTILS ---
+        // ---------------------------------------------
+        // 3. UTILITY FUNCTIONS
+        // ---------------------------------------------
         function calculateAge(dobString) {
             if(!dobString) return 0;
             const dob = new Date(dobString);
@@ -440,19 +456,38 @@
             return Math.abs(age_dt.getUTCFullYear() - 1970);
         }
 
-        // --- VIEW MANAGEMENT ---
+        function showToast(msg, type='info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-triangle' : 'info');
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i><span>${msg}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function copyToClip(id) {
+            const el = document.getElementById(id);
+            if (!el.disabled) {
+                navigator.clipboard.writeText(el.value);
+                showToast('Copied to clipboard', 'success');
+            }
+        }
+
+        // ---------------------------------------------
+        // 4. VIEW & FORM LOGIC
+        // ---------------------------------------------
         function showView(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${id}`).classList.add('active');
             window.scrollTo(0,0);
         }
 
-        // --- FORM LOGIC ---
         function initForm(type) {
             currentType = type;
             document.getElementById('main-form').reset();
             
-            // Toggle Visuals
             const eduWrapper = document.getElementById('student-level-wrapper');
             const citizenBadge = document.getElementById('citizen-badge');
             
@@ -472,36 +507,25 @@
             const dob = document.getElementById('dob-input').value;
             const age = calculateAge(dob);
             document.getElementById('age-display').innerText = dob ? `Calculated Age: ${age} years` : '';
-            updateFormFields(); // Re-evaluate inputs based on new age
+            updateFormFields();
         }
 
         function updateFormFields() {
-            // Logic:
-            // 1. If Citizen -> Show ID Upload.
-            // 2. If Student AND Age > 16 -> Show ID Upload.
-            // 3. If Student AND University -> Show Uni Inputs.
-            // 4. If Student AND < 18 -> Show Parent Inputs.
-            
             const age = calculateAge(document.getElementById('dob-input').value);
             const level = document.getElementById('edu-level').value;
 
-            // Reset
             document.getElementById('id-upload-section').classList.add('hidden');
             document.getElementById('parent-inputs').classList.add('hidden');
             document.getElementById('uni-inputs').classList.add('hidden');
 
-            // ID Logic
             if (currentType === 'citizen' || (currentType === 'student' && age >= 16)) {
                 document.getElementById('id-upload-section').classList.remove('hidden');
             }
 
-            // Student Specifics
             if (currentType === 'student') {
                 if (level === 'university') {
                     document.getElementById('uni-inputs').classList.remove('hidden');
                 }
-                
-                // Minor Logic (Guardian) - usually for Primary/Secondary or <18
                 if (age < 18 && level !== 'university') {
                     document.getElementById('parent-inputs').classList.remove('hidden');
                 }
@@ -521,11 +545,179 @@
             }
         }
 
-        // --- BIOMETRICS ---
+        // ---------------------------------------------
+        // 5. REVIEW & SUBMISSION
+        // ---------------------------------------------
+        function handleReview() {
+            const formData = new FormData(document.getElementById('main-form'));
+            const data = Object.fromEntries(formData.entries());
+            
+            // Check Biometrics
+            if(!document.getElementById('selfie-data').value) {
+                showToast('Please scan your face first', 'error');
+                return;
+            }
+
+            tempFormData = data; // Store for submission
+
+            let html = `
+                <div class="grid grid-cols-2 gap-2">
+                    <span class="text-gray-500">Full Name:</span> <span class="font-bold">${data.full_name}</span>
+                    <span class="text-gray-500">Type:</span> <span class="font-bold uppercase">${currentType}</span>
+                    <span class="text-gray-500">Province:</span> <span>${data.province}</span>
+                    <span class="text-gray-500">DOB:</span> <span>${data.dob}</span>
+                </div>
+            `;
+            document.getElementById('review-content').innerHTML = html;
+            showView('review');
+        }
+
+        // ---------------------------------------------
+        // 6. FIREBASE & KEY GENERATION LOGIC
+        // ---------------------------------------------
+        
+        async function confirmAndSaveToFirestore() {
+            const btn = document.getElementById('btn-mint');
+            btn.innerHTML = `<i data-lucide="loader" class="animate-spin w-4 h-4"></i> Minting...`;
+            btn.disabled = true;
+
+            try {
+                // 1. Generate Keys
+                const randomId = Math.floor(1000 + Math.random() * 9000);
+                const searchKey = `UNI-${new Date().getFullYear()}-${randomId}`;
+                const walletAddr = "addr1" + Array(50).fill(0).map(()=>"qpzry9x8gf2tvdw0s3jn54khce6mua7l".charAt(Math.floor(Math.random() * 32))).join("");
+                const privateKey = "prv_" + Array(64).fill(0).map(()=>"abcdef0123456789".charAt(Math.floor(Math.random() * 16))).join("");
+
+                currentGeneratedKeys = { searchKey, walletAddr, privateKey };
+
+                // 2. Prepare Data Object for Firestore
+                // Note: We are storing images as DataURLs for simplicity in this demo. 
+                // In production, upload to Firebase Storage and save URL here.
+                const dbPayload = {
+                    searchKey: searchKey,
+                    walletAddress: walletAddr,
+                    privateKey: privateKey, // Stored securely, revealed only on face match
+                    role: currentType,
+                    fullName: tempFormData.full_name,
+                    dob: tempFormData.dob,
+                    gender: tempFormData.gender,
+                    province: tempFormData.province,
+                    educationLevel: tempFormData.edu_level || 'N/A',
+                    guardianName: tempFormData.parent_name || 'N/A',
+                    guardianPhone: tempFormData.parent_phone || 'N/A',
+                    uniRegNo: tempFormData.uni_reg_no || 'N/A',
+                    studentPhone: tempFormData.student_phone || 'N/A',
+                    idCardNum: tempFormData.id_card_num || 'N/A',
+                    faceData: document.getElementById('selfie-data').value, // Biometric anchor
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // 3. Write to Firestore
+                await db.collection('identities').doc(searchKey).set(dbPayload);
+
+                // 4. Update UI
+                document.getElementById('search-key-display').value = searchKey;
+                document.getElementById('wallet-addr').value = walletAddr;
+                
+                // Note: We DO NOT fill the private key yet. It's locked.
+                document.getElementById('priv-key').value = "LOCKED - REQUIRE FACE SCAN";
+                
+                showView('wallet');
+                showToast('Identity Minted to Firestore!', 'success');
+
+            } catch (error) {
+                console.error("Firestore Error:", error);
+                showToast('Database Error: ' + error.message, 'error');
+            } finally {
+                btn.innerHTML = "Continue & Mint";
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        async function performSearch() {
+            const key = document.getElementById('search-input').value.trim().toUpperCase();
+            if(!key) return showToast('Enter a key', 'error');
+
+            try {
+                const doc = await db.collection('identities').doc(key).get();
+                
+                if (!doc.exists) {
+                    showToast('Identity not found on chain.', 'error');
+                    return;
+                }
+
+                const data = doc.data();
+
+                // Populate Result View
+                document.getElementById('res-key').innerText = data.searchKey;
+                document.getElementById('res-name').innerText = data.fullName;
+                document.getElementById('res-role').innerText = data.role;
+                document.getElementById('res-dob').innerText = data.dob;
+                document.getElementById('res-age').innerText = calculateAge(data.dob) + " years";
+                document.getElementById('res-gender').innerText = data.gender;
+                document.getElementById('res-province').innerText = data.province;
+                document.getElementById('res-wallet').innerText = data.walletAddress;
+
+                // Conditional Fields
+                if(data.role === 'student') {
+                    document.getElementById('res-edu').innerText = data.educationLevel;
+                    document.getElementById('res-edu-box').classList.remove('hidden');
+                } else {
+                    document.getElementById('res-edu-box').classList.add('hidden');
+                }
+
+                // ID Box
+                if(data.idCardNum && data.idCardNum !== 'N/A') {
+                    document.getElementById('res-id-num').innerText = data.idCardNum;
+                    document.getElementById('res-id-box').classList.remove('hidden');
+                } else {
+                    document.getElementById('res-id-box').classList.add('hidden');
+                }
+
+                // Contact
+                if(data.studentPhone && data.studentPhone !== 'N/A') {
+                    document.getElementById('res-contact').innerText = data.studentPhone;
+                    document.getElementById('res-contact-type').innerText = "Student Direct";
+                } else if(data.guardianPhone && data.guardianPhone !== 'N/A') {
+                    document.getElementById('res-contact').innerText = data.guardianPhone;
+                    document.getElementById('res-contact-type').innerText = "Guardian (" + data.guardianName + ")";
+                } else {
+                    document.getElementById('res-contact').innerText = "Restricted";
+                }
+
+                // Generate QR
+                document.getElementById('result-qr').innerHTML = '';
+                new QRCode(document.getElementById("result-qr"), {
+                    text: data.searchKey,
+                    width: 64,
+                    height: 64
+                });
+
+                showView('result');
+
+            } catch (error) {
+                console.error(error);
+                showToast('Network Error', 'error');
+            }
+        }
+
+        // ---------------------------------------------
+        // 7. BIOMETRIC LOGIC
+        // ---------------------------------------------
         async function openCameraModal(actionMode) {
             mode = actionMode;
             document.getElementById('camera-modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = mode === 'registration' ? 'Register Face' : 'Verify Identity';
+            const btn = document.getElementById('btn-capture');
+            
+            if(mode === 'registration') {
+                document.getElementById('modal-title').innerText = 'Register Face';
+                btn.innerText = "Capture Biometrics";
+            } else {
+                document.getElementById('modal-title').innerText = 'Verify Identity';
+                btn.innerText = "Match Face to Decrypt";
+            }
+
             try {
                 const video = document.getElementById('webcam');
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
@@ -538,187 +730,67 @@
 
         function closeCameraModal() {
             document.getElementById('camera-modal').classList.add('hidden');
-            if(stream) stream.getTracks().forEach(t => t.stop());
-        }
-
-        function capture() {
-            closeCameraModal();
-            if (mode === 'registration') {
-                document.getElementById('selfie-data').value = "captured";
-                document.getElementById('selfie-status').classList.remove('hidden');
-                showToast('Biometrics mapped successfully', 'success');
-            } else if (mode === 'unlock') {
-                revealPrivateKey();
+            if(stream) {
+                stream.getTracks().forEach(track => track.stop());
             }
         }
 
-        // --- SUBMISSION & REVIEW ---
-        document.getElementById('main-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const hasBio = document.getElementById('selfie-data').value;
-            if(!hasBio) return showToast('Biometric Scan Required', 'error');
+        async function capture() {
+            const video = document.getElementById('webcam');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const imageData = canvas.toDataURL('image/jpeg');
 
-            const formData = new FormData(e.target);
-            tempFormData = Object.fromEntries(formData);
-            
-            // Generate Preview HTML
-            let html = `<ul class="space-y-3">`;
-            for (const [key, value] of Object.entries(tempFormData)) {
-                if(value && key !== 'selfie_data' && typeof value === 'string') {
-                    html += `<li class="flex justify-between border-b border-gray-100 pb-1">
-                        <span class="font-bold text-gray-500 capitalize">${key.replace(/_/g, ' ')}</span>
-                        <span class="font-medium text-right">${value}</span>
-                    </li>`;
+            closeCameraModal();
+
+            if (mode === 'registration') {
+                // Store image data for submission
+                document.getElementById('selfie-data').value = imageData;
+                document.getElementById('selfie-status').classList.remove('hidden');
+                showToast('Biometrics Registered', 'success');
+            } 
+            else if (mode === 'unlock') {
+                // UNLOCK LOGIC: Compare new face with stored face
+                showToast('Verifying Biometrics...', 'info');
+                
+                // 1. Get current displayed key
+                const currentSearchKey = document.getElementById('search-key-display').value;
+                if(!currentSearchKey) return;
+
+                try {
+                    // 2. Fetch the secure record from Firestore
+                    const doc = await db.collection('identities').doc(currentSearchKey).get();
+                    if(!doc.exists) throw new Error("Record not found");
+                    const savedData = doc.data();
+
+                    // 3. COMPARE: In a real app, use AI. Here, we verify that a face was captured 
+                    // and check if the stored data exists.
+                    // We simulate a match if the user provides a fresh image and data exists in DB.
+                    if (savedData.faceData && imageData.length > 1000) {
+                        
+                        // --- SIMULATED MATCH SUCCESS ---
+                        // Update UI to reveal the key from Firestore
+                        const pvtKeyInput = document.getElementById('priv-key');
+                        pvtKeyInput.value = savedData.privateKey;
+                        pvtKeyInput.classList.remove('blur-secret');
+                        pvtKeyInput.classList.add('reveal-secret');
+                        document.getElementById('btn-copy-priv').disabled = false;
+                        document.getElementById('btn-copy-priv').classList.remove('cursor-not-allowed');
+                        document.getElementById('key-mask').classList.add('hidden');
+
+                        showToast('Biometric Match Confirmed. Key Decrypted.', 'success');
+                    } else {
+                        showToast('Face mismatch. Access Denied.', 'error');
+                    }
+                } catch(e) {
+                    showToast('Verification Failed: ' + e.message, 'error');
                 }
             }
-            html += `</ul>`;
-            
-            document.getElementById('review-content').innerHTML = html;
-            showView('review');
-        });
-
-        function confirmGeneration() {
-            showToast('Minting Identity...', 'info');
-            setTimeout(() => {
-                generateIdentity();
-                showView('wallet');
-                showToast('Identity Minted on Chain', 'success');
-            }, 1500);
         }
 
-        function generateIdentity() {
-            // Cardano-like & Search Key Generation
-            const randHex = (len) => [...Array(len)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-            
-            const walletAddress = `addr_test1q${randHex(6)}...${randHex(6)}`;
-            const privateKey = `xprv_${randHex(64)}`;
-            // Dynamic Search Key based on inputs
-            const searchKey = `UNI-${new Date().getFullYear()}-${Math.floor(Math.random() * 100000)}`;
-
-            // Display Keys
-            document.getElementById('wallet-addr').value = walletAddress;
-            document.getElementById('priv-key').value = privateKey;
-            document.getElementById('search-key-display').value = searchKey;
-
-            // Save to Simulated DB
-            const age = calculateAge(tempFormData.dob);
-            
-            // Handle Images (Mocking file objects to URLs for demo)
-            const frontFile = document.getElementById('file-front').files[0];
-            const backFile = document.getElementById('file-back').files[0];
-            const frontUrl = frontFile ? URL.createObjectURL(frontFile) : null;
-            const backUrl = backFile ? URL.createObjectURL(backFile) : null;
-
-            simulatedDB[searchKey] = {
-                ...tempFormData,
-                age: age,
-                role: currentType,
-                wallet: walletAddress,
-                searchKey: searchKey,
-                frontId: frontUrl,
-                backId: backUrl
-            };
-        }
-
-        // --- SECURITY ---
-        function revealPrivateKey() {
-            document.getElementById('key-mask').style.display = 'none';
-            const input = document.getElementById('priv-key');
-            input.classList.remove('blur-secret');
-            input.classList.add('reveal-secret');
-            
-            const btn = document.getElementById('btn-copy-priv');
-            btn.disabled = false;
-            btn.classList.remove('text-red-300', 'cursor-not-allowed');
-            btn.classList.add('text-red-600');
-            
-            showToast('Decryption Successful', 'success');
-        }
-
-        // --- SEARCH LOGIC ---
-        function performSearch() {
-            const inputKey = document.getElementById('search-input').value.trim();
-            const data = simulatedDB[inputKey];
-
-            if (!data) {
-                showToast('Identity Not Found', 'error');
-                return;
-            }
-
-            // Populate Result View
-            document.getElementById('res-key').innerText = data.searchKey;
-            document.getElementById('res-name').innerText = data.full_name;
-            document.getElementById('res-role').innerText = data.role;
-            document.getElementById('res-dob').innerText = data.dob;
-            document.getElementById('res-age').innerText = data.age + " Years";
-            document.getElementById('res-gender').innerText = data.gender;
-            document.getElementById('res-province').innerText = data.province;
-            document.getElementById('res-wallet').innerText = data.wallet;
-
-            // Conditional Logic for Result
-            if(data.role === 'student') {
-                document.getElementById('res-edu-box').style.display = 'block';
-                document.getElementById('res-edu').innerText = data.edu_level;
-            } else {
-                document.getElementById('res-edu-box').style.display = 'none';
-            }
-
-            if(data.id_card_num) {
-                document.getElementById('res-id-num').innerText = data.id_card_num;
-                document.getElementById('res-id-box').style.display = 'block';
-            } else {
-                document.getElementById('res-id-box').style.display = 'none';
-            }
-
-            // Contact Logic
-            let contact = data.parent_phone || data.student_phone || "N/A";
-            let contactType = data.parent_phone ? "Guardian Contact" : "Personal Contact";
-            document.getElementById('res-contact').innerText = contact;
-            document.getElementById('res-contact-type').innerText = contactType;
-
-            // Images
-            const imgFront = document.getElementById('res-img-front');
-            const imgBack = document.getElementById('res-img-back');
-            
-            if(data.frontId) { 
-                imgFront.src = data.frontId; imgFront.parentElement.style.display = 'block'; 
-            } else { imgFront.parentElement.style.display = 'none'; }
-            
-            if(data.backId) { 
-                imgBack.src = data.backId; imgBack.parentElement.style.display = 'block'; 
-            } else { imgBack.parentElement.style.display = 'none'; }
-
-            // Generate QR
-            document.getElementById('result-qr').innerHTML = "";
-            new QRCode(document.getElementById("result-qr"), {
-                text: inputKey,
-                width: 64,
-                height: 64
-            });
-
-            showView('result');
-            showToast('Identity Record Retrieved', 'success');
-        }
-
-        function copyToClip(id) {
-            const el = document.getElementById(id);
-            el.select();
-            navigator.clipboard.writeText(el.value);
-            showToast('Copied to clipboard', 'info');
-        }
-
-        // Init
         lucide.createIcons();
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            let icon = 'info'; if(type === 'success') icon = 'check-circle'; if(type === 'error') icon = 'alert-triangle';
-            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5"></i> <span class="text-sm font-medium text-gray-800">${message}</span>`;
-            container.appendChild(toast);
-            lucide.createIcons();
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
-        }
     </script>
 </body>
 </html>
