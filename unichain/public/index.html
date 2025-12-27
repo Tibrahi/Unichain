@@ -8,13 +8,13 @@
     <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         
         .bg-uni-blue { background-color: #0033AD; }
         .text-uni-blue { color: #0033AD; }
         .border-uni-blue { border-color: #0033AD; }
-        
         .bg-uni-black { background-color: #0a0a0a; }
         
         /* Smooth Gradient Background for Header */
@@ -41,38 +41,71 @@
             border-color: #0033AD;
         }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 10px;
-        }
-
         /* Carousel Display Logic */
         .carousel-item { display: none; }
         .carousel-item.active { display: block; animation: fadeIn 0.8s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Mobile Menu Animation */
+        #mobile-menu {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #mobile-menu.open {
+            max-height: 500px; /* Adjust based on content height */
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-gray-900 antialiased">
 
-    <nav class="bg-uni-black/95 backdrop-blur-md text-black sticky top-0 z-50 border-b border-black/10">
+    <nav class="bg-uni-black/95 backdrop-blur-md text-white sticky top-0 z-50 border-b border-white/10">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
+                
                 <div class="flex items-center gap-3 group cursor-pointer">
                     <div class="w-10 h-10 bg-uni-blue rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-blue-900/20 group-hover:rotate-12 transition-transform">U</div>
-                    <span class="font-bold text-2xl tracking-tight">UniChain<span class="text-uni-blue">.rw</span></span>
+                    <span class="font-bold text-2xl tracking-tight text-black">UniChain<span class="text-uni-blue">.rw</span></span>
                 </div>
-                <div class="hidden md:flex items-center space-x-10">
-                    <button onclick="scrollToSection('dashboard')" class="text-black-300 hover:text-wheat transition-colors text-sm font-semibold uppercase tracking-wider">Dashboard</button>
-                    <button onclick="scrollToSection('evidence')" class="text-black-300 hover:text-wheat transition-colors text-sm font-semibold uppercase tracking-wider">Evidence</button>
-                    <button onclick="scrollToSection('impact')" class="text-black-300 hover:text-wheat transition-colors text-sm font-semibold uppercase tracking-wider">Impact</button>
-                    <a href="pages/Info.html" class="text-black-300 hover:text-wheat transition-colors text-sm font-semibold uppercase tracking-wider">System Info</a>
-                    <a href="pages/verify.html" class="bg-white border border-uni-blue text-uni-blue hover:bg-blue-50 px-6 py-2.5 rounded-full text-sm font-bold transition-all">
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="scrollToSection('dashboard')" class="text-gray-700 hover:text-black transition-colors text-sm font-semibold uppercase tracking-wider">Dashboard</button>
+                    <button onclick="scrollToSection('evidence')" class="text-gray-700 hover:text-black transition-colors text-sm font-semibold uppercase tracking-wider">Evidence</button>
+                    <button onclick="scrollToSection('impact')" class="text-gray-700 hover:text-black transition-colors text-sm font-semibold uppercase tracking-wider">Impact</button>
+                    <a href="pages/Info.html" class="text-gray-700 hover:text-black transition-colors text-sm font-semibold uppercase tracking-wider">Info</a>
+                    
+                    <a href="pages/verify.html" class="bg-black text-uni-black hover:bg-gray-700 px-5 py-2.5 rounded-full text-sm font-bold transition-all border border-transparent">
                         Verify Credentials
                     </a>
-                    <button class="bg-uni-blue hover:bg-blue-700 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-blue-600/20 text-white">
+                    <button class="bg-uni-blue hover:bg-blue-600 px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-blue-600/20 text-white border border-uni-blue">
+                        Connect Wallet
+                    </button>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-black focus:outline-none hover:text-uni-blue transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="bg-uni-black border-t border-white/10 md:hidden">
+            <div class="px-6 py-6 space-y-4 flex flex-col">
+                <button onclick="scrollToSection('dashboard'); toggleMobileMenu()" class="text-left text-gray-500 hover:text-white text-lg font-semibold py-2">Dashboard</button>
+                <button onclick="scrollToSection('evidence'); toggleMobileMenu()" class="text-left text-gray-500 hover:text-white text-lg font-semibold py-2">Evidence Map</button>
+                <button onclick="scrollToSection('impact'); toggleMobileMenu()" class="text-left text-gray-500 hover:text-white text-lg font-semibold py-2">Impact</button>
+                <a href="pages/Info.html" class="text-gray-500 hover:text-white text-lg font-semibold py-2 block">System Info</a>
+                
+                <div class="pt-4 flex flex-col gap-3">
+                    <a href="pages/verify.html" class="w-full text-center bg-black text-uni-black hover:bg-black-500 px-6 py-3 rounded-xl text-sm font-bold transition-all">
+                        Verify Credentials
+                    </a>
+                    <button class="w-full bg-uni-blue hover:bg-blue-600 px-6 py-3 rounded-xl text-sm font-bold transition-all text-white shadow-lg">
                         Connect Wallet
                     </button>
                 </div>
@@ -89,7 +122,7 @@
                         <span class="text-uni-blue">Rwanda's Digital Identity</span>
                     </h1>
                     <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
-                        Solving critical gaps in academic verification and financial integrity. We turn physical friction into digital certainty. [cite: 30, 91]
+                        Solving critical gaps in academic verification and financial integrity. We turn physical friction into digital certainty.
                     </p>
                 </div>
                 <div class="carousel-item">
@@ -97,7 +130,7 @@
                         Eliminating <span class="text-uni-blue">Credential Forgery</span>
                     </h1>
                     <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
-                        Protecting employers and institutions from fraudulent academic documents and verification delays. [cite: 7, 74]
+                        Protecting employers and institutions from fraudulent academic documents and verification delays.
                     </p>
                 </div>
                 <div class="carousel-item">
@@ -105,7 +138,7 @@
                         Securing <span class="text-uni-blue">P2P Lending</span>
                     </h1>
                     <p class="max-w-2xl mx-auto text-lg text-gray-500 mb-12 leading-relaxed">
-                        Providing enforceable digital agreements for informal lending to prevent financial loss. [cite: 33, 76]
+                        Providing enforceable digital agreements for informal lending to prevent financial loss.
                     </p>
                 </div>
             </div>
@@ -143,12 +176,12 @@
                     <div class="bg-uni-blue p-8 rounded-3xl text-white shadow-xl shadow-blue-200">
                         <span class="text-blue-200 text-xs font-bold uppercase tracking-widest">Efficiency Gap</span>
                         <div class="text-5xl font-extrabold my-4">7 Days</div>
-                        <p class="text-blue-100 text-sm">Average delay for manual degree verification in Kigali. [cite: 12]</p>
+                        <p class="text-blue-100 text-sm">Average delay for manual degree verification in Kigali.</p>
                     </div>
                     <div class="bg-white p-8 rounded-3xl glass-card">
                         <span class="text-gray-400 text-xs font-bold uppercase tracking-widest">Fraud Prevention</span>
                         <div class="text-5xl font-extrabold my-4 text-uni-black">26+</div>
-                        <p class="text-gray-500 text-sm">Reported suspects paraded for document forgery this quarter. [cite: 19]</p>
+                        <p class="text-gray-500 text-sm">Reported suspects paraded for document forgery this quarter.</p>
                     </div>
                 </div>
             </div>
@@ -186,36 +219,36 @@
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🎓</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Students</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Verification delays prevent timely employment. [cite: 38]</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Verification delays prevent timely employment.</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Field Report: HEC 7-day wait confirmation. [cite: 12]
+                        Field Report: HEC 7-day wait confirmation.
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🏫</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Institutions</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Manual vetting burdens administrative staff. [cite: 109]</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Manual vetting burdens administrative staff.</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Field Report: AUCA manual document requirement. [cite: 111]
+                        Field Report: AUCA manual document requirement.
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🏦</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">SACCOs</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Inability to verify identity leads to financial loss. [cite: 26]</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">Inability to verify identity leads to financial loss.</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Source: KT Press 2025 Integrity Report. [cite: 28]
+                        Source: KT Press 2025 Integrity Report.
                     </div>
                 </div>
 
                 <div onclick="toggleCard(this)" class="group cursor-pointer p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-uni-blue hover:bg-white transition-all duration-500">
                     <div class="w-14 h-14 bg-uni-blue/20 rounded-2xl mb-6 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⚖️</div>
                     <h4 class="text-xl font-bold text-white group-hover:text-uni-black transition-colors">Regulators</h4>
-                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">RIB overwhelmed by investigation caseloads. [cite: 14]</p>
+                    <p class="text-gray-400 mt-3 text-sm group-hover:text-gray-600">RIB overwhelmed by investigation caseloads.</p>
                     <div class="hidden mt-6 pt-6 border-t border-gray-800 text-xs text-uni-blue font-semibold">
-                        Data: RIB 26-suspect parade (Sept). [cite: 19]
+                        Data: RIB 26-suspect parade (Sept).
                     </div>
                 </div>
             </div>
@@ -255,7 +288,7 @@
                         <span class="text-xl font-bold tracking-tight">UniChain</span>
                     </div>
                     <p class="text-gray-500 text-sm leading-relaxed">
-                        Building immutable trust for Rwanda's academic and financial future using Cardano blockchain. [cite: 78, 92]
+                        Building immutable trust for Rwanda's academic and financial future using Cardano blockchain.
                     </p>
                 </div>
                 <div>
@@ -282,8 +315,14 @@
         function scrollToSection(id) {
             document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
+        
+        // Mobile Menu Toggle Function
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('open');
+        }
 
-        // Updated Data: Added P2P Loan Issue (Hakiza Case)
+        // Updated Data
         const evidenceData = [
             { id: 1, date: "Aug 2024", source: "University World News", category: "Education", title: "HEC Tightens Degree Rules", desc: "Widespread suspected fraudulent foreign degrees found.", impact: "High Friction" },
             { id: 2, date: "Jan 2025", source: "IGIHE", category: "Education", title: "5 Teachers Arrested", desc: "Use of forged academic documents in Rutsiro district.", impact: "Criminal" },
@@ -357,7 +396,7 @@
             }
         }
 
-        // New SlideShow Functionality
+        // SlideShow Functionality
         let currentSlide = 0;
         function startHeroCarousel() {
             const slides = document.querySelectorAll('.carousel-item');
@@ -367,7 +406,7 @@
                 slides[currentSlide].classList.remove('active');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
-            }, 5000); // Transitions every 5 seconds
+            }, 5000); 
         }
     </script>
 </body>
