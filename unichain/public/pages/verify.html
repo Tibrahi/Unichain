@@ -112,8 +112,8 @@
                 <button onclick="showView('search')" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
                     <i data-lucide="search" class="w-4 h-4"></i> Search information
                 </button>
-                <button class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
-                    <i data-lucide="home" class="w-4 h-4"></i> <a href="../index.html">Back Home</a>
+                <button onclick="navigateToHome()" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
+                    <i data-lucide="home" class="w-4 h-4"></i> Back Home
                 </button>
             </div>
         </div>
@@ -490,6 +490,11 @@
 
         // Icons Init
         lucide.createIcons();
+
+        // Direct Navigation Function (System Connection)
+        function navigateToHome() {
+            window.location.href = '../index.html';
+        }
 
         // ---------------------------------------------
         // 3. UTILITY FUNCTIONS
